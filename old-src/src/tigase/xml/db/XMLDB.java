@@ -122,7 +122,8 @@ public class XMLDB {
     try {
       String buffer = root.formatedString(0, 1);
       FileWriter file = new FileWriter(dbFile, false);
-      file.write(buffer, 0, buffer.length());
+      file.write("<?xml version='1.0' encoding='UTF-8'?>\n");
+      file.write(buffer+"\n");
       file.close();
     } // end of try
     catch (Exception e) {
