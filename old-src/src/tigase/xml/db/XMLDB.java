@@ -20,7 +20,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.rep.xml;
+package tigase.xml.db;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -30,14 +30,13 @@ import java.util.Comparator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
-import tigase.xmpp.rep.UserRepository;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.SimpleParser;
-import tigase.xmpp.rep.UserNotFoundException;
-import tigase.xmpp.rep.UserExistsException;
+import tigase.xml.db.NodeNotFoundException;
+import tigase.xml.db.NodeExistsException;
 
 /**
- * Describe class XMLRepository here.
+ * Describe class XMLDB here.
  *
  *
  * Created: Tue Oct 26 15:27:33 2004
@@ -45,53 +44,66 @@ import tigase.xmpp.rep.UserExistsException;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class XMLRepository implements UserRepository {
+public class XMLDB {
 
-  private RepositoryElementComparator comparator =
-    new RepositoryElementComparator();
+  private String root_name = "root";
+  private String node1_name = "node1";
+  private DBElementComparator comparator =
+    new DBElementComparator();
   private Lock lock = new ReentrantLock();
 
-  private Logger log =
-    Logger.getLogger("tigase.xmpp.rep.xml.XMLRepository");
-  private String repositoryFile = "users_rep.xml";
-  private RepositoryElement root = null;
-  private ArrayList<RepositoryElement> users = null;
+  private Logger log = Logger.getLogger("tigase.xml.db.XMLDB");
+  private String dbFile = "xml_db.xml";
+  private DBElement root = null;
+  private ArrayList<DBElement> node1s = null;
 
   /**
-   * Used only for searching for given user, do NOT use for any
+   * Used only for searching for given node, do NOT use for any
    * other purpose.
    */
-  private RepositoryElement tmp_user = new RepositoryElement("user");
+  private DBElement tmp_node1 = null;
 
-  public XMLRepository() {
-    loadRepository();
+  public XMLDB() {
+    tmp_node1 = new DBElement(node1_name);
+    loadDB();
   }
 
-  protected void loadRepository() {
+  public XMLDB(String root_name, String node1_name) {
+    this.root_name = root_name;
+    this.node1_name = node1_name;
+    tmp_node1 = new DBElement(node1_name);
+    loadDB();
+  }
+
+  protected void loadDB() {
     try {
       FileReader file = new FileReader(repositoryFile);
       char[] buff = new char[16*1024];
       SimpleParser parser = new SimpleParser();
-      DomBuilderHandler<RepositoryElement> domHandler =
-        new DomBuilderHandler<RepositoryElement>(RepositoryElementFactory.getFactory());
+      DomBuilderHandler<DBElement> domHandler =
+        new DomBuilderHandler<DBElement>(DBElementFactory.getFactory());
       int result = -1;
       while((result = file.read(buff)) != -1) {
         parser.parse(domHandler, buff);
       }
       file.close();
       root = domHandler.getParsedElements().poll();
-      users = root.getChildren();
-      Collections.sort(users, comparator);
+      node1s = root.getChildren();
+      Collections.sort(node1s, comparator);
       log.finest(root.formatedString(0, 2));
     } catch (Exception e) {
       log.severe("Can't load repository file: "+e);
+      log.severe("Create empty DB.");
+      root = new DBElement(root_name);
+      node1s = new ArrayList<DBElement>();
+      root.setChildren(node1s);
     } // end of try-catch
   }
 
-  protected void saveRepository() {
+  protected void saveDB() {
     lock.lock();
     try {
-      String buffer = root.formatedString(0, 2);
+      String buffer = root.formatedString(0, 1);
       FileWriter file = new FileWriter(repositoryFile, false);
       file.write(buffer, 0, buffer.length());
       file.close();
@@ -104,62 +116,60 @@ public class XMLRepository implements UserRepository {
     } // end of try-finally
   }
 
-  protected final RepositoryElement getUser(String user)
-    throws UserNotFoundException {
+  protected final DBElement getNode1(String node1_id)
+    throws NodeNotFoundException {
     lock.lock();
     try {
-      tmp_user.setAttribute("name", user);
-      int idx = Collections.binarySearch(users, tmp_user, comparator);
+      tmp_node1.setAttribute(DBElement.NAME, node1_id);
+      int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
       if (idx >= 0) {
-        return users.get(idx);
+        return node1s.get(idx);
       } // end of if (idx >= 0)
       else {
-        throw new UserNotFoundException("User: "+user+
-          " has not been found in repository.");
+        throw new NodeNotFoundException("Node1: " + node1_id +
+          " has not been found in db.");
       } // end of if (idx >= 0) else
     } finally {
       lock.unlock();
     } // end of try-finally
   }
 
-  protected final RepositoryElement getNode(String user, String subnode)
-    throws UserNotFoundException {
-    RepositoryElement node = getUser(user);
+  protected final DBElement getNode(String node1_id, String subnode)
+    throws NodeNotFoundException {
+    DBElement node = getNode1(node1_id);
     if (subnode != null) {
       node = node.buildNodesTree(subnode);
     } // end of if (subnode != null)
     return node;
   }
 
-  // Implementation of tigase.xmpp.rep.UserRepository
-
-  public void addUser(String user) throws UserExistsException {
+  public void addNode1(String node1_id) throws NodeExistsException {
     lock.lock();
     try {
-      tmp_user.setAttribute("name", user);
-      int idx = Collections.binarySearch(users, tmp_user, comparator);
+      tmp_node1.setAttribute(DBElement.NAME, node1_id);
+      int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
       if (idx >= 0) {
-        throw new UserExistsException("User: "+user+" already exists.");
+        throw new NodeExistsException("Node1: "+node1_id+" already exists.");
       } // end of if (idx >= 0)
-      RepositoryElement newUser = new RepositoryElement("user", "name", user);
-      newUser.addChild(new RepositoryElement("map"));
-      users.add(newUser);
-      Collections.sort(users, comparator);
+      DBElement newNode1 = new DBElement(node1_name, DBElement.NAME, node1_id);
+      newNode1.addChild(new DBElement(DBElement.MAP));
+      node1s.add(newNode1);
+      Collections.sort(node1s, comparator);
     } finally {
       lock.unlock();
     } // end of try-finally
   }
 
-  public void removeUser(String user) throws UserNotFoundException {
+  public void removeNode1(String node1_id) throws NodeNotFoundException {
     lock.lock();
     try {
-      tmp_user.setAttribute("name", user);
-      int idx = Collections.binarySearch(users, tmp_user, comparator);
+      tmp_node1.setAttribute(DBElement.NAME, node1_id);
+      int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
       if (idx >= 0) {
-        users.remove(idx);
+        node1s.remove(idx);
       } // end of if (idx >= 0)
       else {
-        throw new UserNotFoundException("User: "+user+
+        throw new NodeNotFoundException("Node1: " + node1_id +
           " has not been found in repository.");
       } // end of if (idx >= 0) else
     } finally {
@@ -170,182 +180,182 @@ public class XMLRepository implements UserRepository {
   /**
    * Describe <code>setData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @param key a <code>String</code> value
    * @param value a <code>String</code> value
    */
-  public void setData(String user, String subnode, String key, String value)
-    throws UserNotFoundException {
-    getNode(user, subnode).setEntry(key, value);
-    saveRepository();
+  public void setData(String node1_id, String subnode, String key, String value)
+    throws NodeNotFoundException {
+    getNode(node1_id, subnode).setEntry(key, value);
+    saveDB();
   }
 
   /**
    * Describe <code>setData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param key a <code>String</code> value
    * @param value a <code>String</code> value
    */
-  public void setData(String user, String key, String value)
-    throws UserNotFoundException {
-    setData(user, null, key, value);
+  public void setData(String node1_id, String key, String value)
+    throws NodeNotFoundException {
+    setData(node1_id, null, key, value);
   }
 
   /**
    * Describe <code>setDataList</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @param key a <code>String</code> value
    * @param list a <code>String[]</code> value
-   * @exception UserNotFoundException if an error occurs
+   * @exception NodeNotFoundException if an error occurs
    */
-  public void setDataList(String user, String subnode, String key, String[] list)
-    throws UserNotFoundException {
-    getNode(user, subnode).setEntry(key, list);
-    saveRepository();
+  public void setDataList(String node1_id, String subnode, String key, String[] list)
+    throws NodeNotFoundException {
+    getNode(node1_id, subnode).setEntry(key, list);
+    saveDB();
   }
 
   /**
    * Describe <code>getDataList</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @param key a <code>String</code> value
    * @return a <code>String[]</code> value
-   * @exception UserNotFoundException if an error occurs
+   * @exception NodeNotFoundException if an error occurs
    */
-  public String[] getDataList(String user, String subnode, String key)
-    throws UserNotFoundException {
-    return getNode(user, subnode).getEntryValues(key);
+  public String[] getDataList(String node1_id, String subnode, String key)
+    throws NodeNotFoundException {
+    return getNode(node1_id, subnode).getEntryValues(key);
   }
 
   /**
    * Describe <code>getData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @param key a <code>String</code> value
    * @param def a <code>String</code> value
    * @return a <code>String</code> value
    */
-  public String getData(String user, String subnode, String key, String def)
-    throws UserNotFoundException {
-    return getNode(user, subnode).getEntryValue(key, def);
+  public String getData(String node1_id, String subnode, String key, String def)
+    throws NodeNotFoundException {
+    return getNode(node1_id, subnode).getEntryValue(key, def);
   }
 
   /**
    * Describe <code>getData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @param key a <code>String</code> value
    * @return a <code>String</code> value
    */
-  public String getData(String user, String subnode, String key)
-    throws UserNotFoundException {
-    return getData(user, subnode, key, null);
+  public String getData(String node1_id, String subnode, String key)
+    throws NodeNotFoundException {
+    return getData(node1_id, subnode, key, null);
   }
 
   /**
    * Describe <code>getData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param key a <code>String</code> value
    * @return a <code>String</code> value
    */
-  public String getData(String user, String key)
-    throws UserNotFoundException {
-    return getData(user, null, key, null);
+  public String getData(String node1_id, String key)
+    throws NodeNotFoundException {
+    return getData(node1_id, null, key, null);
   }
 
   /**
    * Describe <code>getSubnodes</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @return a <code>String[]</code> value
    */
-  public String[] getSubnodes(String user, String subnode)
-    throws UserNotFoundException {
-    return getNode(user, subnode).getSubnodes();
+  public String[] getSubnodes(String node1_id, String subnode)
+    throws NodeNotFoundException {
+    return getNode(node1_id, subnode).getSubnodes();
   }
 
   /**
    * Describe <code>getSubnodes</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @return a <code>String[]</code> value
    */
-  public String[] getSubnodes(String user)
-    throws UserNotFoundException {
-    return getSubnodes(user, null);
+  public String[] getSubnodes(String node1_id)
+    throws NodeNotFoundException {
+    return getSubnodes(node1_id, null);
   }
 
   /**
    * Describe <code>getKeys</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @return a <code>String[]</code> value
    */
-  public String[] getKeys(String user, String subnode)
-    throws UserNotFoundException {
-    return getNode(user, subnode).getEntryKeys();
+  public String[] getKeys(String node1_id, String subnode)
+    throws NodeNotFoundException {
+    return getNode(node1_id, subnode).getEntryKeys();
   }
 
   /**
    * Describe <code>getKeys</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @return a <code>String[]</code> value
    */
-  public String[] getKeys(String user)
-    throws UserNotFoundException {
-    return getKeys(user, null);
+  public String[] getKeys(String node1_id)
+    throws NodeNotFoundException {
+    return getKeys(node1_id, null);
   }
 
   /**
    * Describe <code>removeData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    * @param key a <code>String</code> value
    */
-  public void removeData(String user, String subnode, String key)
-    throws UserNotFoundException {
-    getNode(user, subnode).removeEntry(key);
-    saveRepository();
+  public void removeData(String node1_id, String subnode, String key)
+    throws NodeNotFoundException {
+    getNode(node1_id, subnode).removeEntry(key);
+    saveDB();
   }
 
   /**
    * Describe <code>removeData</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param key a <code>String</code> value
    */
-  public void removeData(String user, String key)
-    throws UserNotFoundException {
-    removeData(user, null, key);
+  public void removeData(String node1_id, String key)
+    throws NodeNotFoundException {
+    removeData(node1_id, null, key);
   }
 
   /**
    * Describe <code>removeSubnode</code> method here.
    *
-   * @param user a <code>String</code> value
+   * @param node1_id a <code>String</code> value
    * @param subnode a <code>String</code> value
    */
-  public void removeSubnode(String user, String subnode)
-    throws UserNotFoundException {
-    saveRepository();
+  public void removeSubnode(String node1_id, String subnode)
+    throws NodeNotFoundException {
+    saveDB();
   }
 
-  private class RepositoryElementComparator
-    implements Comparator<RepositoryElement> {
+  private class DBElementComparator
+    implements Comparator<DBElement> {
 
-    public int compare(RepositoryElement el1, RepositoryElement el2) {
+    public int compare(DBElement el1, DBElement el2) {
       String name1 = el1.getAttribute("name");
       String name2 = el2.getAttribute("name");
       return name1.compareTo(name2);
@@ -353,4 +363,4 @@ public class XMLRepository implements UserRepository {
 
   }
 
-} // XMLRepository
+} // XMLDB

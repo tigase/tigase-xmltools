@@ -20,7 +20,7 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.rep.xml;
+package tigase.xml.db;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import tigase.xml.Element;
 
 /**
- * Describe class RepositoryElement here.
+ * Describe class DBElement here.
  *
  *
  * Created: Tue Oct 26 22:01:47 2004
@@ -36,18 +36,25 @@ import tigase.xml.Element;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RepositoryElement extends Element<RepositoryElement> {
+public class DBElement extends Element<DBElement> {
 
-  public RepositoryElement(String argName) {
+  public static final String NODE  = "node";
+  public static final String MAP   = "map";
+  public static final String ENTRY = "entry";
+  public static final String NAME  = "name";
+  public static final String VALUE = "value";
+  public static final String KEY   = "key";
+
+  public DBElement(String argName) {
     super(argName);
   }
 
-  public RepositoryElement(String argName, String attname, String attvalue) {
+  public DBElement(String argName, String attname, String attvalue) {
     super(argName, null,
       new String[] {attname}, new String[] {attvalue});
   }
 
-  public RepositoryElement(String argName, String argCData,
+  public DBElement(String argName, String argCData,
     StringBuilder[] att_names, StringBuilder[] att_values) {
     super(argName, argCData, att_names, att_values);
   }
@@ -86,7 +93,7 @@ public class RepositoryElement extends Element<RepositoryElement> {
     StringBuilder result = new StringBuilder();
     if (children != null) {
       synchronized (children) {
-        for (RepositoryElement child : children) {
+        for (DBElement child : children) {
           result.append(child.formatedString(indent, step));
         } // end of for ()
       }
@@ -94,17 +101,17 @@ public class RepositoryElement extends Element<RepositoryElement> {
     return result.toString();
   }
 
-  public final RepositoryElement getSubnode(String name) {
+  public final DBElement getSubnode(String name) {
     if (children == null) {
       return null;
     } // end of if (children == null)
     synchronized (children) {
-      for (RepositoryElement elem : children) {
-        if (elem.getName().equals("node") &&
-          elem.getAttribute("name").equals(name)) {
+      for (DBElement elem : children) {
+        if (elem.getName().equals(NODE) &&
+          elem.getAttribute(NAME).equals(name)) {
           return elem;
         } //
-      } // end of for (RepositoryElement node : children)
+      } // end of for (DBElement node : children)
     }
     return null;
   }
@@ -117,34 +124,34 @@ public class RepositoryElement extends Element<RepositoryElement> {
     String[] result = new String[children.size()-1];
     synchronized (children) {
       int idx = 0;
-      for (RepositoryElement elem : children) {
-        if (elem.getName().equals("node")) {
-          result[idx++] = elem.getAttribute("name");
+      for (DBElement elem : children) {
+        if (elem.getName().equals(NODE)) {
+          result[idx++] = elem.getAttribute(NAME);
         } //
-      } // end of for (RepositoryElement node : children)
+      } // end of for (DBElement node : children)
     }
     return result;
   }
 
-  public final RepositoryElement findNode(String nodePath) {
+  public final DBElement findNode(String nodePath) {
     StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
-    if (!getName().equals("node") ||
-      !getAttribute("name").equals(strtok.nextToken())) {
+    if (!getName().equals(NODE) ||
+      !getAttribute(NAME).equals(strtok.nextToken())) {
       return null;
     } // end of if (!strtok.nextToken().equals(child.getName()))
-    RepositoryElement node = this;
+    DBElement node = this;
     while (strtok.hasMoreTokens() && node != null) {
       node = node.getSubnode(strtok.nextToken());
     } // end of while (strtok.hasMoreTokens())
     return node;
   }
 
-  public final RepositoryElement buildNodesTree(String nodePath) {
+  public final DBElement buildNodesTree(String nodePath) {
     StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
-    RepositoryElement node = this;
+    DBElement node = this;
     while (strtok.hasMoreTokens()) {
       String token = strtok.nextToken();
-      RepositoryElement tmp = node.getSubnode(token);
+      DBElement tmp = node.getSubnode(token);
       if (tmp != null) {
         node = tmp;
       } // end of if (node.getSubnode() != null)
@@ -158,54 +165,54 @@ public class RepositoryElement extends Element<RepositoryElement> {
     return node;
   }
 
-  public final RepositoryElement newSubnode(String name) {
-    RepositoryElement node =
-      new RepositoryElement("node", "name", name);
-    node.addChild(new RepositoryElement("map"));
+  public final DBElement newSubnode(String name) {
+    DBElement node =
+      new DBElement(NODE, NAME, name);
+    node.addChild(new DBElement(MAP));
     addChild(node);
     return node;
   }
 
-  public final RepositoryElement findEntry(String key) {
-    RepositoryElement result = null;
-    ArrayList<RepositoryElement> entries = getChild("map").getChildren();
+  public final DBElement findEntry(String key) {
+    DBElement result = null;
+    ArrayList<DBElement> entries = getChild(MAP).getChildren();
     if (entries != null) {
       synchronized (entries) {
-        for (RepositoryElement elem : entries) {
-          if (elem.getAttribute("key").equals(key)) {
+        for (DBElement elem : entries) {
+          if (elem.getAttribute(KEY).equals(key)) {
             result = elem;
             break;
           } //
-        } // end of for (RepositoryElement node : children)
+        } // end of for (DBElement node : children)
       }
     }
     return result;
   }
 
   public final void removeEntry(String key) {
-    RepositoryElement result = null;
-    ArrayList<RepositoryElement> entries = getChild("map").getChildren();
+    DBElement result = null;
+    ArrayList<DBElement> entries = getChild(MAP).getChildren();
     if (entries != null) {
       synchronized (entries) {
-        for (Iterator<RepositoryElement> it = entries.iterator();
+        for (Iterator<DBElement> it = entries.iterator();
              it.hasNext();) {
-          if (it.next().getAttribute("key").equals(key)) {
+          if (it.next().getAttribute(KEY).equals(key)) {
             it.remove();
             break;
           } //
-        } // end of for (RepositoryElement node : children)
+        } // end of for (DBElement node : children)
       }
     }
   }
 
   public final String[] getEntryKeys() {
-    ArrayList<RepositoryElement> entries = getChild("map").getChildren();
+    ArrayList<DBElement> entries = getChild(MAP).getChildren();
     if (entries != null) {
       String[] result = null;
       synchronized (entries) {
         result = new String[entries.size()];
         for (int i = 0; i < result.length; i++) {
-          result[i] = entries.get(i).getAttribute("key");
+          result[i] = entries.get(i).getAttribute(KEY);
         } // end of for (int i = 0; i < result.length; i++)
       }
       return result;
@@ -213,44 +220,44 @@ public class RepositoryElement extends Element<RepositoryElement> {
     return null;
   }
 
-  public final RepositoryElement getEntry(String key) {
-    RepositoryElement result = findEntry(key);
+  public final DBElement getEntry(String key) {
+    DBElement result = findEntry(key);
     if (result == null) {
-      result = new RepositoryElement("entry","key", key);
-      getChild("map").addChild(result);
+      result = new DBElement(ENTRY,KEY, key);
+      getChild(MAP).addChild(result);
     } // end of if (result == null)
     return result;
   }
 
   public final void setEntry(String key, String value) {
-    RepositoryElement entry = getEntry(key);
-    entry.setAttribute("value", value);
+    DBElement entry = getEntry(key);
+    entry.setAttribute(VALUE, value);
   }
 
   public final void setEntry(String key, String values[]) {
-    RepositoryElement entry = getEntry(key);
+    DBElement entry = getEntry(key);
     for (String val : values) {
-      entry.addChild(new RepositoryElement("item", "value", val));
+      entry.addChild(new DBElement("item", VALUE, val));
     } // end of for (String val : values)
   }
 
   public final String getEntryValue(String key, String def) {
-    RepositoryElement entry = findEntry(key);
+    DBElement entry = findEntry(key);
     String result = null;
     if (entry != null) {
-      result = entry.getAttribute("value");
+      result = entry.getAttribute(VALUE);
     } // end of if (entry != null)
     return result != null ? result : def;
   }
 
   public final String[] getEntryValues(String key) {
-    RepositoryElement entry = findEntry(key);
+    DBElement entry = findEntry(key);
     if (entry != null) {
-      ArrayList<RepositoryElement> items = entry.getChildren();
+      ArrayList<DBElement> items = entry.getChildren();
       if (items != null) {
         String[] result = new String[items.size()];
         for (int i = 0; i < items.size(); i++) {
-          result[i] = items.get(i).getAttribute("value");
+          result[i] = items.get(i).getAttribute(VALUE);
         } // end of for (int i = 0; i < items.size(); i++)
         return result;
       } // end of if (items != null)
@@ -258,4 +265,4 @@ public class RepositoryElement extends Element<RepositoryElement> {
     return null;
   }
 
-} // RepositoryElement
+} // DBElement

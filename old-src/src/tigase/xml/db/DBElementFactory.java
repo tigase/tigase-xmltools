@@ -20,13 +20,13 @@
  * Last modified by $Author$
  * $Date$
  */
-package tigase.xmpp.rep.xml;
+package tigase.xml.db;
 
 import tigase.xml.Element;
 import tigase.xml.ElementFactory;
 
 /**
- * Describe class RepositoryElementFactory here.
+ * Describe class DBElementFactory here.
  *
  *
  * Created: Tue Oct 26 22:41:57 2004
@@ -34,17 +34,16 @@ import tigase.xml.ElementFactory;
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class RepositoryElementFactory
-  implements ElementFactory<RepositoryElement> {
+public class DBElementFactory implements ElementFactory<DBElement> {
 
-  private static RepositoryElementFactory factory =
-    new RepositoryElementFactory();
+  private static DBElementFactory factory =
+    new DBElementFactory();
 
   /**
-   * Creates a new <code>RepositoryElementFactory</code> instance.
+   * Creates a new <code>DBElementFactory</code> instance.
    *
    */
-  private RepositoryElementFactory() { }
+  private DBElementFactory() { }
 
   // Implementation of tigase.xml.ElementFactory
 
@@ -55,15 +54,15 @@ public class RepositoryElementFactory
    * @param cdata a <code>String</code> value
    * @param attnames a <code>StringBuilder[]</code> value
    * @param attvalues a <code>StringBuilder[]</code> value
-   * @return an <code>RepositoryElement</code> value
+   * @return an <code>DBElement</code> value
    */
-  public RepositoryElement elementInstance(final String name, final String cdata,
+  public DBElement elementInstance(final String name, final String cdata,
     final StringBuilder[] attnames, final StringBuilder[] attvalues) {
-    return new RepositoryElement(name, cdata, attnames, attvalues);
+    return new DBElement(name, cdata, attnames, attvalues);
   }
 
-  public static RepositoryElementFactory getFactory() {
+  public static DBElementFactory getFactory() {
     return factory;
   }
 
-} // RepositoryElementFactory
+} // DBElementFactory
