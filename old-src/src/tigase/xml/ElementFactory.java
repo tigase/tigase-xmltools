@@ -25,9 +25,9 @@ package tigase.xml;
 /**
  * <code>ElementFactory</code> is inderface definition for factories
  * creating proper instances of <code>Element</code> class or its extension.
- *
+ * <p>
  * Created: Mon Oct 25 21:47:45 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */

@@ -29,9 +29,9 @@ package tigase.xml;
  *  implementation exists to offer complementary implementation of
  *  <em>DOM</em>. It can be used when basic <code>Element</code> class is
  *  sufficient for particular needs.
- *
+ * <p>
  * Created: Mon Oct 25 22:08:37 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
