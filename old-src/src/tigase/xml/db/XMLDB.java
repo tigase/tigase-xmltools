@@ -32,8 +32,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.SimpleParser;
-import tigase.xml.db.NodeNotFoundException;
-import tigase.xml.db.NodeExistsException;
 
 /**
  * Describe class XMLDB here.
@@ -63,12 +61,14 @@ public class XMLDB {
    */
   private DBElement tmp_node1 = null;
 
-  public XMLDB() {
+  public XMLDB(String db_file) {
+    dbFile = db_file;
     tmp_node1 = new DBElement(node1_name);
     loadDB();
   }
 
-  public XMLDB(String root_name, String node1_name) {
+  public XMLDB(String db_file, String root_name, String node1_name) {
+    dbFile = db_file;
     this.root_name = root_name;
     this.node1_name = node1_name;
     tmp_node1 = new DBElement(node1_name);
@@ -77,7 +77,7 @@ public class XMLDB {
 
   protected void loadDB() {
     try {
-      FileReader file = new FileReader(repositoryFile);
+      FileReader file = new FileReader(dbFile);
       char[] buff = new char[16*1024];
       SimpleParser parser = new SimpleParser();
       DomBuilderHandler<DBElement> domHandler =
@@ -104,7 +104,7 @@ public class XMLDB {
     lock.lock();
     try {
       String buffer = root.formatedString(0, 1);
-      FileWriter file = new FileWriter(repositoryFile, false);
+      FileWriter file = new FileWriter(dbFile, false);
       file.write(buffer, 0, buffer.length());
       file.close();
     } // end of try
@@ -349,6 +349,7 @@ public class XMLDB {
    */
   public void removeSubnode(String node1_id, String subnode)
     throws NodeNotFoundException {
+    getNode1(node1_id).removeNode(subnode);
     saveDB();
   }
 
