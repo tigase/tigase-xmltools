@@ -37,7 +37,7 @@ package tigase.xml;
  * Created: Sat Oct  2 22:12:21 2004
  * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
- * @version $Revision: $
+ * @version $Revision: 1.1 $
  */
 
 public class SingletonFactory {
