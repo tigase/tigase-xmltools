@@ -24,6 +24,7 @@ package tigase.xml.db;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,13 +45,14 @@ import tigase.xml.SimpleParser;
  */
 public class XMLDB {
 
+  private static Logger log = Logger.getLogger("tigase.xml.db.XMLDB");
+
   private String root_name = "root";
-  private String node1_name = "node1";
+  private String node1_name = "node";
   private DBElementComparator comparator =
     new DBElementComparator();
   private Lock lock = new ReentrantLock();
 
-  private Logger log = Logger.getLogger("tigase.xml.db.XMLDB");
   private String dbFile = "xml_db.xml";
   private DBElement root = null;
   private ArrayList<DBElement> node1s = null;
@@ -61,13 +63,16 @@ public class XMLDB {
    */
   private DBElement tmp_node1 = null;
 
-  public XMLDB(String db_file) {
+  private XMLDB() {}
+
+  public XMLDB(String db_file) throws IOException {
     dbFile = db_file;
     tmp_node1 = new DBElement(node1_name);
     loadDB();
   }
 
-  public XMLDB(String db_file, String root_name, String node1_name) {
+  public XMLDB(String db_file, String root_name, String node1_name)
+    throws IOException {
     dbFile = db_file;
     this.root_name = root_name;
     this.node1_name = node1_name;
@@ -75,29 +80,41 @@ public class XMLDB {
     loadDB();
   }
 
-  protected void loadDB() {
-    try {
-      FileReader file = new FileReader(dbFile);
-      char[] buff = new char[16*1024];
-      SimpleParser parser = new SimpleParser();
-      DomBuilderHandler<DBElement> domHandler =
-        new DomBuilderHandler<DBElement>(DBElementFactory.getFactory());
-      int result = -1;
-      while((result = file.read(buff)) != -1) {
-        parser.parse(domHandler, buff);
-      }
-      file.close();
-      root = domHandler.getParsedElements().poll();
-      node1s = root.getChildren();
-      Collections.sort(node1s, comparator);
-      log.finest(root.formatedString(0, 2));
-    } catch (Exception e) {
-      log.severe("Can't load repository file: "+e);
-      log.severe("Create empty DB.");
-      root = new DBElement(root_name);
-      node1s = new ArrayList<DBElement>();
-      root.setChildren(node1s);
-    } // end of try-catch
+  public static XMLDB createDB(String db_file,
+    String root_name, String node1_name) {
+    XMLDB xmldb = new XMLDB();
+    xmldb.setupNewDB(db_file, root_name, node1_name);
+    return xmldb;
+  }
+
+  protected void setupNewDB(String db_file, String root_name,
+    String node1_name) {
+
+    log.info("Create empty DB.");
+    this.dbFile = db_file;
+    this.root_name = root_name;
+    this.node1_name = node1_name;
+    tmp_node1 = new DBElement(node1_name);
+    root = new DBElement(root_name);
+    node1s = new ArrayList<DBElement>();
+    root.setChildren(node1s);
+  }
+
+  protected void loadDB() throws IOException {
+    FileReader file = new FileReader(dbFile);
+    char[] buff = new char[16*1024];
+    SimpleParser parser = new SimpleParser();
+    DomBuilderHandler<DBElement> domHandler =
+      new DomBuilderHandler<DBElement>(DBElementFactory.getFactory());
+    int result = -1;
+    while((result = file.read(buff)) != -1) {
+      parser.parse(domHandler, buff);
+    }
+    file.close();
+    root = domHandler.getParsedElements().poll();
+    node1s = root.getChildren();
+    Collections.sort(node1s, comparator);
+    log.finest(root.formatedString(0, 2));
   }
 
   protected void saveDB() {

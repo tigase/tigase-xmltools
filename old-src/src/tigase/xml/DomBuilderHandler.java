@@ -54,11 +54,11 @@ import java.util.Queue;
 
 public class DomBuilderHandler<E extends Element> implements SimpleHandler {
 
+  private static Logger log =
+    Logger.getLogger("tigase.protocols.xmpp.DomBuilderHandler");
+
   private static final String ELEM_STREAM_STREAM = "stream:stream";
   private ElementFactory<E> customFactory = null;
-
-  private Logger log =
-    Logger.getLogger("tigase.protocols.xmpp.DomBuilderHandler");
 
   private Object parserState = null;
 
