@@ -71,14 +71,14 @@ public class XMLDB {
     loadDB();
   }
 
-  public XMLDB(String db_file, String root_name, String node1_name)
-    throws IOException {
-    dbFile = db_file;
-    this.root_name = root_name;
-    this.node1_name = node1_name;
-    tmp_node1 = new DBElement(node1_name);
-    loadDB();
-  }
+//   public XMLDB(String db_file, String root_name, String node1_name)
+//     throws IOException {
+//     dbFile = db_file;
+//     this.root_name = root_name;
+//     this.node1_name = node1_name;
+//     tmp_node1 = new DBElement(node1_name);
+//     loadDB();
+//   }
 
   public static XMLDB createDB(String db_file,
     String root_name, String node1_name) {
@@ -92,8 +92,12 @@ public class XMLDB {
 
     log.info("Create empty DB.");
     this.dbFile = db_file;
-    this.root_name = root_name;
-    this.node1_name = node1_name;
+    if (root_name != null) {
+      this.root_name = root_name;
+    } // end of if (root_name != null)
+    if (node1_name != null) {
+      this.node1_name = node1_name;
+    } // end of if (node1_name != null)
     tmp_node1 = new DBElement(node1_name);
     root = new DBElement(root_name);
     node1s = new ArrayList<DBElement>();
@@ -113,6 +117,11 @@ public class XMLDB {
     file.close();
     root = domHandler.getParsedElements().poll();
     node1s = root.getChildren();
+    this.root_name = root.getName();
+    ArrayList<DBElement> children = root.getChildren();
+    if (children != null && children.size() > 0) {
+      this.node1_name = children.get(0).getName();
+    } // end of if (children != null && children.size() > 0)
     Collections.sort(node1s, comparator);
     log.finest(root.formatedString(0, 2));
   }
