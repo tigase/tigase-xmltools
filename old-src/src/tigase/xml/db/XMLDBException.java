@@ -23,11 +23,12 @@
 package tigase.xml.db;
 
 /**
- * Describe class XMLDBException here.
- *
- *
+ * This is parrent exception for all data base related exceptions. It is not
+ * directly thrown. They are a few descendants implementations which are thrown
+ * in some particular cases.
+ * <p>
  * Created: Thu Nov 11 20:49:08 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */

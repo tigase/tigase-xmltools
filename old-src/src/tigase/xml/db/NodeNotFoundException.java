@@ -23,11 +23,14 @@
 package tigase.xml.db;
 
 /**
- * Describe class NodeNotFoundException here.
+ * Exception is thrown when user tries to access non-existen node on 1st level.
+ * All subnodes on lower higher levels are automatically created when required
+ * apart from nodes on 1st level. Nodes on 1st level have special maining. They
+ * act in similar way as tables in relational data bases.
  *
- *
+ * <p>
  * Created: Thu Nov 11 20:51:20 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */

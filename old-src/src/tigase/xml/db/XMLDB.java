@@ -35,11 +35,57 @@ import tigase.xml.DomBuilderHandler;
 import tigase.xml.SimpleParser;
 
 /**
- * Describe class XMLDB here.
+ * <code>XMLDB</code> is the main data base access class.
+ * It allows you to create new data base in given file, open data base from
+ * given file, add, delete and retrieve data and data lists. All data or data
+ * lists are stored in data base nodes. There are three possible kinds of nodes
+ * for each data base:
+ * <ol>
+ * <li><b>root node</b> - this is top node in each <em>XML</em> hierachy tree.
+ *  There can be only one root node in data base as there can be only one root
+ *  element in <em>XML</em> file. The element name for root node can be defined
+ *  by the user when new data base is created or defualt element name
+ *  '<code>root</code>' is used.</li>
+ * <li><b>node1 nodes</b> - these are the first level nodes under <em>root</em>
+ *  node. There can be any number of nodes on this level. All data added for
+ *  this data base are added to first level node unless subnode path is
+ *  given. User can define element name of <em>node1</em> when new data base is
+ *  created. If not given default element name '<code>node</code>' is used.</li>
+ * <li><b>subnodes</b> - node on any deeper level under <em>node1</em>
+ *  level. There can be any number of <em>subnodes</em> on any
+ *  level. <em>Subnodes</em> has always '<code>node</code>' element name and this
+ *  can't be changed.</li>
+ * </ol>
+ * <p>All <em>node1</em> nodes and <em>subnodes</em> can contains any number of
+ * data associated with keys. With some keys there ca be more than one value
+ * assigned. Such kind of data are called <em>data lists</em>.<br/>
+ * Although element name for <em>subnode</em> can not be defined it is actually not
+ * important. Because data base user doesn't use subnode element names. He doesn't
+ * even use neiher <em>root</em> node element name nor <em>node1</em> element
+ * name. Data base user uses <em><b>node name</b></em> what is quite different
+ * from <b><em>node element name</em></b>. Let see example below:</p>
+ * <pre>&#60;node name='roster'/&#62;</pre>
+ * <p>In this example <em>node element name</em> is <b>node</b> and
+ * <em>node name</em> is <b>roster.</b><br/>
+ * Data base users (actually developers) use only <em>node names</em>.<br/>
+ * If you want to access subnode on some level you need to give full path to
+ * this subnode. For example, let's assume we have following data base:</p>
+ * <pre>  &#60;node name='tigase'>
+ * &#60;node name='server'>
+ * &#60;/node>
+ * &#60;node name='xmpp'>
+ * &#60;/node>
+ * &#60;/node></pre>
+ * <p>If you need to access '<code>server</code>' subnode you need to call method
+ * with '<code>/tigase/server</code>' as subnode path and for subnode
+ * '<code>xmpp</code>' proper subnode path is of course
+ * '<code>/tigase/xmpp</code>'. If you skip subnode path or give
+ * <code>null</code> as a parameter you will be accessing data on <em>node1</em>
+ * level. You can not access or save data on root node level.</p>
  *
- *
+ * <p>
  * Created: Tue Oct 26 15:27:33 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */

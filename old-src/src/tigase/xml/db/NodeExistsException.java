@@ -23,11 +23,14 @@
 package tigase.xml.db;
 
 /**
- * Describe class NodeExistsException here.
+ * This exception is thrown when user tries to add subnode with name which
+ * already exists in data base. Data base implementation requires that all nodes
+ * have unique names thus adding multiple nodes with the same name is not
+ * permitted.
  *
- *
+ * <p>
  * Created: Thu Nov 11 20:52:34 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */

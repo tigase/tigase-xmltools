@@ -26,11 +26,13 @@ import tigase.xml.Element;
 import tigase.xml.ElementFactory;
 
 /**
- * Describe class DBElementFactory here.
+ * <code>DBElementFactory</code> is implementation of factory design pattern
+ * required by <em>XML</em> <em>DOM</em> builder to create proper
+ * <code>Element</code> instances for tree nodes.
  *
- *
+ * <p>
  * Created: Tue Oct 26 22:41:57 2004
- *
+ * </p>
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
