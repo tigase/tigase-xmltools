@@ -284,11 +284,11 @@ public class SimpleParser {
           break;
         } // end of if (chr == OPEN_BRACKET)
         if (parser_state.element_cdata == null) {
+          // Skip leading white characters
           if (Arrays.binarySearch(WHITE_CHARS, chr) < 0) {
             parser_state.element_cdata = new StringBuilder();
             parser_state.element_cdata.append(chr);
           } // end of if (Arrays.binarySearch(WHITE_CHARS, chr) < 0)
-          // Skip leading white characters
         } // end of if (parser_state.element_cdata == null)
         else {
           parser_state.element_cdata.append(chr);
