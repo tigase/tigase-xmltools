@@ -69,7 +69,7 @@ public class SimpleParser {
    * For efficiency it is better to use fixed number of attributes and
    * operate on arrays than on lists.
    */
-  public static int MAX_ATTRIBS_NUMBER = 5;
+  public static int MAX_ATTRIBS_NUMBER = 6;
 
   private static enum State
   {
@@ -110,6 +110,13 @@ public class SimpleParser {
   private StringBuilder[] initArray(int size) {
     StringBuilder[] array = new StringBuilder[size];
     Arrays.fill(array, null);
+    return array;
+  }
+
+  private StringBuilder[] resizeArray(StringBuilder[] src, int size) {
+    StringBuilder[] array = new StringBuilder[size];
+    System.arraycopy(src, 0, array, 0, src.length);
+    Arrays.fill(array, src.length, array.length, null);
     return array;
   }
 
@@ -237,7 +244,17 @@ public class SimpleParser {
           if (parser_state.attrib_names == null) {
             parser_state.attrib_names = initArray(MAX_ATTRIBS_NUMBER);
             parser_state.attrib_values = initArray(MAX_ATTRIBS_NUMBER);
-          } // end of if ()
+          } else {
+            if (parser_state.current_attr ==
+              parser_state.attrib_names.length - 1) {
+              int new_size =
+                parser_state.attrib_names.length + MAX_ATTRIBS_NUMBER;
+              parser_state.attrib_names =
+                resizeArray(parser_state.attrib_names, new_size);
+              parser_state.attrib_values =
+                resizeArray(parser_state.attrib_values, new_size);
+            }
+          } // end of else
           parser_state.attrib_names[++parser_state.current_attr] =
             new StringBuilder();
           parser_state.attrib_names[parser_state.current_attr].append(chr);

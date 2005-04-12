@@ -64,6 +64,7 @@ public class Element<E extends Element> implements Comparable<E> {
 
   protected String name = null;
   protected String cdata = null;
+  protected String xmlns = null;
   protected Map<String, String> attributes = null;
   protected ArrayList<E> children = null;
 
@@ -193,6 +194,26 @@ public class Element<E extends Element> implements Comparable<E> {
       }
     } // end of if (attributes != null)
     return null;
+  }
+
+  public final void setDefXMLNS(String ns) {
+    xmlns = ns;
+  }
+
+  /**
+   *
+   */
+  public final String getXMLNS() {
+    String ns = getAttribute("xmlns");
+    return ns != null ? ns : xmlns;
+  }
+
+  /**
+   *
+   */
+  public final String getXMLNS(String elementPath) {
+    Element child = findChild(elementPath);
+    return child != null ? child.getXMLNS() : null;
   }
 
   public final String getAttribute(String elementPath, String att_name) {

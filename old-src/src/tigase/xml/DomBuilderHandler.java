@@ -61,6 +61,8 @@ public class DomBuilderHandler<E extends Element> implements SimpleHandler {
   private ElementFactory<E> customFactory = null;
 
   private Object parserState = null;
+  private String top_xmlns = null;
+  private String def_xmlns = null;
 
   private LinkedList<E> all_roots = new LinkedList<E>();
   private Stack<E> el_stack = new Stack<E>();
@@ -90,8 +92,17 @@ public class DomBuilderHandler<E extends Element> implements SimpleHandler {
 
     String tmp_name = name.toString();
 
-    el_stack.push(newElement(tmp_name, null, attr_names, attr_values));
+    E elem = newElement(tmp_name, null, attr_names, attr_values);
+    String ns = elem.getXMLNS();
+    if (ns == null) {
+      elem.setDefXMLNS(def_xmlns);
+    } // end of if (ns == null)
+    else {
+      def_xmlns = ns;
+    } // end of if (ns == null) else
+    el_stack.push(elem);
     if (tmp_name.equals(ELEM_STREAM_STREAM)) {
+      top_xmlns = elem.getXMLNS();
       endElement(name);
     } // end of if (tmp_name.equals())
   }
@@ -100,7 +111,6 @@ public class DomBuilderHandler<E extends Element> implements SimpleHandler {
     log.finest("Element CDATA: "+cdata);
 
     el_stack.peek().setCData(cdata.toString());
-
   }
 
   public void endElement(StringBuilder name) {
@@ -113,12 +123,12 @@ public class DomBuilderHandler<E extends Element> implements SimpleHandler {
     E elem = el_stack.pop();
     if (el_stack.isEmpty()) {
       all_roots.offer(elem);
+      def_xmlns = top_xmlns;
       log.finest("Adding new request: "+elem.toString());
     } // end of if (el_stack.isEmpty())
     else {
       el_stack.peek().addChild(elem);
     } // end of if (el_stack.isEmpty()) else
-
   }
 
   public void otherXML(StringBuilder other) {
