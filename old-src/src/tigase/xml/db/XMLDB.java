@@ -248,6 +248,7 @@ public class XMLDB {
     } finally {
       lock.unlock();
     } // end of try-finally
+    saveDB();
   }
 
   /**
