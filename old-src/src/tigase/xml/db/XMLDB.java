@@ -22,9 +22,13 @@
  */
 package tigase.xml.db;
 
-import java.io.FileReader;
-import java.io.FileWriter;
+//import java.io.FileReader;
+//import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -95,9 +99,11 @@ public class XMLDB {
 
   private String root_name = "root";
   private String node1_name = "node";
-  private DBElementComparator comparator =
-    new DBElementComparator();
+  private DBElementComparator comparator = new DBElementComparator();
   private Lock lock = new ReentrantLock();
+  private DBSaver db_saver = new DBSaver();
+  //  private boolean modified = false;
+  //  private long time_modified = 0;
 
   private String dbFile = "xml_db.xml";
   private DBElement root = null;
@@ -109,22 +115,20 @@ public class XMLDB {
    */
   private DBElement tmp_node1 = null;
 
-  private XMLDB() {}
+  private XMLDB() {
+    Thread thrd = new Thread(db_saver);
+    thrd.setDaemon(true);
+    thrd.start();
+  }
 
   public XMLDB(String db_file) throws IOException {
+    Thread thrd = new Thread(db_saver);
+    thrd.setDaemon(true);
+    thrd.start();
     dbFile = db_file;
     tmp_node1 = new DBElement(node1_name);
     loadDB();
   }
-
-//   public XMLDB(String db_file, String root_name, String node1_name)
-//     throws IOException {
-//     dbFile = db_file;
-//     this.root_name = root_name;
-//     this.node1_name = node1_name;
-//     tmp_node1 = new DBElement(node1_name);
-//     loadDB();
-//   }
 
   public static XMLDB createDB(String db_file,
     String root_name, String node1_name) {
@@ -151,7 +155,9 @@ public class XMLDB {
   }
 
   protected void loadDB() throws IOException {
-    FileReader file = new FileReader(dbFile);
+    //    FileReader file = new FileReader(dbFile);
+    InputStreamReader file =
+      new InputStreamReader(new FileInputStream(dbFile), "UTF-8");
     char[] buff = new char[16*1024];
     SimpleParser parser = new SimpleParser();
     DomBuilderHandler<DBElement> domHandler =
@@ -173,20 +179,9 @@ public class XMLDB {
   }
 
   protected void saveDB() {
-    lock.lock();
-    try {
-      String buffer = root.formatedString(0, 1);
-      FileWriter file = new FileWriter(dbFile, false);
-      file.write("<?xml version='1.0' encoding='UTF-8'?>\n");
-      file.write(buffer+"\n");
-      file.close();
-    } // end of try
-    catch (Exception e) {
-      log.severe("Can't save repository file: "+e);
-    } // end of try-catch
-    finally {
-      lock.unlock();
-    } // end of try-finally
+    synchronized(db_saver) {
+      db_saver.notifyAll();
+    }
   }
 
   protected final DBElement getNode1(String node1_id)
@@ -437,5 +432,43 @@ public class XMLDB {
     }
 
   }
+
+  class DBSaver implements Runnable {
+
+    public DBSaver() {
+    }
+
+    // Implementation of java.lang.Runnable
+
+    /**
+     * Describe <code>run</code> method here.
+     *
+     */
+    public void run() {
+      while (true) {
+        try {
+          synchronized(db_saver) { db_saver.wait(); }
+          Thread.sleep(1000);
+        } catch (InterruptedException e) { }
+        lock.lock();
+        try {
+          String buffer = root.formatedString(0, 1);
+          OutputStreamWriter file =
+            new OutputStreamWriter(new FileOutputStream(dbFile, false),
+              "UTF-8");
+          file.write("<?xml version='1.0' encoding='UTF-8'?>\n");
+          file.write(buffer+"\n");
+          file.close();
+        } catch (Exception e) {
+          log.severe("Can't save repository file: "+e);
+        } finally {
+          lock.unlock();
+        } // end of try-finally
+        //        modified = false;
+      } // end of while (true)
+    }
+
+  }
+
 
 } // XMLDB
