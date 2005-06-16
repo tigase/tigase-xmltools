@@ -94,6 +94,11 @@ public class Element<E extends Element> implements Comparable<E> {
     return children;
   }
 
+  public ArrayList<E> getChildren(String elementPath) {
+    Element child = findChild(elementPath);
+    return child != null ? child.getChildren() : null;
+  }
+
   public void setChildren(ArrayList<E> children) {
     this.children = children;
   }
@@ -167,6 +172,11 @@ public class Element<E extends Element> implements Comparable<E> {
   }
 
   public String getChildCData(String elementPath) {
+    Element child = findChild(elementPath);
+    return child != null ? child.getCData() : null;
+  }
+
+  public String getCData(String elementPath) {
     Element child = findChild(elementPath);
     return child != null ? child.getCData() : null;
   }
