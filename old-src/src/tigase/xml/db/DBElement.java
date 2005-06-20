@@ -156,22 +156,15 @@ public class DBElement extends Element<DBElement> {
   }
 
   public final void removeNode(String nodePath) {
-    System.out.println("Remove node: " + nodePath);
-    System.out.println("This name: " + getAttribute(NAME));
     StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
     DBElement node = this;
     DBElement parent = null;
     while (strtok.hasMoreTokens() && node != null) {
       parent = node;
       node = node.getSubnode(strtok.nextToken());
-      System.out.println("subnode: " + node.getAttribute(NAME));
     } // end of while (strtok.hasMoreTokens())
     if (parent != null && node != null) {
-      System.out.println("remove node: " + node.getAttribute(NAME));
-      System.out.println("remove parent: " + parent.getAttribute(NAME));
       boolean res = parent.removeChild(node);
-      System.out.println("Removed: " + res);
-      System.out.println("Parent content: " + parent);
     } // end of if (parent != null && node != null)
   }
 
