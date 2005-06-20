@@ -22,7 +22,7 @@
  */
 package tigase.xml.db;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import tigase.xml.Element;
@@ -51,6 +51,8 @@ public class DBElement extends Element<DBElement> {
   public static final String NAME  = "name";
   public static final String VALUE = "value";
   public static final String KEY   = "key";
+
+  public boolean removed = false;
 
   public DBElement(String argName) {
     super(argName);
@@ -154,15 +156,22 @@ public class DBElement extends Element<DBElement> {
   }
 
   public final void removeNode(String nodePath) {
+    System.out.println("Remove node: " + nodePath);
+    System.out.println("This name: " + getAttribute(NAME));
     StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
     DBElement node = this;
     DBElement parent = null;
     while (strtok.hasMoreTokens() && node != null) {
       parent = node;
       node = node.getSubnode(strtok.nextToken());
+      System.out.println("subnode: " + node.getAttribute(NAME));
     } // end of while (strtok.hasMoreTokens())
     if (parent != null && node != null) {
-      parent.getChildren().remove(node);
+      System.out.println("remove node: " + node.getAttribute(NAME));
+      System.out.println("remove parent: " + parent.getAttribute(NAME));
+      boolean res = parent.removeChild(node);
+      System.out.println("Removed: " + res);
+      System.out.println("Parent content: " + parent);
     } // end of if (parent != null && node != null)
   }
 
@@ -195,7 +204,7 @@ public class DBElement extends Element<DBElement> {
 
   public final DBElement findEntry(String key) {
     DBElement result = null;
-    ArrayList<DBElement> entries = getChild(MAP).getChildren();
+    List<DBElement> entries = getChild(MAP).getChildren();
     if (entries != null) {
       synchronized (entries) {
         for (DBElement elem : entries) {
@@ -211,7 +220,7 @@ public class DBElement extends Element<DBElement> {
 
   public final void removeEntry(String key) {
     DBElement result = null;
-    ArrayList<DBElement> entries = getChild(MAP).getChildren();
+    List<DBElement> entries = getChild(MAP).getChildren();
     if (entries != null) {
       synchronized (entries) {
         for (Iterator<DBElement> it = entries.iterator();
@@ -226,14 +235,15 @@ public class DBElement extends Element<DBElement> {
   }
 
   public final String[] getEntryKeys() {
-    ArrayList<DBElement> entries = getChild(MAP).getChildren();
+    List<DBElement> entries = getChild(MAP).getChildren();
     if (entries != null) {
       String[] result = null;
       synchronized (entries) {
         result = new String[entries.size()];
-        for (int i = 0; i < result.length; i++) {
-          result[i] = entries.get(i).getAttribute(KEY);
-        } // end of for (int i = 0; i < result.length; i++)
+        int cnt  = 0;
+        for (DBElement dbe : entries) {
+          result[cnt++] = dbe.getAttribute(KEY);
+        } // end of for (DBElement dbe : entries)
       }
       return result;
     }
@@ -273,12 +283,13 @@ public class DBElement extends Element<DBElement> {
   public final String[] getEntryValues(String key) {
     DBElement entry = findEntry(key);
     if (entry != null) {
-      ArrayList<DBElement> items = entry.getChildren();
+      List<DBElement> items = entry.getChildren();
       if (items != null) {
         String[] result = new String[items.size()];
-        for (int i = 0; i < items.size(); i++) {
-          result[i] = items.get(i).getAttribute(VALUE);
-        } // end of for (int i = 0; i < items.size(); i++)
+        int cnt  = 0;
+        for (DBElement item : items) {
+          result[cnt++] = item.getAttribute(VALUE);
+        } // end of for (DBElement dbe : entries)
         return result;
       } // end of if (items != null)
     } // end of if (entry != null)

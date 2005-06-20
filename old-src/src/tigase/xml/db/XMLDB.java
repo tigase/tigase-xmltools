@@ -29,8 +29,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -107,7 +109,9 @@ public class XMLDB {
 
   private String dbFile = "xml_db.xml";
   private DBElement root = null;
-  private ArrayList<DBElement> node1s = null;
+  //  private List<DBElement> node1s = null;
+  private DBElement[] node1s = new DBElement[] {};
+  private boolean node1s_modified = true;
 
   /**
    * Used only for searching for given node, do NOT use for any
@@ -150,8 +154,8 @@ public class XMLDB {
     } // end of if (node1_name != null)
     tmp_node1 = new DBElement(node1_name);
     root = new DBElement(root_name);
-    node1s = new ArrayList<DBElement>();
-    root.setChildren(node1s);
+//     node1s = new LinkedList<DBElement>();
+//     root.setChildren(node1s);
   }
 
   protected void loadDB() throws IOException {
@@ -168,13 +172,13 @@ public class XMLDB {
     }
     file.close();
     root = domHandler.getParsedElements().poll();
-    node1s = root.getChildren();
+    //    node1s = root.getChildren();
     this.root_name = root.getName();
-    ArrayList<DBElement> children = root.getChildren();
+    List<DBElement> children = root.getChildren();
     if (children != null && children.size() > 0) {
       this.node1_name = children.get(0).getName();
     } // end of if (children != null && children.size() > 0)
-    Collections.sort(node1s, comparator);
+    //    Collections.sort(node1s, comparator);
     log.finest(root.formatedString(0, 2));
   }
 
@@ -189,17 +193,59 @@ public class XMLDB {
     lock.lock();
     try {
       tmp_node1.setAttribute(DBElement.NAME, node1_id);
-      int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
+//       int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
+      int idx = Arrays.binarySearch(node1s, tmp_node1, comparator);
+      DBElement dbel = null;
       if (idx >= 0) {
-        return node1s.get(idx);
+        dbel = node1s[idx];
       } // end of if (idx >= 0)
-      else {
-        throw new NodeNotFoundException("Node1: " + node1_id +
-          " has not been found in db.");
-      } // end of if (idx >= 0) else
+      if (node1s_modified && (idx < 0 || (dbel != null && dbel.removed))) {
+        List<DBElement> children = root.getChildren();
+        node1s = children.toArray(new DBElement[children.size()]);
+        Arrays.sort(node1s, comparator);
+        idx = Arrays.binarySearch(node1s, tmp_node1, comparator);
+        node1s_modified = false;
+      } // end of if (idx < 0)
+      if (idx >= 0) {
+        return node1s[idx];
+      }
+      throw new NodeNotFoundException("Node1: " + node1_id +
+        " has not been found in db.");
     } finally {
       lock.unlock();
     } // end of try-finally
+  }
+
+  public void addNode1(String node1_id) throws NodeExistsException {
+    lock.lock();
+    try {
+      try {
+        getNode1(node1_id);
+        throw new NodeExistsException("Node1: "+node1_id+" already exists.");
+      } catch (NodeNotFoundException e) {
+        node1s_modified = true;
+        DBElement newNode1 =
+          new DBElement(node1_name, DBElement.NAME, node1_id);
+        newNode1.addChild(new DBElement(DBElement.MAP));
+        root.addChild(newNode1);
+      } // end of try-catch
+    } finally {
+      lock.unlock();
+    } // end of try-finally
+    //    saveDB();
+  }
+
+  public void removeNode1(String node1_id) throws NodeNotFoundException {
+    lock.lock();
+    try {
+      DBElement dbel = getNode1(node1_id);
+      node1s_modified = true;
+      root.removeChild(dbel);
+      dbel.removed = true;
+    } finally {
+      lock.unlock();
+    } // end of try-finally
+    saveDB();
   }
 
   protected final DBElement getNode(String node1_id, String subnode)
@@ -209,41 +255,6 @@ public class XMLDB {
       node = node.buildNodesTree(subnode);
     } // end of if (subnode != null)
     return node;
-  }
-
-  public void addNode1(String node1_id) throws NodeExistsException {
-    lock.lock();
-    try {
-      tmp_node1.setAttribute(DBElement.NAME, node1_id);
-      int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
-      if (idx >= 0) {
-        throw new NodeExistsException("Node1: "+node1_id+" already exists.");
-      } // end of if (idx >= 0)
-      DBElement newNode1 = new DBElement(node1_name, DBElement.NAME, node1_id);
-      newNode1.addChild(new DBElement(DBElement.MAP));
-      node1s.add(newNode1);
-      Collections.sort(node1s, comparator);
-    } finally {
-      lock.unlock();
-    } // end of try-finally
-  }
-
-  public void removeNode1(String node1_id) throws NodeNotFoundException {
-    lock.lock();
-    try {
-      tmp_node1.setAttribute(DBElement.NAME, node1_id);
-      int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
-      if (idx >= 0) {
-        node1s.remove(idx);
-      } // end of if (idx >= 0)
-      else {
-        throw new NodeNotFoundException("Node1: " + node1_id +
-          " has not been found in repository.");
-      } // end of if (idx >= 0) else
-    } finally {
-      lock.unlock();
-    } // end of try-finally
-    saveDB();
   }
 
   /**

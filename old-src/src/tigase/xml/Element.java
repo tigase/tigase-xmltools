@@ -23,7 +23,8 @@
 
 package tigase.xml;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class Element<E extends Element> implements Comparable<E> {
   protected String cdata = null;
   protected String xmlns = null;
   protected Map<String, String> attributes = null;
-  protected ArrayList<E> children = null;
+  protected LinkedList<E> children = null;
 
   public Element(String argName) {
     setName(argName);
@@ -90,17 +91,17 @@ public class Element<E extends Element> implements Comparable<E> {
     } // end of if (att_names != null)
   }
 
-  public ArrayList<E> getChildren() {
+  public List<E> getChildren() {
     return children;
   }
 
-  public ArrayList<E> getChildren(String elementPath) {
+  public List<E> getChildren(String elementPath) {
     Element child = findChild(elementPath);
     return child != null ? child.getChildren() : null;
   }
 
-  public void setChildren(ArrayList<E> children) {
-    this.children = children;
+  public void setChildren(List<E> children) {
+    this.children = new LinkedList<E>(children);
   }
 
   public String toString() {
@@ -139,11 +140,21 @@ public class Element<E extends Element> implements Comparable<E> {
 
   public final void addChild(E child) {
     if (children == null) {
-      children = new ArrayList<E>();
+      children = new LinkedList<E>();
     } // end of if (children == null)
     synchronized (children) {
       children.add(child);
     }
+  }
+
+  public final boolean removeChild(E child) {
+    boolean res = false;
+    if (children != null) {
+      synchronized (children) {
+        res = children.remove(child);
+      }
+    } // end of if (children == null)
+    return res;
   }
 
   public final E getChild(String name) {
