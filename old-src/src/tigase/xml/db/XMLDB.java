@@ -459,7 +459,7 @@ public class XMLDB {
       while (true) {
         try {
           synchronized(db_saver) { db_saver.wait(); }
-          Thread.sleep(1000);
+          Thread.sleep(2000);
         } catch (InterruptedException e) { }
         lock.lock();
         try {
