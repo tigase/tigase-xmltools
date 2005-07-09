@@ -23,13 +23,11 @@
 
 package tigase.xml;
 
-import tigase.xml.SimpleHandler;
 import java.util.Arrays;
-import java.util.logging.Logger;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Stack;
 import java.util.Queue;
+import java.util.Stack;
+import java.util.logging.Logger;
 
 /**
  * <code>DomBuilderHandler</code> - implementation of
