@@ -104,12 +104,9 @@ public class XMLDB {
   private DBElementComparator comparator = new DBElementComparator();
   private Lock lock = new ReentrantLock();
   private DBSaver db_saver = new DBSaver();
-  //  private boolean modified = false;
-  //  private long time_modified = 0;
 
   private String dbFile = "xml_db.xml";
   private DBElement root = null;
-  //  private List<DBElement> node1s = null;
   private DBElement[] node1s = new DBElement[] {};
   private boolean node1s_modified = true;
 
@@ -154,12 +151,9 @@ public class XMLDB {
     } // end of if (node1_name != null)
     tmp_node1 = new DBElement(node1_name);
     root = new DBElement(root_name);
-//     node1s = new LinkedList<DBElement>();
-//     root.setChildren(node1s);
   }
 
   protected void loadDB() throws IOException {
-    //    FileReader file = new FileReader(dbFile);
     InputStreamReader file =
       new InputStreamReader(new FileInputStream(dbFile), "UTF-8");
     char[] buff = new char[16*1024];
@@ -168,7 +162,7 @@ public class XMLDB {
       new DomBuilderHandler<DBElement>(DBElementFactory.getFactory());
     int result = -1;
     while((result = file.read(buff)) != -1) {
-      parser.parse(domHandler, buff);
+      parser.parse(domHandler, buff, 0, result);
     }
     file.close();
     root = domHandler.getParsedElements().poll();
@@ -178,7 +172,6 @@ public class XMLDB {
     if (children != null && children.size() > 0) {
       this.node1_name = children.get(0).getName();
     } // end of if (children != null && children.size() > 0)
-    //    Collections.sort(node1s, comparator);
     log.finest(root.formatedString(0, 2));
   }
 
@@ -193,7 +186,6 @@ public class XMLDB {
     lock.lock();
     try {
       tmp_node1.setAttribute(DBElement.NAME, node1_id);
-//       int idx = Collections.binarySearch(node1s, tmp_node1, comparator);
       int idx = Arrays.binarySearch(node1s, tmp_node1, comparator);
       DBElement dbel = null;
       if (idx >= 0) {
@@ -201,9 +193,11 @@ public class XMLDB {
       } // end of if (idx >= 0)
       if (node1s_modified && (idx < 0 || (dbel != null && dbel.removed))) {
         List<DBElement> children = root.getChildren();
-        node1s = children.toArray(new DBElement[children.size()]);
-        Arrays.sort(node1s, comparator);
-        idx = Arrays.binarySearch(node1s, tmp_node1, comparator);
+        if (children != null) {
+          node1s = children.toArray(new DBElement[children.size()]);
+          Arrays.sort(node1s, comparator);
+          idx = Arrays.binarySearch(node1s, tmp_node1, comparator);
+        } // end of if (children != null)
         node1s_modified = false;
       } // end of if (idx < 0)
       if (idx >= 0) {
@@ -232,7 +226,6 @@ public class XMLDB {
     } finally {
       lock.unlock();
     } // end of try-finally
-    //    saveDB();
   }
 
   public void removeNode1(String node1_id) throws NodeNotFoundException {
@@ -475,7 +468,6 @@ public class XMLDB {
         } finally {
           lock.unlock();
         } // end of try-finally
-        //        modified = false;
       } // end of while (true)
     }
 

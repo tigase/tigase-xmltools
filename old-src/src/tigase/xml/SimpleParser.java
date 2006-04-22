@@ -121,14 +121,17 @@ public class SimpleParser {
   }
 
   @TODO(note="1. Better XML errors detection. 2. Add XML comments handling. 3. Character overflow detection i.e. limit max number of characters for each entity.")
-  public final void parse(SimpleHandler handler, char[] data) {
+  public final void parse(SimpleHandler handler, char[] data,
+    int off, int len) {
 
     ParserState parser_state = (ParserState)handler.restoreParserState();
     if (parser_state == null) {
       parser_state = new ParserState();
     } // end of if (parser_state == null)
 
-    for (char chr : data) {
+    for (int index = off; index < len; index++) {
+      char chr = data[index];
+
       switch (parser_state.state) {
       case START:
         if (chr == OPEN_BRACKET) {

@@ -177,7 +177,7 @@ public class XMLFormatter implements SimpleHandler {
     } // end of if (args.length == 2) else
     int result = -1;
     while((result = file.read(buff)) != -1) {
-      parser.parse(formatter, buff);
+      parser.parse(formatter, buff, 0, result);
     }
     file.close();
     formatter.outputExtraData("");

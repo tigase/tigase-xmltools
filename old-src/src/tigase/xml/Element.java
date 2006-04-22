@@ -205,13 +205,17 @@ public class Element<E extends Element> implements Comparable<E> {
     this.attributes = newAttributes;
   }
 
-  public final String getAttribute(String attname) {
+  public final String getAttribute(String attName) {
     if (attributes != null) {
       synchronized (attributes) {
-        return attributes.get(attname);
+        return attributes.get(attName);
       }
     } // end of if (attributes != null)
     return null;
+  }
+
+  public final void addAttribute(String attName, String attValue) {
+    setAttribute(attName, attValue);
   }
 
   public final void setDefXMLNS(String ns) {
