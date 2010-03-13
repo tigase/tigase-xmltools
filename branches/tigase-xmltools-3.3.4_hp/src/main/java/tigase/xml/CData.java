@@ -1,20 +1,21 @@
 /*
- * Tigase Jabber/XMPP Server
- * Copyright (C) 2004-2008 "Artur Hefczyc" <artur.hefczyc@tigase.org>
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. Look for COPYING file in the top folder.
- * If not, see http://www.gnu.org/licenses/.
- * 
+ * Tigase XMPP/Jabber XML Tools
+ * Copyright (C) 2004-2010 "Artur Hefczyc" <artur.hefczyc@tigase.org>
+ *
+ * This program is licensed to HP, under Licensor's Intellectual Property Rights,
+ * a paid-up, worldwide, non-exclusive, non-transferable, perpetual license in the
+ * Source Code to use, make, reproduce (for archival and back-up purposes only),
+ * and prepare derivative works.
+ *
+ * The right to prepare derivative works includes translations, localizations,
+ * adaptations, and compilations. HP shall own all right, title, and interest in
+ * any derivative works prepared by HP.
+ *
+ * HP shall use its standard forms in distributing Object Code.
+ *
+ * Licensor retains all right, title, and interest in the Licensed Software and
+ * Documentation.
+ *
  * $Rev$
  * Last modified by $Author$
  * $Date$
