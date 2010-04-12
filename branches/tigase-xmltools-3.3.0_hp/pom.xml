@@ -12,9 +12,9 @@
     	<url>http://www.tigase.org</url>
 	</organization>
 	<scm>
-		<connection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.3.0</connection>
-		<developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.3.0</developerConnection>
-		<url>https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.3.0</url>
+	<connection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/branches/tigase-xmltools-3.3.0_hp</connection>
+	<developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/trunk</developerConnection>
+	<url>https://svn.tigase.org/reps/tigase-xmltools</url>
 	</scm>        
 	<developers>
 		<developer>
@@ -31,8 +31,8 @@
   </issueManagement>	
 	<licenses>
 		<license>
- 	    	<name>GNU General Public License</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
+ 	    	<name>Licensed to HP</name>
+		<url>https://svn.tigase.org/reps/tigase-xmltools/branches/tigase-xmltools-3.3.0_hp/COPYING.rtf</url>
 		</license>
 	</licenses>
   
