@@ -3,39 +3,39 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>tigase</groupId>
-	<artifactId>tigase-xmltools</artifactId>
-	<version>3.3.4</version>
-	<description>Tigase XML Tools</description>
-	<name>TigaseXMLTools</name>
-	<url>http://xmltools.tigase.org/</url>
-	<organization>
-	    <name>Tigase</name>
-    	<url>http://www.tigase.org</url>
-	</organization>
-	<scm>
-		<connection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.3.4</connection>
-		<developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.3.4</developerConnection>
-		<url>https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.3.4</url>
-	</scm>        
-	<developers>
-		<developer>
-			<name>Artur Hefczyc</name>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tigase</groupId>
+  <artifactId>tigase-xmltools</artifactId>
+  <version>3.3.4</version>
+  <description>Tigase XML Tools</description>
+  <name>TigaseXMLTools</name>
+  <url>http://xmltools.tigase.org/</url>
+  <organization>
+    <name>Tigase</name>
+    <url>http://www.tigase.org</url>
+  </organization>
+  <scm>
+    <connection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/branches/tigase-xmltools-3.3.4_hp</connection>
+    <developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/trunk</developerConnection>
+    <url>https://svn.tigase.org/reps/tigase-xmltools</url>
+  </scm>        
+  <developers>
+    <developer>
+      <name>Artur Hefczyc</name>
+      <roles>
+        <role>architect</role>
+	<role>developer</role>
+      </roles>
+    </developer>
+  </developers>
   <issueManagement>
     <system>Trac</system>
     <url>http://xmltools.tigase.org/</url>
   </issueManagement>	
 	<licenses>
 		<license>
- 	    	<name>GNU General Public License</name>
-			<url>http://www.gnu.org/licenses/gpl.txt</url>
+ 	    	<name>Licensed to HP</name>
+		<url>https://svn.tigase.org/reps/tigase-xmltools/branches/tigase-xmltools-3.3.4_hp/COPYING.rtf</url>
 		</license>
 	</licenses>
   
