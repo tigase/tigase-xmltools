@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>tigase</groupId>
+	<artifactId>tigase-xmltools</artifactId>
+	<version>3.0.9</version>
+	<description>Tigase XML Tools</description>
+	<name>TigaseXMLTools</name>
+	<url>http://xmltools.tigase.org/</url>
+	<organization>
+	    <name>Tigase</name>
+    	<url>http://www.tigase.org</url>
+	</organization>
+	<scm>
+		<connection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.0.9</connection>
+		<developerConnection>scm:svn:https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.0.9</developerConnection>
+		<url>https://svn.tigase.org/reps/tigase-xmltools/tags/tigase-xmltools-3.0.9</url>
+	</scm>        
+	<developers>
+		<developer>
+			<name>Artur Hefczyc</name>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+  <issueManagement>
+    <system>Trac</system>
+    <url>http://xmltools.tigase.org/</url>
+  </issueManagement>	
+	<licenses>
+		<license>
+ 	    	<name>GNU General Public License</name>
+			<url>http://www.gnu.org/licenses/gpl.txt</url>
+		</license>
+	</licenses>
+  
+	<repositories>
+	   <repository>
+	     <id>tigase</id>
+	     <name>Tigase rpos</name>
+	     <layout>default</layout>
+	     <url>http://maven.tigase.org</url>
+	     <snapshots>
+	       <enabled>true</enabled>
+	     </snapshots>
+	   </repository>
+	 </repositories>
+	<distributionManagement>
+		<repository>
+			<id>tigase</id>
+			<name>Tigase Repo</name>
+			<url>scpexe://maven.tigase.org:/home/webapp/maven-repository</url>
+		</repository>
+		<snapshotRepository>
+			<id>tigase</id>
+			<name>Tigase Repo</name>
+			<url>scpexe://maven.tigase.org:/home/webapp/maven-repository</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>	
+	</build>
+</project>
