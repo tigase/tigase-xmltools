@@ -26,7 +26,7 @@ package tigase.xml;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import tigase.annotations.TODO;
+import tigase.xml.annotations.TODO;
 
 //~--- JDK imports ------------------------------------------------------------
 

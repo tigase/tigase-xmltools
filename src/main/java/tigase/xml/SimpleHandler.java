@@ -22,7 +22,7 @@
 
 package tigase.xml;
 
-import tigase.annotations.TODO;
+import tigase.xml.annotations.TODO;
 
 /**
  * <code>SimpleHandler</code> - parser handler interface for event driven

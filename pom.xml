@@ -7,8 +7,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tigase</groupId>
 	<artifactId>tigase-xmltools</artifactId>
-	<version>3.6.0-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<name>Tigase XML Tools</name>
+	<packaging>bundle</packaging>
 	<description>Tigase XML Tools</description>
 	<url>http://www.tigase.org/</url>
 	<issueManagement>
@@ -167,6 +168,25 @@
 							<Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Build>
 						</manifestEntries>
 					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.4.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions combine.inherited="append">
+						<Implementation-Title>${project.name}</Implementation-Title>
+						<Implementation-Version>${project.version}-b${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Version>
+						<Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})</Implementation-Build>
+						<Tigase-Version>${project.version}-b${gitVersion}</Tigase-Version>
+						<Export-Package>tigase.xml.*;version=${project.version}</Export-Package>
+						<Import-Package>!junit.*,!sun.*,!com.sun.*,*</Import-Package>
+						<DynamicImport-Package>*</DynamicImport-Package>
+						<Embed-Dependency>*;scope=compile|runtime;artifactId=!junit|org.osgi.core|slf4j-api</Embed-Dependency>
+						<Bundle-SymbolicName>${project.artifactId};singleton=true</Bundle-SymbolicName>
+					</instructions>
 				</configuration>
 			</plugin>
 		</plugins>
