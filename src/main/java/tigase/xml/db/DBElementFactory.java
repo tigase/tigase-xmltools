@@ -23,45 +23,43 @@ import tigase.xml.Element;
 import tigase.xml.ElementFactory;
 
 /**
- * <code>DBElementFactory</code> is implementation of factory design pattern
- * required by <em>XML</em> <em>DOM</em> builder to create proper
- * <code>Element</code> instances for tree nodes.
- *
- * <p>
- * Created: Tue Oct 26 22:41:57 2004
+ * <code>DBElementFactory</code> is implementation of factory design pattern required by <em>XML</em> <em>DOM</em>
+ * builder to create proper <code>Element</code> instances for tree nodes. <p> <p> Created: Tue Oct 26 22:41:57 2004
  * </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DBElementFactory implements ElementFactory {
+public class DBElementFactory
+		implements ElementFactory {
 
-  private static DBElementFactory factory =
-    new DBElementFactory();
+	private static DBElementFactory factory = new DBElementFactory();
 
-  /**
-   * Creates a new <code>DBElementFactory</code> instance.
-   *
-   */
-  private DBElementFactory() { }
+	public static DBElementFactory getFactory() {
+		return factory;
+	}
 
-  // Implementation of tigase.xml.ElementFactory
+	// Implementation of tigase.xml.ElementFactory
 
-  /**
-   * Describe <code>elementInstance</code> method here.
-   *
-   * @param name a <code>String</code> value
-   * @param cdata a <code>String</code> value
-   * @param attnames a <code>StringBuilder[]</code> value
-   * @param attvalues a <code>StringBuilder[]</code> value
-   * @return an <code>DBElement</code> value
-   */
-  public Element elementInstance(final String name, final String cdata,
-    final StringBuilder[] attnames, final StringBuilder[] attvalues) {
-    return new DBElement(name, cdata, attnames, attvalues);
-  }
+	/**
+	 * Creates a new <code>DBElementFactory</code> instance.
+	 */
+	private DBElementFactory() {
+	}
 
-  public static DBElementFactory getFactory() {
-    return factory;
-  }
+	/**
+	 * Describe <code>elementInstance</code> method here.
+	 *
+	 * @param name a <code>String</code> value
+	 * @param cdata a <code>String</code> value
+	 * @param attnames a <code>StringBuilder[]</code> value
+	 * @param attvalues a <code>StringBuilder[]</code> value
+	 *
+	 * @return an <code>DBElement</code> value
+	 */
+	public Element elementInstance(final String name, final String cdata, final StringBuilder[] attnames,
+								   final StringBuilder[] attvalues) {
+		return new DBElement(name, cdata, attnames, attvalues);
+	}
 
 } // DBElementFactory

@@ -24,71 +24,38 @@ package tigase.xml;
 
 import tigase.xml.annotations.TODO;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Arrays;
+
+//~--- JDK imports ------------------------------------------------------------
 
 //~--- classes ----------------------------------------------------------------
 
 /**
- * <code>SimpleParser</code> - implementation of <em>SAX</em> parser.
- *  This is very basic implementation of <em>XML</em> parser designed especially
- *  to be light and parse <em>XML</em> streams like jabber <em>XML</em> stream.
- *  It is very efficient, capable of parsing parts of <em>XML</em> document
- *  received from the network connection as well as handling a few <em>XML</em>
- *  documents in one buffer. This is especially useful when parsing data
- *  received from the network. Packets received from the network can contain
- *  non-comlete
- *  <em>XML</em> document as well as a few complete <em>XML</em> documents. It
- *  doesn't support <em>XML</em> comments, processing instructions, document
- *  inclussions. Actually it supports only:
- *  <ul>
- *   <li>Start element event (with all attributes found).</li>
- *   <li>End element even.</li>
- *   <li>Character data event.</li>
- *   <li>'OtherXML' data event - everything between '&#60;' and '&#62;' if after
- *   &#60; is '?' or '!'. So it can 'catch' doctype declaration, processing
- *   instructions but it can't process correctly commented blocks.</li>
- *  </ul> Although very simple this imlementation is sufficient for Jabber
- *  protocol needs and is even used by some other packages of this server like
- *  implementation of <code>UserRepository</code> based on <em>XML</em> file or
- *  server configuration.
- *  <p>It is worth to note also that this class is fully thread safe. It means that
- *   one instance of this class can be simultanously used by many threads. This
- *   is to improve resources usage when processing many client connections at
- *   the same time.</p>
- * <p>
- * Created: Fri Oct  1 23:02:15 2004
- * </p>
+ * <code>SimpleParser</code> - implementation of <em>SAX</em> parser. This is very basic implementation of <em>XML</em>
+ * parser designed especially to be light and parse <em>XML</em> streams like jabber <em>XML</em> stream. It is very
+ * efficient, capable of parsing parts of <em>XML</em> document received from the network connection as well as handling
+ * a few <em>XML</em> documents in one buffer. This is especially useful when parsing data received from the network.
+ * Packets received from the network can contain non-comlete <em>XML</em> document as well as a few complete
+ * <em>XML</em> documents. It doesn't support <em>XML</em> comments, processing instructions, document inclussions.
+ * Actually it supports only: <ul> <li>Start element event (with all attributes found).</li> <li>End element even.</li>
+ * <li>Character data event.</li> <li>'OtherXML' data event - everything between '&#60;' and '&#62;' if after &#60; is
+ * '?' or '!'. So it can 'catch' doctype declaration, processing instructions but it can't process correctly commented
+ * blocks.</li> </ul> Although very simple this imlementation is sufficient for Jabber protocol needs and is even used
+ * by some other packages of this server like implementation of <code>UserRepository</code> based on <em>XML</em> file
+ * or server configuration. <p>It is worth to note also that this class is fully thread safe. It means that one instance
+ * of this class can be simultanously used by many threads. This is to improve resources usage when processing many
+ * client connections at the same time.</p> <p> Created: Fri Oct  1 23:02:15 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class SimpleParser {
 
-	public int ATTRIBUTES_NUMBER_LIMIT = 50;
-	public static final String ATTRIBUTES_NUMBER_LIMIT_PROP_KEY =
-		"tigase.xml.attributes_number_limit";
-	/**
-	 * Variable constant <code>MAX_ATTRIBS_NUMBER</code> keeps value of
-	 * maximum possible attributes number. Real XML parser shouldn't have
-	 * such limit but in most cases XML elements don't have too many attributes.
-	 * For efficiency it is better to use fixed number of attributes and
-	 * operate on arrays than on lists.
-	 * Data structures will automaticly grow if real attributes number is
-	 * bigger so there should be no problem with processing XML streams
-	 * different than expected.
-	 */
-	public int MAX_ATTRIBS_NUMBER = 6;
+	public static final String ATTRIBUTES_NUMBER_LIMIT_PROP_KEY = "tigase.xml.attributes_number_limit";
 	public static final String MAX_ATTRIBS_NUMBER_PROP_KEY = "tigase.xml.max_attrib_number";
-	public int MAX_ELEMENT_NAME_SIZE = 1024;
 	public static final String MAX_ELEMENT_NAME_SIZE_PROP_KEY = "tigase.xml.max_element_size";
-	public int MAX_ATTRIBUTE_NAME_SIZE = 1024;
-	public static final String MAX_ATTRIBUTE_NAME_SIZE_PROP_KEY =
-		"tigase.xml.max_attribute_name_size";
-	public int MAX_ATTRIBUTE_VALUE_SIZE = 10 * 1024;
-	public static final String MAX_ATTRIBUTE_VALUE_SIZE_PROP_KEY =
-		"tigase.xml.max_attribute_value_size";
-	public int MAX_CDATA_SIZE = 1024 * 1024;
+	public static final String MAX_ATTRIBUTE_NAME_SIZE_PROP_KEY = "tigase.xml.max_attribute_name_size";
+	public static final String MAX_ATTRIBUTE_VALUE_SIZE_PROP_KEY = "tigase.xml.max_attribute_value_size";
 	public static final String MAX_CDATA_SIZE_PROP_KEY = "tigase.xml.max_cdata_size";
 	private static final char OPEN_BRACKET = '<';
 	private static final char CLOSE_BRACKET = '>';
@@ -105,33 +72,12 @@ public class SimpleParser {
 	private static final char SEMICOLON = ';';
 	private static final char SINGLE_QUOTE = '\'';
 	private static final char DOUBLE_QUOTE = '"';
-	private static final char[] QUOTES = { SINGLE_QUOTE, DOUBLE_QUOTE };
-	private static final char[] WHITE_CHARS = { SPACE, LF, CR, TAB };
-	private static final char[] END_NAME_CHARS = {
-		CLOSE_BRACKET, SLASH, SPACE, TAB, LF, CR
-	};
-	private static final char[] ERR_NAME_CHARS = { OPEN_BRACKET, QUESTION_MARK, AMP };
-	private static final char[] IGNORE_CHARS = { '\0' };
-
-	//~--- constant enums -------------------------------------------------------
-
-	protected static enum EntityType {
-		UNKNOWN,
-		NAMED,
-		CODEPOINT,
-		CODEPOINT_DEC,
-		CODEPOINT_HEX
-	}
-	
-	protected static enum State {
-		START, OPEN_BRACKET, ELEMENT_NAME, END_ELEMENT_NAME, ATTRIB_NAME, END_OF_ATTR_NAME,
-		ATTRIB_VALUE_S, ATTRIB_VALUE_D, ELEMENT_CDATA, OTHER_XML, ERROR, CLOSE_ELEMENT,
-		ENTITY
-	}
-
-	;
-
-	//~--- static initializers --------------------------------------------------
+	private static final char[] QUOTES = {SINGLE_QUOTE, DOUBLE_QUOTE};
+	private static final char[] WHITE_CHARS = {SPACE, LF, CR, TAB};
+	private static final char[] END_NAME_CHARS = {CLOSE_BRACKET, SLASH, SPACE, TAB, LF, CR};
+	private static final char[] ERR_NAME_CHARS = {OPEN_BRACKET, QUESTION_MARK, AMP};
+	private static final char[] IGNORE_CHARS = {'\0'};
+	private static final boolean[] ALLOWED_CHARS_LOW = new boolean[0x20];
 
 	static {
 
@@ -139,16 +85,38 @@ public class SimpleParser {
 		Arrays.sort(IGNORE_CHARS);
 	}
 
+	static {
+		ALLOWED_CHARS_LOW[0x09] = true;
+		ALLOWED_CHARS_LOW[0x0A] = true;
+		ALLOWED_CHARS_LOW[0x0D] = true;
+	}
+
+	public int ATTRIBUTES_NUMBER_LIMIT = 50;
+	/**
+	 * Variable constant <code>MAX_ATTRIBS_NUMBER</code> keeps value of maximum possible attributes number. Real XML
+	 * parser shouldn't have such limit but in most cases XML elements don't have too many attributes. For efficiency it
+	 * is better to use fixed number of attributes and operate on arrays than on lists. Data structures will automaticly
+	 * grow if real attributes number is bigger so there should be no problem with processing XML streams different than
+	 * expected.
+	 */
+	public int MAX_ATTRIBS_NUMBER = 6;
+	public int MAX_ATTRIBUTE_NAME_SIZE = 1024;
+
+	//~--- constant enums -------------------------------------------------------
+	public int MAX_ATTRIBUTE_VALUE_SIZE = 10 * 1024;
+	public int MAX_CDATA_SIZE = 1024 * 1024;
+
+	;
+
+	//~--- static initializers --------------------------------------------------
+	public int MAX_ELEMENT_NAME_SIZE = 1024;
+
 	public SimpleParser() {
-		ATTRIBUTES_NUMBER_LIMIT =
-			Integer.getInteger(ATTRIBUTES_NUMBER_LIMIT_PROP_KEY, ATTRIBUTES_NUMBER_LIMIT);
+		ATTRIBUTES_NUMBER_LIMIT = Integer.getInteger(ATTRIBUTES_NUMBER_LIMIT_PROP_KEY, ATTRIBUTES_NUMBER_LIMIT);
 		MAX_ATTRIBS_NUMBER = Integer.getInteger(MAX_ATTRIBS_NUMBER_PROP_KEY, MAX_ATTRIBS_NUMBER);
-		MAX_ELEMENT_NAME_SIZE =
-			Integer.getInteger(MAX_ELEMENT_NAME_SIZE_PROP_KEY, MAX_ELEMENT_NAME_SIZE);
-		MAX_ATTRIBUTE_NAME_SIZE =
-			Integer.getInteger(MAX_ATTRIBUTE_NAME_SIZE_PROP_KEY, MAX_ATTRIBUTE_NAME_SIZE);
-		MAX_ATTRIBUTE_VALUE_SIZE =
-			Integer.getInteger(MAX_ATTRIBUTE_VALUE_SIZE_PROP_KEY, MAX_ATTRIBUTE_VALUE_SIZE);
+		MAX_ELEMENT_NAME_SIZE = Integer.getInteger(MAX_ELEMENT_NAME_SIZE_PROP_KEY, MAX_ELEMENT_NAME_SIZE);
+		MAX_ATTRIBUTE_NAME_SIZE = Integer.getInteger(MAX_ATTRIBUTE_NAME_SIZE_PROP_KEY, MAX_ATTRIBUTE_NAME_SIZE);
+		MAX_ATTRIBUTE_VALUE_SIZE = Integer.getInteger(MAX_ATTRIBUTE_VALUE_SIZE_PROP_KEY, MAX_ATTRIBUTE_VALUE_SIZE);
 		MAX_CDATA_SIZE = Integer.getInteger(MAX_CDATA_SIZE_PROP_KEY, MAX_CDATA_SIZE);
 	}
 
@@ -157,14 +125,13 @@ public class SimpleParser {
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param handler
 	 * @param data
 	 * @param off
 	 * @param len
 	 */
-	@TODO(note = "1. Better XML errors detection. 2. Add XML comments handling. "
-			+ "3. Character overflow detection i.e. limit max number of characters for each entity.")
+	@TODO(note = "1. Better XML errors detection. 2. Add XML comments handling. " +
+			"3. Character overflow detection i.e. limit max number of characters for each entity.")
 	public final void parse(SimpleHandler handler, char[] data, int off, int len) {
 		ParserState parser_state = (ParserState) handler.restoreParserState();
 
@@ -187,10 +154,9 @@ public class SimpleParser {
 				parser_state.errorMessage = "Not allowed character '" + chr + "' in XML stream";
 				parser_state.state = State.ERROR;
 			}
-				
 
 			switch (parser_state.state) {
-				case START :
+				case START:
 					if (chr == OPEN_BRACKET) {
 						parser_state.state = State.OPEN_BRACKET;
 						parser_state.slash_found = false;
@@ -199,32 +165,33 @@ public class SimpleParser {
 					// Skip everything up to open bracket
 					break;
 
-				case OPEN_BRACKET :
+				case OPEN_BRACKET:
 					switch (chr) {
-						case QUESTION_MARK :
-						case EXCLAMATION_MARK :
+						case QUESTION_MARK:
+						case EXCLAMATION_MARK:
 							parser_state.state = State.OTHER_XML;
 							parser_state.element_cdata = new StringBuilder(100);
 							parser_state.element_cdata.append(chr);
 
 							break;
 
-						case SLASH :
+						case SLASH:
 							parser_state.state = State.CLOSE_ELEMENT;
 							parser_state.element_name = new StringBuilder(10);
 							parser_state.slash_found = true;
 
 							break;
 
-						default :
+						default:
 							if (Arrays.binarySearch(WHITE_CHARS, chr) < 0) {
-								if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
+								if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) ||
+										(chr == ERR_NAME_CHARS[2])) {
 									parser_state.state = State.ERROR;
 									parser_state.errorMessage = "Not allowed character in start element name: " + chr;
 
 									break;
 								}    // end of if ()
-								
+
 								parser_state.state = State.ELEMENT_NAME;
 								parser_state.element_name = new StringBuilder(10);
 								parser_state.element_name.append(chr);
@@ -235,7 +202,7 @@ public class SimpleParser {
 
 					break;
 
-				case ELEMENT_NAME :
+				case ELEMENT_NAME:
 					if (isWhite(chr)) {
 						parser_state.state = State.END_ELEMENT_NAME;
 
@@ -265,9 +232,8 @@ public class SimpleParser {
 
 					if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Not allowed character in start element name: " + chr
-								+ "\nExisting characters in start element name: "
-									+ parser_state.element_name.toString();
+						parser_state.errorMessage = "Not allowed character in start element name: " + chr +
+								"\nExisting characters in start element name: " + parser_state.element_name.toString();
 
 						break;
 					}    // end of if ()
@@ -276,22 +242,22 @@ public class SimpleParser {
 
 					if (parser_state.element_name.length() > MAX_ELEMENT_NAME_SIZE) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Max element name size exceeded: " + MAX_ELEMENT_NAME_SIZE
-								+ "\nreceived: " + parser_state.element_name.toString();
+						parser_state.errorMessage =
+								"Max element name size exceeded: " + MAX_ELEMENT_NAME_SIZE + "\nreceived: " +
+										parser_state.element_name.toString();
 					}
 
 					break;
 
-				case CLOSE_ELEMENT :
+				case CLOSE_ELEMENT:
 					if (isWhite(chr)) {
 						break;
 					}    // end of if ()
 
 					if (chr == SLASH) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Not allowed character in close element name: " + chr
-								+ "\nExisting characters in close element name: "
-									+ parser_state.element_name.toString();
+						parser_state.errorMessage = "Not allowed character in close element name: " + chr +
+								"\nExisting characters in close element name: " + parser_state.element_name.toString();
 
 						break;
 					}    // end of if (chr == SLASH)
@@ -300,7 +266,9 @@ public class SimpleParser {
 						parser_state.state = State.ELEMENT_CDATA;
 						if (!handler.endElement(parser_state.element_name)) {
 							parser_state.state = State.ERROR;
-							parser_state.errorMessage = "Malformed XML: element close found without open for this element: " + parser_state.element_name;
+							parser_state.errorMessage =
+									"Malformed XML: element close found without open for this element: " +
+											parser_state.element_name;
 							break;
 						}
 
@@ -312,9 +280,8 @@ public class SimpleParser {
 
 					if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Not allowed character in close element name: " + chr
-								+ "\nExisting characters in close element name: "
-									+ parser_state.element_name.toString();
+						parser_state.errorMessage = "Not allowed character in close element name: " + chr +
+								"\nExisting characters in close element name: " + parser_state.element_name.toString();
 
 						break;
 					}    // end of if ()
@@ -323,13 +290,14 @@ public class SimpleParser {
 
 					if (parser_state.element_name.length() > MAX_ELEMENT_NAME_SIZE) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Max element name size exceeded: " + MAX_ELEMENT_NAME_SIZE
-								+ "\nreceived: " + parser_state.element_name.toString();
+						parser_state.errorMessage =
+								"Max element name size exceeded: " + MAX_ELEMENT_NAME_SIZE + "\nreceived: " +
+										parser_state.element_name.toString();
 					}
 
 					break;
 
-				case END_ELEMENT_NAME :
+				case END_ELEMENT_NAME:
 					if (chr == SLASH) {
 						parser_state.slash_found = true;
 
@@ -339,7 +307,7 @@ public class SimpleParser {
 					if (chr == CLOSE_BRACKET) {
 						parser_state.state = State.ELEMENT_CDATA;
 						handler.startElement(parser_state.element_name, parser_state.attrib_names,
-								parser_state.attrib_values);
+											 parser_state.attrib_values);
 						parser_state.attrib_names = null;
 						parser_state.attrib_values = null;
 						parser_state.current_attr = -1;
@@ -355,7 +323,7 @@ public class SimpleParser {
 						break;
 					}      // end of if ()
 
-					if ( !isWhite(chr)) {
+					if (!isWhite(chr)) {
 						parser_state.state = State.ATTRIB_NAME;
 
 						if (parser_state.attrib_names == null) {
@@ -365,9 +333,9 @@ public class SimpleParser {
 							if (parser_state.current_attr == parser_state.attrib_names.length - 1) {
 								if (parser_state.attrib_names.length >= ATTRIBUTES_NUMBER_LIMIT) {
 									parser_state.state = State.ERROR;
-									parser_state.errorMessage = "Attributes nuber limit exceeded: "
-										+ ATTRIBUTES_NUMBER_LIMIT
-										+ "\nreceived: " + parser_state.element_name.toString();
+									parser_state.errorMessage =
+											"Attributes nuber limit exceeded: " + ATTRIBUTES_NUMBER_LIMIT +
+													"\nreceived: " + parser_state.element_name.toString();
 									break;
 								} else {
 									int new_size = parser_state.attrib_names.length + MAX_ATTRIBS_NUMBER;
@@ -387,7 +355,7 @@ public class SimpleParser {
 					// do nothing, skip white chars
 					break;
 
-				case ATTRIB_NAME :
+				case ATTRIB_NAME:
 					if (isWhite(chr) || (chr == EQUALS)) {
 						parser_state.state = State.END_OF_ATTR_NAME;
 
@@ -396,26 +364,25 @@ public class SimpleParser {
 
 					if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Not allowed character in element attribute name: " + chr
-								+ "\nExisting characters in element attribute name: "
-									+ parser_state.attrib_names[parser_state.current_attr].toString();
+						parser_state.errorMessage = "Not allowed character in element attribute name: " + chr +
+								"\nExisting characters in element attribute name: " +
+								parser_state.attrib_names[parser_state.current_attr].toString();
 
 						break;
 					}    // end of if ()
 
 					parser_state.attrib_names[parser_state.current_attr].append(chr);
 
-					if (parser_state.attrib_names[parser_state.current_attr].length()
-							> MAX_ATTRIBUTE_NAME_SIZE) {
+					if (parser_state.attrib_names[parser_state.current_attr].length() > MAX_ATTRIBUTE_NAME_SIZE) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Max attribute name size exceeded: "
-								+ MAX_ATTRIBUTE_NAME_SIZE + "\nreceived: "
-									+ parser_state.attrib_names[parser_state.current_attr].toString();
+						parser_state.errorMessage =
+								"Max attribute name size exceeded: " + MAX_ATTRIBUTE_NAME_SIZE + "\nreceived: " +
+										parser_state.attrib_names[parser_state.current_attr].toString();
 					}
 
 					break;
 
-				case END_OF_ATTR_NAME :
+				case END_OF_ATTR_NAME:
 					if (chr == SINGLE_QUOTE) {
 						parser_state.state = State.ATTRIB_VALUE_S;
 						parser_state.attrib_values[parser_state.current_attr] = new StringBuilder(64);
@@ -429,7 +396,7 @@ public class SimpleParser {
 					// Skip white characters and actually everything except quotes
 					break;
 
-				case ATTRIB_VALUE_S :
+				case ATTRIB_VALUE_S:
 					if (chr == SINGLE_QUOTE) {
 						parser_state.state = State.END_ELEMENT_NAME;
 
@@ -445,25 +412,24 @@ public class SimpleParser {
 							break;
 						case '<':
 							parser_state.state = State.ERROR;
-							parser_state.errorMessage = "Not allowed character in element attribute value: " + chr
-									+ "\nExisting characters in element attribute value: "
-									+ parser_state.attrib_values[parser_state.current_attr].toString();
+							parser_state.errorMessage = "Not allowed character in element attribute value: " + chr +
+									"\nExisting characters in element attribute value: " +
+									parser_state.attrib_values[parser_state.current_attr].toString();
 							break;
 						default:
 							break;
 					}
 
-					if (parser_state.attrib_values[parser_state.current_attr].length()
-							> MAX_ATTRIBUTE_VALUE_SIZE) {
+					if (parser_state.attrib_values[parser_state.current_attr].length() > MAX_ATTRIBUTE_VALUE_SIZE) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Max attribute value size exceeded: "
-								+ MAX_ATTRIBUTE_VALUE_SIZE + "\nreceived: "
-									+ parser_state.attrib_values[parser_state.current_attr].toString();
+						parser_state.errorMessage =
+								"Max attribute value size exceeded: " + MAX_ATTRIBUTE_VALUE_SIZE + "\nreceived: " +
+										parser_state.attrib_values[parser_state.current_attr].toString();
 					}
 
 					break;
 
-				case ATTRIB_VALUE_D :
+				case ATTRIB_VALUE_D:
 					if (chr == DOUBLE_QUOTE) {
 						parser_state.state = State.END_ELEMENT_NAME;
 
@@ -471,7 +437,7 @@ public class SimpleParser {
 					}    // end of if (chr == SINGLE_QUOTE || chr == DOUBLE_QUOTE)
 
 					parser_state.attrib_values[parser_state.current_attr].append(chr);
-					
+
 					switch (chr) {
 						case '&':
 							parser_state.parentState = parser_state.state;
@@ -480,25 +446,24 @@ public class SimpleParser {
 							break;
 						case '<':
 							parser_state.state = State.ERROR;
-							parser_state.errorMessage = "Not allowed character in element attribute value: " + chr
-									+ "\nExisting characters in element attribute value: "
-									+ parser_state.attrib_values[parser_state.current_attr].toString();
+							parser_state.errorMessage = "Not allowed character in element attribute value: " + chr +
+									"\nExisting characters in element attribute value: " +
+									parser_state.attrib_values[parser_state.current_attr].toString();
 							break;
 						default:
 							break;
 					}
 
-					if (parser_state.attrib_values[parser_state.current_attr].length()
-							> MAX_ATTRIBUTE_VALUE_SIZE) {
+					if (parser_state.attrib_values[parser_state.current_attr].length() > MAX_ATTRIBUTE_VALUE_SIZE) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Max attribute value size exceeded: "
-								+ MAX_ATTRIBUTE_VALUE_SIZE + "\nreceived: "
-									+ parser_state.attrib_values[parser_state.current_attr].toString();
+						parser_state.errorMessage =
+								"Max attribute value size exceeded: " + MAX_ATTRIBUTE_VALUE_SIZE + "\nreceived: " +
+										parser_state.attrib_values[parser_state.current_attr].toString();
 					}
 
 					break;
 
-				case ELEMENT_CDATA :
+				case ELEMENT_CDATA:
 					if (chr == OPEN_BRACKET) {
 						parser_state.state = State.OPEN_BRACKET;
 						parser_state.slash_found = false;
@@ -519,18 +484,18 @@ public class SimpleParser {
 //            parser_state.element_cdata.append(chr);
 //            }// end of if (Arrays.binarySearch(WHITE_CHARS, chr) < 0)
 						}    // end of if (parser_state.element_cdata == null) else
-						
+
 						parser_state.element_cdata.append(chr);
 						if (chr == '&') {
 							parser_state.parentState = parser_state.state;
 							parser_state.state = State.ENTITY;
 							parser_state.entityType = EntityType.UNKNOWN;
 						}
-						
+
 						if (parser_state.element_cdata.length() > MAX_CDATA_SIZE) {
 							parser_state.state = State.ERROR;
-							parser_state.errorMessage = "Max cdata size exceeded: " + MAX_CDATA_SIZE
-									+ "\nreceived: " + parser_state.element_cdata.toString();
+							parser_state.errorMessage = "Max cdata size exceeded: " + MAX_CDATA_SIZE + "\nreceived: " +
+									parser_state.element_cdata.toString();
 						}
 					}
 
@@ -541,7 +506,7 @@ public class SimpleParser {
 					boolean numeric = !alpha && (chr >= '0' && chr <= '9');
 
 					boolean valid = true;
-					
+
 					switch (parser_state.entityType) {
 						case UNKNOWN:
 							if (alpha) {
@@ -554,16 +519,18 @@ public class SimpleParser {
 							break;
 						case NAMED:
 							if (!(alpha || numeric)) {
-								if (chr != SEMICOLON)
+								if (chr != SEMICOLON) {
 									valid = false;
-								else
+								} else {
 									parser_state.state = parser_state.parentState;
+								}
 							}
 							break;
 						case CODEPOINT:
 							if (chr == 'x') {
 								parser_state.entityType = EntityType.CODEPOINT_HEX;
-							} if (numeric) {
+							}
+							if (numeric) {
 								parser_state.entityType = EntityType.CODEPOINT_DEC;
 							} else {
 								valid = false;
@@ -571,22 +538,24 @@ public class SimpleParser {
 							break;
 						case CODEPOINT_DEC:
 							if (!numeric) {
-								if (chr != SEMICOLON)
+								if (chr != SEMICOLON) {
 									valid = false;
-								else
+								} else {
 									parser_state.state = parser_state.parentState;
+								}
 							}
 							break;
 						case CODEPOINT_HEX:
 							if (!((chr >= 'a' && chr <= 'f') || (chr >= 'A' || chr <= 'F') || numeric)) {
-								if (chr != SEMICOLON)
+								if (chr != SEMICOLON) {
 									valid = false;
-								else
+								} else {
 									parser_state.state = parser_state.parentState;
+								}
 							}
 							break;
 					}
-						
+
 					if (valid) {
 						switch (parser_state.parentState) {
 							case ATTRIB_VALUE_D:
@@ -602,8 +571,8 @@ public class SimpleParser {
 						parser_state.errorMessage = "Invalid XML entity";
 					}
 					break;
-					
-				case OTHER_XML :
+
+				case OTHER_XML:
 					if (chr == CLOSE_BRACKET) {
 						parser_state.state = State.START;
 						handler.otherXML(parser_state.element_cdata);
@@ -620,20 +589,20 @@ public class SimpleParser {
 
 					if (parser_state.element_cdata.length() > MAX_CDATA_SIZE) {
 						parser_state.state = State.ERROR;
-						parser_state.errorMessage = "Max cdata size exceeded: " + MAX_CDATA_SIZE
-								+ "\nreceived: " + parser_state.element_cdata.toString();
+						parser_state.errorMessage = "Max cdata size exceeded: " + MAX_CDATA_SIZE + "\nreceived: " +
+								parser_state.element_cdata.toString();
 					}
 
 					break;
 
-				case ERROR :
+				case ERROR:
 					handler.error(parser_state.errorMessage);
 					parser_state = null;
 
 					return;
 
 				// break;
-				default :
+				default:
 					assert false : "Unknown SimpleParser state: " + parser_state.state;
 
 					break;
@@ -643,7 +612,32 @@ public class SimpleParser {
 		handler.saveParserState(parser_state);
 	}
 
-//private boolean ignore(char chr) {
+	protected boolean checkIsCharValidInXML(ParserState parserState, char chr) {
+		boolean highSurrogate = parserState.highSurrogate;
+		parserState.highSurrogate = false;
+		if (chr <= 0xD7FF) {
+			if (chr >= 0x20) {
+				return true;
+			}
+			return ALLOWED_CHARS_LOW[chr];
+		} else if (chr <= 0xFFFD) {
+			if (chr >= 0xE000) {
+				return true;
+			}
+
+			if (Character.isLowSurrogate(chr)) {
+				return highSurrogate;
+			} else if (Character.isHighSurrogate(chr)) {
+				parserState.highSurrogate = true;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	//private boolean ignore(char chr) {
 //  return Arrays.binarySearch(IGNORE_CHARS, chr) >= 0;
 //}
 	private StringBuilder[] initArray(int size) {
@@ -654,7 +648,7 @@ public class SimpleParser {
 		return array;
 	}
 
-	//~--- get methods ----------------------------------------------------------
+	//~--- methods --------------------------------------------------------------
 
 	private boolean isWhite(char chr) {
 
@@ -671,8 +665,6 @@ public class SimpleParser {
 		// return Arrays.binarySearch(WHITE_CHARS, chr) >= 0;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private StringBuilder[] resizeArray(StringBuilder[] src, int size) {
 		StringBuilder[] array = new StringBuilder[size];
 
@@ -682,53 +674,48 @@ public class SimpleParser {
 		return array;
 	}
 
-	private static final boolean[] ALLOWED_CHARS_LOW = new boolean[0x20];
-	static {
-		ALLOWED_CHARS_LOW[0x09] = true;
-		ALLOWED_CHARS_LOW[0x0A] = true;
-		ALLOWED_CHARS_LOW[0x0D] = true;
+	protected static enum EntityType {
+		UNKNOWN,
+		NAMED,
+		CODEPOINT,
+		CODEPOINT_DEC,
+		CODEPOINT_HEX
 	}
-	
-	protected boolean checkIsCharValidInXML(ParserState parserState, char chr) {
-		boolean highSurrogate = parserState.highSurrogate;
-		parserState.highSurrogate = false;
-		if (chr <= 0xD7FF) {
-			if (chr >= 0x20)
-				return true;
-			return ALLOWED_CHARS_LOW[chr];
-		} else if (chr <= 0xFFFD) {
-			if (chr >= 0xE000)
-				return true;
 
-			if (Character.isLowSurrogate(chr)) {
-				return highSurrogate;
-			} else if (Character.isHighSurrogate(chr)) {
-				parserState.highSurrogate = true;
-				return true;
-			}
-		}
-		return false;
+	protected static enum State {
+		START,
+		OPEN_BRACKET,
+		ELEMENT_NAME,
+		END_ELEMENT_NAME,
+		ATTRIB_NAME,
+		END_OF_ATTR_NAME,
+		ATTRIB_VALUE_S,
+		ATTRIB_VALUE_D,
+		ELEMENT_CDATA,
+		OTHER_XML,
+		ERROR,
+		CLOSE_ELEMENT,
+		ENTITY
 	}
-	
+
 	//~--- inner classes --------------------------------------------------------
 
 	protected static class ParserState {
+
 		StringBuilder[] attrib_names = null;
 		StringBuilder[] attrib_values = null;
 		int current_attr = -1;
 		StringBuilder element_cdata = null;
 		StringBuilder element_name = null;
+		EntityType entityType = EntityType.UNKNOWN;
 		String errorMessage = null;
 		boolean highSurrogate = false;
-		EntityType entityType = EntityType.UNKNOWN;
 		State parentState = null;
 		boolean slash_found = false;
 		State state = State.START;
 	}
 }    // SimpleParser
 
-
 //~ Formatted in Sun Code Convention
-
 
 //~ Formatted by Jindent --- http://www.jindent.com

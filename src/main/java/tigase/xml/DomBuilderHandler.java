@@ -20,100 +20,77 @@
 
 package tigase.xml;
 
-import java.util.EmptyStackException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Stack;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * <code>DomBuilderHandler</code> - implementation of
- *  <code>SimpleHandler</code> building <em>DOM</em> strctures during parsing
- *  time.
- *  It also supports creation multiple, sperate document trees if parsed
- *  buffer contains a few <em>XML</em> documents. As a result of work it returns
- *  always <code>Queue</code> containing all found <em>XML</em> trees in the
- *  same order as they were found in network data.<br/>
- *  Document trees created by this <em>DOM</em> builder consist of instances of
- *  <code>Element</code> class or instances of class extending
- *  <code>Element</code> class. To receive trees built with instances of proper
- *  class user must provide <code>ElementFactory</code> implementation creating
- *  instances of required <code>ELement</code> extension.
+ * <code>DomBuilderHandler</code> - implementation of <code>SimpleHandler</code> building <em>DOM</em> strctures during
+ * parsing time. It also supports creation multiple, sperate document trees if parsed buffer contains a few <em>XML</em>
+ * documents. As a result of work it returns always <code>Queue</code> containing all found <em>XML</em> trees in the
+ * same order as they were found in network data.<br/> Document trees created by this <em>DOM</em> builder consist of
+ * instances of <code>Element</code> class or instances of class extending <code>Element</code> class. To receive trees
+ * built with instances of proper class user must provide <code>ElementFactory</code> implementation creating instances
+ * of required <code>ELement</code> extension. <p> <p> Created: Sat Oct  2 22:01:34 2004 </p>
  *
- * <p>
- * Created: Sat Oct  2 22:01:34 2004
- * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 
-public class DomBuilderHandler implements SimpleHandler {
-
-  private static Logger log =
-    Logger.getLogger("tigase.xml.DomBuilderHandler");
+public class DomBuilderHandler
+		implements SimpleHandler {
 
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
-
+	private static Logger log = Logger.getLogger("tigase.xml.DomBuilderHandler");
+	private LinkedList<Element> all_roots = new LinkedList<Element>();
 	private ElementFactory customFactory = null;
-
-  private Object parserState = null;
-  private String top_xmlns = null;
-
-  private LinkedList<Element> all_roots = new LinkedList<Element>();
-  private Stack<Element> el_stack = new Stack<Element>();
+	private Stack<Element> el_stack = new Stack<Element>();
 	private Map<String, String> namespaces = new TreeMap<String, String>();
+	private Object parserState = null;
+	private String top_xmlns = null;
 
-  public DomBuilderHandler(ElementFactory factory) {
-    customFactory = factory;
-  }
+	public DomBuilderHandler(ElementFactory factory) {
+		customFactory = factory;
+	}
 
-  public DomBuilderHandler() {
-    customFactory = defaultFactory;
-  }
+	public DomBuilderHandler() {
+		customFactory = defaultFactory;
+	}
 
-  public Queue<Element> getParsedElements() {
-    return all_roots;
-  }
+	public Queue<Element> getParsedElements() {
+		return all_roots;
+	}
 
-  public void error(String errorMessage) {
-    log.warning("XML content parse error.");
+	public void error(String errorMessage) {
+		log.warning("XML content parse error.");
 		log.warning(errorMessage);
-  }
+	}
 
-  private Element newElement(String name, String cdata,
-    StringBuilder[] attnames, StringBuilder[] attvals) {
-    return customFactory.elementInstance(name, cdata, attnames, attvals);
-  }
-
-  public void startElement(StringBuilder name,
-    StringBuilder[] attr_names, StringBuilder[] attr_values) {
+	public void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Start element name: " + name);
 			log.finest("Element attributes names: " + Arrays.toString(attr_names));
 			log.finest("Element attributes values: " + Arrays.toString(attr_values));
 		}
-    //System.out.println("Start element name: "+name);
-    //System.out.println("Element attributes names: "+Arrays.toString(attr_names));
-    //System.out.println("Element attributes values: "+Arrays.toString(attr_values));
+		//System.out.println("Start element name: "+name);
+		//System.out.println("Element attributes names: "+Arrays.toString(attr_names));
+		//System.out.println("Element attributes values: "+Arrays.toString(attr_values));
 
 		// Look for 'xmlns:' declarations:
 		if (attr_names != null) {
 			for (int i = 0; i < attr_names.length; ++i) {
 				// Exit the loop as soon as we reach end of attributes set
-				if (attr_names[i] == null) { break;	}
+				if (attr_names[i] == null) {
+					break;
+				}
 				if (attr_names[i].toString().startsWith("xmlns:")) {
-					namespaces.put(attr_names[i].substring("xmlns:".length(),
-							attr_names[i].length()),
-						attr_values[i].toString());
+					namespaces.put(attr_names[i].substring("xmlns:".length(), attr_names[i].length()),
+								   attr_values[i].toString());
 				} // end of if (att_name.startsWith("xmlns:"))
 			} // end of for (String att_name : attnames)
 		} // end of if (attr_names != null)
 
-    String tmp_name = name.toString();
+		String tmp_name = name.toString();
 		String new_xmlns = null;
 		String prefix = null;
 		String tmp_name_prefix = null;
@@ -130,23 +107,23 @@ public class DomBuilderHandler implements SimpleHandler {
 				} // end of if (tmp_name.startsWith(xmlns))
 			} // end of for (String xmlns: namespaces.keys())
 		}
-    Element elem = newElement(tmp_name, null, attr_names, attr_values);
-    String ns = elem.getXMLNS();
-    if (ns == null) {
+		Element elem = newElement(tmp_name, null, attr_names, attr_values);
+		String ns = elem.getXMLNS();
+		if (ns == null) {
 			if (el_stack.isEmpty() || el_stack.peek().getXMLNS() == null) {
 				//elem.setDefXMLNS(top_xmlns);
 			} else {
 				elem.setDefXMLNS(el_stack.peek().getXMLNS());
 			}
-    }
+		}
 		if (new_xmlns != null) {
 			elem.setXMLNS(new_xmlns);
 			elem.removeAttribute("xmlns:" + prefix);
 		}
-    el_stack.push(elem);
-  }
+		el_stack.push(elem);
+	}
 
-  public void elementCData(StringBuilder cdata) {
+	public void elementCData(StringBuilder cdata) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Element CDATA: " + cdata);
 		}
@@ -157,61 +134,65 @@ public class DomBuilderHandler implements SimpleHandler {
 			// Do nothing here, it happens sometimes that client sends
 			// some white characters after sending open stream data....
 		}
-  }
+	}
 
-  public boolean endElement(StringBuilder name) {
+	public boolean endElement(StringBuilder name) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("End element name: " + name);
 		}
-    //System.out.println("End element name: "+name);
+		//System.out.println("End element name: "+name);
 
-	String tmp_name = name.toString();
-	String tmp_name_prefix = null;
-	int idx = tmp_name.indexOf(':');
-	if (idx > 0) {
-	 tmp_name_prefix = tmp_name.substring(0, idx);
-	}
-	if (tmp_name_prefix != null) {
-	  for (String pref : namespaces.keySet()) {
-		if (tmp_name_prefix.equals(pref)) {
-		  tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
-	    } // end of if (tmp_name.startsWith(xmlns))
-	  } // end of for (String xmlns: namespaces.keys())
-	}
+		String tmp_name = name.toString();
+		String tmp_name_prefix = null;
+		int idx = tmp_name.indexOf(':');
+		if (idx > 0) {
+			tmp_name_prefix = tmp_name.substring(0, idx);
+		}
+		if (tmp_name_prefix != null) {
+			for (String pref : namespaces.keySet()) {
+				if (tmp_name_prefix.equals(pref)) {
+					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
+				} // end of if (tmp_name.startsWith(xmlns))
+			} // end of for (String xmlns: namespaces.keys())
+		}
 
+		if (el_stack.isEmpty()) {
+			el_stack.push(newElement(tmp_name, null, null, null));
+		} // end of if (tmp_name.equals())
 
-    if (el_stack.isEmpty()) {
-      el_stack.push(newElement(tmp_name, null, null, null));
-    } // end of if (tmp_name.equals())
-
-    Element elem = el_stack.pop();
-	if (elem.getName() != tmp_name.intern())
-		return false;
-    if (el_stack.isEmpty()) {
-      all_roots.offer(elem);
+		Element elem = el_stack.pop();
+		if (elem.getName() != tmp_name.intern()) {
+			return false;
+		}
+		if (el_stack.isEmpty()) {
+			all_roots.offer(elem);
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Adding new request: " + elem.toString());
 			}
-    } // end of if (el_stack.isEmpty())
-    else {
-      el_stack.peek().addChild(elem);
-    } // end of if (el_stack.isEmpty()) else
-	return true;
-  }
+		} // end of if (el_stack.isEmpty())
+		else {
+			el_stack.peek().addChild(elem);
+		} // end of if (el_stack.isEmpty()) else
+		return true;
+	}
 
-  public void otherXML(StringBuilder other) {
+	public void otherXML(StringBuilder other) {
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Other XML content: " + other);
 		}
-    // Just ignore
-  }
+		// Just ignore
+	}
 
-  public void saveParserState(Object state) {
-    parserState = state;
-  }
+	public void saveParserState(Object state) {
+		parserState = state;
+	}
 
-  public Object restoreParserState() {
-    return parserState;
-  }
+	public Object restoreParserState() {
+		return parserState;
+	}
+
+	private Element newElement(String name, String cdata, StringBuilder[] attnames, StringBuilder[] attvals) {
+		return customFactory.elementInstance(name, cdata, attnames, attvals);
+	}
 
 }// DomBuilderHandler

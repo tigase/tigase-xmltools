@@ -24,10 +24,11 @@ package tigase.xml;
  * Created: Feb 9, 2009 12:21:23 PM
  *
  * @param <T>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public interface XMLNodeIfc<T extends XMLNodeIfc>
-				extends Comparable<T>, Cloneable {
+		extends Comparable<T>, Cloneable {
 
 	T clone();
 

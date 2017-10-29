@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xml;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -38,67 +36,67 @@ import java.util.Map;
  * @author andrzej
  */
 public class ElementTest
-				extends TestCase {
-	private static final String[] static_str_arr = { "parent", "child" };
-	private static final String str_path         = "parent/child";
-	private static final String str_slash_path   = "/parent/child";
-	private static final String xmlns            = "xmlns:1";
+		extends TestCase {
+
+	private static final String[] static_str_arr = {"parent", "child"};
+	private static final String str_path = "parent/child";
+	private static final String str_slash_path = "/parent/child";
+	private static final String xmlns = "xmlns:1";
 
 	//~--- fields ---------------------------------------------------------------
 
-	private String c_att_name  = null;
+	private String c_att_name = null;
 	private String c_att_value = null;
-	private Element child      = null;
-	private String p_att_name  = null;
+	private Element child = null;
+	private String p_att_name = null;
 	private String p_att_value = null;
-	private Element parent     = null;
-	private String value       = null;
+	private Element parent = null;
+	private String value = null;
 
 	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws Exception
 	 */
 	@BeforeClass
-	public static void setUpClass() throws Exception {}
+	public static void setUpClass() throws Exception {
+	}
 
 	//~--- methods --------------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws Exception
 	 */
 	@AfterClass
-	public static void tearDownClass() throws Exception {}
+	public static void tearDownClass() throws Exception {
+	}
 
 	//~--- set methods ----------------------------------------------------------
 
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		value  = "correct-value";
+		value = "correct-value";
 		parent = new Element("parent");
-		child  = new Element("child");
+		child = new Element("child");
 		child.setXMLNS(xmlns);
 		//multiple call to setCData to verify the value is correct
 		child.setCData(value);
 		child.setCData(value);
 		child.setCData(value);
 		parent.addChild(child);
-		p_att_name  = "parent_att_name";
+		p_att_name = "parent_att_name";
 		p_att_value = "parent_att_value";
 		parent.setAttribute(p_att_name, p_att_value);
-		c_att_name  = "child_att_name";
+		c_att_name = "child_att_name";
 		c_att_value = "child_att_value";
 		child.setAttribute(c_att_name, c_att_value);
 	}
@@ -108,23 +106,21 @@ public class ElementTest
 	/**
 	 * Method description
 	 *
-	 *
 	 * @throws Exception
 	 */
 	@After
 	public void tearDown() throws Exception {
-		parent      = null;
-		child       = null;
-		value       = null;
-		p_att_name  = null;
+		parent = null;
+		child = null;
+		value = null;
+		p_att_name = null;
 		p_att_value = null;
-		c_att_name  = null;
+		c_att_name = null;
 		c_att_value = null;
 	}
 
 	/**
 	 * Method description
-	 *
 	 */
 	@Test
 	public void testGetChildCData() {
@@ -144,7 +140,7 @@ public class ElementTest
 	 */
 	@Test
 	public void testAddAttribute() {
-		String attName  = "key";
+		String attName = "key";
 		String attValue = "value";
 
 		parent.addAttribute(attName, attValue);
@@ -443,6 +439,5 @@ public class ElementTest
 		testGetCData_0args();
 	}
 }
-
 
 //~ Formatted in Tigase Code Convention on 13/02/20

@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xml.db;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -27,35 +25,29 @@ package tigase.xml.db;
 import tigase.xml.Element;
 import tigase.xml.XMLNodeIfc;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-
 import java.util.List;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
 
+//~--- JDK imports ------------------------------------------------------------
+
 /**
- * <code>DBElement</code> class extends <code>tigase.xml.Element</code>. It
- * adds some extra functionality useful for data base operations like searching
- * for some specific nodes, add data entries, remove data, and all other common
- * operations not directly related to pure <em>XML</em> processing. Pure
- * <em>XML</em> processing is of course implemented in
- * <code>tigase.xml.Element</code>. The are also some methods which make it
- * easier to save <em>XML</em> tree from memory to disk file in a form which is
- * easier to read by a human.
- *
- * <p>
- * Created: Tue Oct 26 22:01:47 2004
+ * <code>DBElement</code> class extends <code>tigase.xml.Element</code>. It adds some extra functionality useful for
+ * data base operations like searching for some specific nodes, add data entries, remove data, and all other common
+ * operations not directly related to pure <em>XML</em> processing. Pure <em>XML</em> processing is of course
+ * implemented in <code>tigase.xml.Element</code>. The are also some methods which make it easier to save <em>XML</em>
+ * tree from memory to disk file in a form which is easier to read by a human. <p> <p> Created: Tue Oct 26 22:01:47 2004
  * </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public class DBElement
-				extends Element {
+		extends Element {
+
 	/** Field description */
 	public static final String ENTRY = "entry";
 
@@ -87,7 +79,6 @@ public class DBElement
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param argName
 	 */
 	public DBElement(String argName) {
@@ -97,26 +88,23 @@ public class DBElement
 	/**
 	 * Constructs ...
 	 *
-	 *
 	 * @param argName
 	 * @param attname
 	 * @param attvalue
 	 */
 	public DBElement(String argName, String attname, String attvalue) {
-		super(argName, new String[] { attname }, new String[] { attvalue });
+		super(argName, new String[]{attname}, new String[]{attvalue});
 	}
 
 	/**
 	 * Constructs ...
-	 *
 	 *
 	 * @param argName
 	 * @param argCData
 	 * @param att_names
 	 * @param att_values
 	 */
-	public DBElement(String argName, String argCData, StringBuilder[] att_names,
-									 StringBuilder[] att_values) {
+	public DBElement(String argName, String argCData, StringBuilder[] att_names, StringBuilder[] att_values) {
 		super(argName, argCData, att_names, att_values);
 	}
 
@@ -124,7 +112,6 @@ public class DBElement
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param indent
 	 * @param step
@@ -146,7 +133,7 @@ public class DBElement
 		}      // end of if (attributes != null)
 
 		String childrenStr = childrenFormatedString(indent + step, step);
-		String cdata       = getCData();
+		String cdata = getCData();
 
 		if ((cdata != null) || (childrenStr.length() > 0)) {
 			result.append(">");
@@ -168,7 +155,6 @@ public class DBElement
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param indent
 	 * @param step
@@ -198,7 +184,6 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param name
 	 *
 	 * @return
@@ -212,8 +197,7 @@ public class DBElement
 				if (el instanceof Element) {
 					Element elem = (Element) el;
 
-					if (elem.getName().equals(NODE) &&
-							elem.getAttributeStaticStr(NAME).equals(name)) {
+					if (elem.getName().equals(NODE) && elem.getAttributeStaticStr(NAME).equals(name)) {
 						return (DBElement) elem;
 					}    //
 				}
@@ -225,7 +209,6 @@ public class DBElement
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @return
 	 */
@@ -259,7 +242,6 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param nodePath
 	 *
 	 * @return
@@ -267,8 +249,7 @@ public class DBElement
 	public final DBElement findNode(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
 
-		if (!getName().equals(NODE) ||
-				!getAttributeStaticStr(NAME).equals(strtok.nextToken())) {
+		if (!getName().equals(NODE) || !getAttributeStaticStr(NAME).equals(strtok.nextToken())) {
 			return null;
 		}    // end of if (!strtok.nextToken().equals(child.getName()))
 
@@ -284,17 +265,16 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param nodePath
 	 */
 	public final void removeNode(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
-		DBElement node         = this;
-		DBElement parent       = null;
+		DBElement node = this;
+		DBElement parent = null;
 
 		while (strtok.hasMoreTokens() && (node != null)) {
 			parent = node;
-			node   = node.getSubnode(strtok.nextToken());
+			node = node.getSubnode(strtok.nextToken());
 		}    // end of while (strtok.hasMoreTokens())
 		if ((parent != null) && (node != null)) {
 
@@ -308,17 +288,16 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param nodePath
 	 *
 	 * @return
 	 */
 	public final DBElement getSubnodePath(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
-		DBElement node         = this;
+		DBElement node = this;
 
 		while (strtok.hasMoreTokens()) {
-			String token  = strtok.nextToken();
+			String token = strtok.nextToken();
 			DBElement tmp = node.getSubnode(token);
 
 			if (tmp != null) {
@@ -336,23 +315,22 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param nodePath
 	 *
 	 * @return
 	 */
 	public final DBElement buildNodesTree(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
-		DBElement node         = this;
+		DBElement node = this;
 
 		while (strtok.hasMoreTokens()) {
-			String token  = strtok.nextToken();
+			String token = strtok.nextToken();
 			DBElement tmp = node.getSubnode(token);
 
 			if (tmp != null) {
 				node = tmp;
 			}      // end of if (node.getSubnode() != null)
-							else {
+			else {
 				if (token.equals("") || token.equals("null")) {
 					return null;
 				}    // end of if (token.equals("") || token.equals("null"))
@@ -365,7 +343,6 @@ public class DBElement
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param name
 	 *
@@ -383,13 +360,12 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param key
 	 *
 	 * @return
 	 */
 	public final DBElement findEntry(String key) {
-		DBElement result      = null;
+		DBElement result = null;
 		List<Element> entries = getChild(MAP).getChildren();
 
 		if (entries != null) {
@@ -409,7 +385,6 @@ public class DBElement
 
 	/**
 	 * Method description
-	 *
 	 *
 	 * @param key
 	 */
@@ -439,7 +414,6 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @return
 	 */
 	public final String[] getEntryKeys() {
@@ -467,7 +441,6 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param key
 	 *
 	 * @return
@@ -488,13 +461,12 @@ public class DBElement
 	/**
 	 * Method description
 	 *
-	 *
 	 * @param key
 	 * @param value
 	 */
 	public final void setEntry(String key, Object value) {
 		Types.DataType type = Types.DataType.valueof(value.getClass().getSimpleName());
-		DBElement entry     = getEntry(key);
+		DBElement entry = getEntry(key);
 
 		entry.setAttribute(TYPE, type.toString());
 		if (value.getClass().isArray()) {
@@ -502,41 +474,236 @@ public class DBElement
 				entry.getChildren().clear();
 			}      // end of if (entry.getChildren() != null)
 			switch (type) {
-			case INTEGER_ARR :
-				for (int val : (int[]) value) {
-					entry.addChild(new DBElement("item", VALUE, encode(val)));
-				}    // end of for (String val : values)
+				case INTEGER_ARR:
+					for (int val : (int[]) value) {
+						entry.addChild(new DBElement("item", VALUE, encode(val)));
+					}    // end of for (String val : values)
 
-				break;
+					break;
 
-			case DOUBLE_ARR :
-				for (double val : (double[]) value) {
-					entry.addChild(new DBElement("item", VALUE, encode(val)));
-				}    // end of for (String val : values)
+				case DOUBLE_ARR:
+					for (double val : (double[]) value) {
+						entry.addChild(new DBElement("item", VALUE, encode(val)));
+					}    // end of for (String val : values)
 
-				break;
+					break;
 
-			case BOOLEAN_ARR :
-				for (boolean val : (boolean[]) value) {
-					entry.addChild(new DBElement("item", VALUE, encode(val)));
-				}    // end of for (String val : values)
+				case BOOLEAN_ARR:
+					for (boolean val : (boolean[]) value) {
+						entry.addChild(new DBElement("item", VALUE, encode(val)));
+					}    // end of for (String val : values)
 
-				break;
+					break;
 
-			default :
-				for (Object val : (Object[]) value) {
-					entry.addChild(new DBElement("item", VALUE, encode(val)));
-				}    // end of for (String val : values)
+				default:
+					for (Object val : (Object[]) value) {
+						entry.addChild(new DBElement("item", VALUE, encode(val)));
+					}    // end of for (String val : values)
 
-				break;
+					break;
 			}      // end of switch (type)
 		}        // end of if (value.getClass().isArray())
-						else {
+		else {
 			entry.setAttribute(VALUE, encode(value));
 		}        // end of if (value.getClass().isArray()) else
 	}
 
 	//~--- methods --------------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final String getEntryStringValue(String key, String def) {
+		return (String) getEntryValue(key, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final String[] getEntryStringArrValue(String key, String[] def) {
+		Object result = getEntryValue(key, def);
+		DBElement entry = findEntry(key);
+
+		if (entry == null) {
+			return def;
+		}
+
+		Types.DataType type = Types.DataType.valueof(entry.getAttributeStaticStr(TYPE));
+
+		switch (type) {
+			case STRING_ARR:
+				break;
+
+			case STRING:
+			default:
+				result = new String[]{result.toString()};
+
+				break;
+		}    // end of switch (type)
+
+		return (String[]) result;
+	}
+
+	//~--- get methods ----------------------------------------------------------
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final int getEntryIntValue(String key, int def) {
+		return ((Integer) getEntryValue(key, Integer.valueOf(def))).intValue();
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final int[] getEntryIntArrValue(String key, int[] def) {
+		return (int[]) getEntryValue(key, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final double getEntryDoubleValue(String key, double def) {
+		return ((Double) getEntryValue(key, new Double(def))).doubleValue();
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final double[] getEntryDoubleArrValue(String key, double[] def) {
+		return (double[]) getEntryValue(key, def);
+	}
+
+	/**
+	 * Method description
+	 *
+	 * @param key
+	 * @param def
+	 *
+	 * @return
+	 */
+	public final Object getEntryValue(String key, Object def) {
+		DBElement entry = findEntry(key);
+
+		if (entry == null) {
+			return def;
+		}
+
+		Types.DataType type = Types.DataType.valueof(entry.getAttributeStaticStr(TYPE));
+		Object result = def;
+		String[] tmp_s = getEntryValues(key);
+		int idx = -1;
+
+		try {
+			switch (type) {
+				case INTEGER:
+					result = Integer.decode(entry.getAttributeStaticStr(VALUE));
+
+					break;
+
+				case INTEGER_ARR:
+					int[] tmp_i = new int[tmp_s.length];
+
+					for (String tmp : tmp_s) {
+						tmp_i[++idx] = Integer.decode(tmp).intValue();
+					}    // end of for (String tmp : tmp_s)
+					result = tmp_i;
+
+					break;
+
+				case LONG:
+					result = Long.decode(entry.getAttributeStaticStr(VALUE));
+
+					break;
+
+				case LONG_ARR:
+					long[] tmp_l = new long[tmp_s.length];
+
+					for (String tmp : tmp_s) {
+						tmp_l[++idx] = Long.decode(tmp).longValue();
+					}    // end of for (String tmp : tmp_s)
+					result = tmp_l;
+
+					break;
+
+				case STRING_ARR:
+					result = tmp_s;
+
+					break;
+
+				case DOUBLE:
+					result = new Double(Double.parseDouble(entry.getAttributeStaticStr(VALUE)));
+
+					break;
+
+				case DOUBLE_ARR:
+					double[] tmp_f = new double[tmp_s.length];
+
+					for (String tmp : tmp_s) {
+						tmp_f[++idx] = Double.parseDouble(tmp);
+					}    // end of for (String tmp : tmp_s)
+					result = tmp_f;
+
+					break;
+
+				case BOOLEAN:
+					result = Boolean.valueOf(parseBool(entry.getAttributeStaticStr(VALUE)));
+
+					break;
+
+				case BOOLEAN_ARR:
+					boolean[] tmp_b = new boolean[tmp_s.length];
+
+					for (String tmp : tmp_s) {
+						tmp_b[++idx] = parseBool(tmp);
+					}    // end of for (String tmp : tmp_s)
+					result = tmp_b;
+
+					break;
+
+				case STRING:
+				default:
+					result = decode(entry.getAttributeStaticStr(VALUE));
+
+					break;
+			}      // end of switch (type)
+		}        // end of try
+		catch (NullPointerException e) {
+			result = def;
+		}        // end of try-catch
+
+		return result;
+	}
 
 	private String encode(final Object source) {
 		try {
@@ -554,214 +721,11 @@ public class DBElement
 		}    // end of try-catch
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final String getEntryStringValue(String key, String def) {
-		return (String) getEntryValue(key, def);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final String[] getEntryStringArrValue(String key, String[] def) {
-		Object result   = getEntryValue(key, def);
-		DBElement entry = findEntry(key);
-
-		if (entry == null) {
-			return def;
-		}
-
-		Types.DataType type = Types.DataType.valueof(entry.getAttributeStaticStr(TYPE));
-
-		switch (type) {
-		case STRING_ARR :
-			break;
-
-		case STRING :
-		default :
-			result = new String[] { result.toString() };
-
-			break;
-		}    // end of switch (type)
-
-		return (String[]) result;
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final int getEntryIntValue(String key, int def) {
-		return ((Integer) getEntryValue(key, Integer.valueOf(def))).intValue();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final int[] getEntryIntArrValue(String key, int[] def) {
-		return (int[]) getEntryValue(key, def);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final double getEntryDoubleValue(String key, double def) {
-		return ((Double) getEntryValue(key, new Double(def))).doubleValue();
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final double[] getEntryDoubleArrValue(String key, double[] def) {
-		return (double[]) getEntryValue(key, def);
-	}
-
-	/**
-	 * Method description
-	 *
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
-	public final Object getEntryValue(String key, Object def) {
-		DBElement entry = findEntry(key);
-
-		if (entry == null) {
-			return def;
-		}
-
-		Types.DataType type = Types.DataType.valueof(entry.getAttributeStaticStr(TYPE));
-		Object result       = def;
-		String[] tmp_s      = getEntryValues(key);
-		int idx             = -1;
-
-		try {
-			switch (type) {
-			case INTEGER :
-				result = Integer.decode(entry.getAttributeStaticStr(VALUE));
-
-				break;
-
-			case INTEGER_ARR :
-				int[] tmp_i = new int[tmp_s.length];
-
-				for (String tmp : tmp_s) {
-					tmp_i[++idx] = Integer.decode(tmp).intValue();
-				}    // end of for (String tmp : tmp_s)
-				result = tmp_i;
-
-				break;
-
-			case LONG :
-				result = Long.decode(entry.getAttributeStaticStr(VALUE));
-
-				break;
-
-			case LONG_ARR :
-				long[] tmp_l = new long[tmp_s.length];
-
-				for (String tmp : tmp_s) {
-					tmp_l[++idx] = Long.decode(tmp).longValue();
-				}    // end of for (String tmp : tmp_s)
-				result = tmp_l;
-
-				break;
-
-			case STRING_ARR :
-				result = tmp_s;
-
-				break;
-
-			case DOUBLE :
-				result = new Double(Double.parseDouble(entry.getAttributeStaticStr(VALUE)));
-
-				break;
-
-			case DOUBLE_ARR :
-				double[] tmp_f = new double[tmp_s.length];
-
-				for (String tmp : tmp_s) {
-					tmp_f[++idx] = Double.parseDouble(tmp);
-				}    // end of for (String tmp : tmp_s)
-				result = tmp_f;
-
-				break;
-
-			case BOOLEAN :
-				result = Boolean.valueOf(parseBool(entry.getAttributeStaticStr(VALUE)));
-
-				break;
-
-			case BOOLEAN_ARR :
-				boolean[] tmp_b = new boolean[tmp_s.length];
-
-				for (String tmp : tmp_s) {
-					tmp_b[++idx] = parseBool(tmp);
-				}    // end of for (String tmp : tmp_s)
-				result = tmp_b;
-
-				break;
-
-			case STRING :
-			default :
-				result = decode(entry.getAttributeStaticStr(VALUE));
-
-				break;
-			}      // end of switch (type)
-		}        // end of try
-						catch (NullPointerException e) {
-			result = def;
-		}        // end of try-catch
-
-		return result;
-	}
-
 	//~--- methods --------------------------------------------------------------
 
 	private boolean parseBool(final String val) {
 		return (val != null) &&
-					 (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
-						val.equalsIgnoreCase("on"));
+				(val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on"));
 	}
 
 	//~--- get methods ----------------------------------------------------------
@@ -774,7 +738,7 @@ public class DBElement
 
 			if (items != null) {
 				String[] result = new String[items.size()];
-				int cnt         = 0;
+				int cnt = 0;
 
 				for (Element item : items) {
 					result[cnt++] = decode(item.getAttributeStaticStr(VALUE));
@@ -807,6 +771,5 @@ public class DBElement
 // return getAttribute("name").hashCode();
 //  }
 }    // DBElement
-
 
 //~ Formatted in Tigase Code Convention on 13/02/20

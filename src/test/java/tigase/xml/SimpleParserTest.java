@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author Wojtek
  */
 public class SimpleParserTest {
@@ -43,12 +42,12 @@ public class SimpleParserTest {
 	public void setUp() {
 		parser = new SimpleParser();
 	}
-	
+
 	@After
 	public void tearDown() {
 		parser = null;
 	}
-	
+
 	@Test
 	public void testNPE() {
 		SimpleHandler handler = new SimpleHandler() {
@@ -85,9 +84,9 @@ public class SimpleParserTest {
 				return this.state;
 			}
 		};
-		
+
 		String input = "<root test1 \"test2\"/>";
-		
+
 		char[] data = input.toCharArray();
 		parser.parse(handler, data, 0, data.length);
 	}
@@ -102,17 +101,17 @@ public class SimpleParserTest {
 
 		char[] data = input.toCharArray();
 
-		parser.parse( domHandler, data, 0, data.length );
+		parser.parse(domHandler, data, 0, data.length);
 		parsedElements = domHandler.getParsedElements();
 
 		Element el;
-		if ( parsedElements != null && parsedElements.size() > 0 ){
+		if (parsedElements != null && parsedElements.size() > 0) {
 			el = parsedElements.poll();
-			boolean equals = input.equals( el.toString() );
-			System.out.println( "input:  " + input );
-			System.out.println( "output: " + el );
-			System.out.println( "equals: " + equals );
-			assertTrue( "Input and output are different!", equals );
+			boolean equals = input.equals(el.toString());
+			System.out.println("input:  " + input);
+			System.out.println("output: " + el);
+			System.out.println("equals: " + equals);
+			assertTrue("Input and output are different!", equals);
 		}
 
 	}
@@ -153,26 +152,22 @@ public class SimpleParserTest {
 				return this.state;
 			}
 		};
-				
+
 		char[] data = "<test/>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 
 		handler.saveParserState(null);
-		String dataStr = new StringBuilder("<test>").append(Character.toChars(127479)).append("</test>").toString(); 
+		String dataStr = new StringBuilder("<test>").append(Character.toChars(127479)).append("</test>").toString();
 		data = dataStr.toCharArray();
 
- 		parser.parse(handler, data, 0, data.length);
-		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		parser.parse(handler, data, 0, data.length);
+		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 
 		data = "<test>\u0000</test".toCharArray();
- 		parser.parse(handler, data, 0, data.length);
-		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		parser.parse(handler, data, 0, data.length);
+		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 	}
-	
-	protected boolean checkIsCharValidInXML(char chr) {
-		return (chr == 0x09 || chr ==0x0a || chr == 0x0d || (chr >= 0x20 && chr <= 0xD7FF) || (chr >= 0xE000 && chr <= 0xFFFD) || (chr >= 0x10000 && chr <= 0x10FFFF));
-	}	
-	
+
 	@Test
 	public void testEntities() throws InstantiationException, IllegalAccessException {
 		char[] data;
@@ -181,16 +176,16 @@ public class SimpleParserTest {
 
 		data = "<message from=\"test@example.com\"><body>© §      ∉ ⇒ </body></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
-		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 		assertFalse(error.get());
 		assertEquals("© §      ∉ ⇒ ", handler.getParsedElements().poll().getChild("body").getCData());
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
-		
+
 		data = "<message from=\"test@example.com\"><body>123 - &#123;</body></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
-		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 		assertEquals("123 - &#123;", handler.getParsedElements().poll().getChild("body").getCData());
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
@@ -198,11 +193,11 @@ public class SimpleParserTest {
 		data = "<message from=\"test@example.com\"><body>123 - &a123;</body></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
-		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 		assertEquals("123 - &a123;", handler.getParsedElements().poll().getChild("body").getCData());
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
-		
+
 		data = "<message from=\"test@example.com\"><body>123 - &123;</body></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertTrue(error.get());
@@ -227,7 +222,7 @@ public class SimpleParserTest {
 		data = "<message from=\"test@example.com\" id=\"&a123;\"></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
-		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 		assertEquals("&a123;", handler.getParsedElements().poll().getAttribute("id"));
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
@@ -235,7 +230,7 @@ public class SimpleParserTest {
 		data = "<message from=\"test@example.com\" id=\"&#123;\"></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
-		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
+		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 		assertEquals("&#123;", handler.getParsedElements().poll().getAttribute("id"));
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
@@ -246,7 +241,7 @@ public class SimpleParserTest {
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
-		
+
 		data = "<message from=\"test@example.com\" id=\"&a123\"></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertTrue(error.get());
@@ -265,38 +260,40 @@ public class SimpleParserTest {
 		parser.parse(handler, data, 0, data.length);
 		assertTrue(error.get());
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
-		handler.saveParserState(null);		
+		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 
 		data = "<message from=\"test@example.com\"><<body>Test</body></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertTrue(error.get());
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
-		handler.saveParserState(null);		
+		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 
 		data = "<message from=\"test@example.com\"><body>Test</body1></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertTrue(error.get());
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
-		handler.saveParserState(null);		
+		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 
 		data = "<message to=\"test@zeus\" type=\"chat\" id=\"t&amp;t<\"><body>Test &amp; done</body></message>".toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertTrue(error.get());
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
-		handler.saveParserState(null);		
+		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
-		
-		data = "<db:result to=\"malkowscy.net\" from=\"brzezinski.mobi\">CAESBxCXyf6RqCoaEGFkhIYrlYto/kK5GTcsaTw=</db:result><db:verify to=\"malkowscy.net\" from=\"brzezinski.mobi\" id=\"1B6476BAD2C0BF34\">4ab1c1d99f40263822ae7d4851854eb158e46325009e928a66b1148ee4fed331</db:verify><db:result to=\"malkowscy.net\" from=\"gmail.com\">CAESBxCXyf6RqCoaEGPHnXDLTIeKBNx9ZJ1SmzM=</db:result>".toCharArray();
+
+		data = "<db:result to=\"malkowscy.net\" from=\"brzezinski.mobi\">CAESBxCXyf6RqCoaEGFkhIYrlYto/kK5GTcsaTw=</db:result><db:verify to=\"malkowscy.net\" from=\"brzezinski.mobi\" id=\"1B6476BAD2C0BF34\">4ab1c1d99f40263822ae7d4851854eb158e46325009e928a66b1148ee4fed331</db:verify><db:result to=\"malkowscy.net\" from=\"gmail.com\">CAESBxCXyf6RqCoaEGPHnXDLTIeKBNx9ZJ1SmzM=</db:result>"
+				.toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
-		handler.saveParserState(null);		
+		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 
-		data = "<body xmlns:xmpp=\"urn:xmpp:xbosh\" ack=\"6621206\" from=\"test\" xmlns=\"http://jabber.org/protocol/httpbind\" secure=\"true\" xmpp:version=\"1.0\" xmlns:stream=\"http://etherx.jabber.org/streams\" host=\"mbp-andrzej.local\"><stream:features xmlns=\"jabber:client\"><auth xmlns=\"http://jabber.org/features/iq-auth\"/><mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>SCRAM-SHA-1</mechanism><mechanism>PLAIN</mechanism><mechanism>ANONYMOUS</mechanism></mechanisms><register xmlns=\"http://jabber.org/features/iq-register\"/><ver xmlns=\"urn:xmpp:features:rosterver\"/><starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/><compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression></stream:features></body>".toCharArray();
+		data = "<body xmlns:xmpp=\"urn:xmpp:xbosh\" ack=\"6621206\" from=\"test\" xmlns=\"http://jabber.org/protocol/httpbind\" secure=\"true\" xmpp:version=\"1.0\" xmlns:stream=\"http://etherx.jabber.org/streams\" host=\"mbp-andrzej.local\"><stream:features xmlns=\"jabber:client\"><auth xmlns=\"http://jabber.org/features/iq-auth\"/><mechanisms xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><mechanism>SCRAM-SHA-1</mechanism><mechanism>PLAIN</mechanism><mechanism>ANONYMOUS</mechanism></mechanisms><register xmlns=\"http://jabber.org/features/iq-register\"/><ver xmlns=\"urn:xmpp:features:rosterver\"/><starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\"/><compression xmlns=\"http://jabber.org/features/compress\"><method>zlib</method></compression></stream:features></body>"
+				.toCharArray();
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
 //		assertEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState)handler.restoreParserState()).state);
@@ -305,7 +302,13 @@ public class SimpleParserTest {
 
 	}
 
-	private class DomBuilderHandlerImpl extends DomBuilderHandler {
+	protected boolean checkIsCharValidInXML(char chr) {
+		return (chr == 0x09 || chr == 0x0a || chr == 0x0d || (chr >= 0x20 && chr <= 0xD7FF) ||
+				(chr >= 0xE000 && chr <= 0xFFFD) || (chr >= 0x10000 && chr <= 0x10FFFF));
+	}
+
+	private class DomBuilderHandlerImpl
+			extends DomBuilderHandler {
 
 		private AtomicBoolean error;
 
@@ -326,6 +329,8 @@ public class SimpleParserTest {
 			}
 		}
 
-	};
-	
+	}
+
+	;
+
 }

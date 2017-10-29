@@ -20,17 +20,14 @@
 package tigase.xml;
 
 /**
- * <code>ElementFactory</code> is inderface definition for factories
- * creating proper instances of <code>Element</code> class or its extension.
- * <p>
- * Created: Mon Oct 25 21:47:45 2004
- * </p>
+ * <code>ElementFactory</code> is inderface definition for factories creating proper instances of <code>Element</code>
+ * class or its extension. <p> Created: Mon Oct 25 21:47:45 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
 public interface ElementFactory {
 
-  Element elementInstance(String name, String cdata,
-    StringBuilder[] attNames, StringBuilder[] attValues);
+	Element elementInstance(String name, String cdata, StringBuilder[] attNames, StringBuilder[] attValues);
 
 } // ElementFactory

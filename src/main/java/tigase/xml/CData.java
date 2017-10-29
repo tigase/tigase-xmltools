@@ -18,8 +18,6 @@
  * If not, see http://www.gnu.org/licenses/.
  */
 
-
-
 package tigase.xml;
 
 /**
@@ -28,7 +26,8 @@ package tigase.xml;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
 public class CData
-				implements XMLNodeIfc<CData> {
+		implements XMLNodeIfc<CData> {
+
 	private String cdata = null;
 
 	public CData(String cdata) {
@@ -52,7 +51,7 @@ public class CData
 		return cdata;
 	}
 
-	public void setCdata( String cdata ) {
+	public void setCdata(String cdata) {
 		this.cdata = cdata;
 	}
 
@@ -68,9 +67,7 @@ public class CData
 
 	@Override
 	public String toStringSecure() {
-		return (((cdata != null) && (cdata.length() > 2))
-						? "CData size: " + cdata.length()
-						: cdata);
+		return (((cdata != null) && (cdata.length() > 2)) ? "CData size: " + cdata.length() : cdata);
 	}
 
 	@Override

@@ -19,33 +19,29 @@
  */
 package tigase.xml;
 
-
 /**
- * <code>DefaultElementFactory</code> is an <code>ElementFactory</code>
- *  implementation creating instances of basic <code>Element</code> class. This
- *  implementation exists to offer complementary implementation of
- *  <em>DOM</em>. It can be used when basic <code>Element</code> class is
- *  sufficient for particular needs.
- * <p>
- * Created: Mon Oct 25 22:08:37 2004
- * </p>
+ * <code>DefaultElementFactory</code> is an <code>ElementFactory</code> implementation creating instances of basic
+ * <code>Element</code> class. This implementation exists to offer complementary implementation of <em>DOM</em>. It can
+ * be used when basic <code>Element</code> class is sufficient for particular needs. <p> Created: Mon Oct 25 22:08:37
+ * 2004 </p>
+ *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class DefaultElementFactory implements ElementFactory {
+public class DefaultElementFactory
+		implements ElementFactory {
 
-  /**
-   * Creates a new <code>DefaultElementFactory</code> instance.
-   *
-   */
-  public DefaultElementFactory() { }
+	/**
+	 * Creates a new <code>DefaultElementFactory</code> instance.
+	 */
+	public DefaultElementFactory() {
+	}
 
-  // Implementation of tigase.xml.ElementFactory
+	// Implementation of tigase.xml.ElementFactory
 
-  public final Element elementInstance(final String name,
-		final String cdata,
-    final StringBuilder[] attnames, final StringBuilder[] attvals) {
-    return new Element(name, cdata, attnames, attvals);
-  }
+	public final Element elementInstance(final String name, final String cdata, final StringBuilder[] attnames,
+										 final StringBuilder[] attvals) {
+		return new Element(name, cdata, attnames, attvals);
+	}
 
 } // DefaultElementFactory

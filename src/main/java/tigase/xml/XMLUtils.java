@@ -23,32 +23,32 @@ package tigase.xml;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.FileReader;
-
 import java.util.Queue;
 
 //~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class XMLUtil here.
- *
- *
+ * <p>
+ * <p>
  * Created: Tue Jan 23 20:59:30 2007
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>
  * @version $Rev$
  */
 public abstract class XMLUtils {
-	private static final String[] decoded = { "&", "<", ">", "\"", "\'" };
-	private static final String[] encoded = { "&amp;", "&lt;", "&gt;", "&quot;", "&apos;" };
 
-	private static final String[] decoded_1 = { "<", ">", "\"", "\'", "&" };
-	private static final String[] encoded_1 = { "&lt;", "&gt;", "&quot;", "&apos;", "&amp;" };
+	private static final String[] decoded = {"&", "<", ">", "\"", "\'"};
+	private static final String[] encoded = {"&amp;", "&lt;", "&gt;", "&quot;", "&apos;"};
+
+	private static final String[] decoded_1 = {"<", ">", "\"", "\'", "&"};
+	private static final String[] encoded_1 = {"&lt;", "&gt;", "&quot;", "&apos;", "&amp;"};
 
 	//~--- methods --------------------------------------------------------------
 
-	public static String escape( String input ) {
-		if ( input != null ){
-			return translateAll( input, decoded, encoded );
+	public static String escape(String input) {
+		if (input != null) {
+			return translateAll(input, decoded, encoded);
 		} else {
 			return null;
 		}
@@ -89,9 +89,9 @@ public abstract class XMLUtils {
 		return result;
 	}
 
-	public static String unescape( String input ) {
-		if ( input != null ){
-			return translateAll( input, encoded_1, decoded_1 );
+	public static String unescape(String input) {
+		if (input != null) {
+			return translateAll(input, encoded_1, decoded_1);
 		} else {
 			return null;
 		}

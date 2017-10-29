@@ -24,8 +24,8 @@ import java.util.TreeMap;
 
 /**
  * Describe class Types here.
- *
- *
+ * <p>
+ * <p>
  * Created: Wed Dec 28 21:54:43 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -33,13 +33,10 @@ import java.util.TreeMap;
  */
 public abstract class Types {
 
-	public static Map<String, DataType> dataTypeMap =
-	  new TreeMap<String, DataType>();
-
 	/**
 	 * Describe class DataType here.
-	 *
-	 *
+	 * <p>
+	 * <p>
 	 * Created: Tue Dec  6 17:34:22 2005
 	 *
 	 * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -48,30 +45,18 @@ public abstract class Types {
 	public enum DataType {
 
 		INTEGER(Integer.class.getSimpleName()),
-			INTEGER_ARR(int[].class.getSimpleName()),
-			LONG(Long.class.getSimpleName()),
-			LONG_ARR(long[].class.getSimpleName()),
-			STRING(String.class.getSimpleName()),
-			STRING_ARR(String[].class.getSimpleName()),
-			DOUBLE(Double.class.getSimpleName()),
-			DOUBLE_ARR(double[].class.getSimpleName()),
-			BOOLEAN(Boolean.class.getSimpleName()),
-			BOOLEAN_ARR(boolean[].class.getSimpleName()),
-			UNDEFINED(null)
-			;
+		INTEGER_ARR(int[].class.getSimpleName()),
+		LONG(Long.class.getSimpleName()),
+		LONG_ARR(long[].class.getSimpleName()),
+		STRING(String.class.getSimpleName()),
+		STRING_ARR(String[].class.getSimpleName()),
+		DOUBLE(Double.class.getSimpleName()),
+		DOUBLE_ARR(double[].class.getSimpleName()),
+		BOOLEAN(Boolean.class.getSimpleName()),
+		BOOLEAN_ARR(boolean[].class.getSimpleName()),
+		UNDEFINED(null);
 
 		private String javaType = null;
-
-		/**
-		 * Creates a new <code>DataType</code> instance.
-		 *
-		 */
-		private DataType(String java_type) {
-			this.javaType = java_type;
-			if (java_type != null) {
-				dataTypeMap.put(java_type, this);
-			} // end of if (java_type != null)
-		}
 
 		public static DataType valueof(String javaType) {
 			DataType result = UNDEFINED;
@@ -79,6 +64,16 @@ public abstract class Types {
 				result = dataTypeMap.get(javaType);
 			} // end of if (javaType != null && !javaType.equals(""))
 			return result == null ? UNDEFINED : result;
+		}
+
+		/**
+		 * Creates a new <code>DataType</code> instance.
+		 */
+		private DataType(String java_type) {
+			this.javaType = java_type;
+			if (java_type != null) {
+				dataTypeMap.put(java_type, this);
+			} // end of if (java_type != null)
 		}
 
 		public String toString() {
@@ -91,5 +86,7 @@ public abstract class Types {
 		}
 
 	} // DataType
+
+	public static Map<String, DataType> dataTypeMap = new TreeMap<String, DataType>();
 
 } // Types

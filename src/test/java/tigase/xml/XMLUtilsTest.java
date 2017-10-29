@@ -30,12 +30,11 @@ public class XMLUtilsTest {
 		Assert.assertEquals("&lt;&lt;&lt;&lt;", XMLUtils.escape("<<<<"));
 		Assert.assertEquals("&lt;&quot;&amp;&gt;&lt;foo&gt;;&apos;", XMLUtils.escape("<\"&><foo>;'"));
 		Assert.assertEquals("&lt;&amp;quot;&amp;amp;&amp;gt;&amp;lt;foo&gt;;&apos;",
-				XMLUtils.escape("<&quot;&amp;&gt;&lt;foo>;'"));
+							XMLUtils.escape("<&quot;&amp;&gt;&lt;foo>;'"));
 	}
 
 	/**
-	 * Test for error described in
-	 * <a href="https://projects.tigase.org/issues/242">Bug #242</a>.
+	 * Test for error described in <a href="https://projects.tigase.org/issues/242">Bug #242</a>.
 	 */
 	@Test
 	public void testEscapeUnescape() {

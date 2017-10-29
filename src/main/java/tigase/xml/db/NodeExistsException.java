@@ -20,26 +20,32 @@
 package tigase.xml.db;
 
 /**
- * This exception is thrown when user tries to add subnode with name which
- * already exists in data base. Data base implementation requires that all nodes
- * have unique names thus adding multiple nodes with the same name is not
- * permitted.
+ * This exception is thrown when user tries to add subnode with name which already exists in data base. Data base
+ * implementation requires that all nodes have unique names thus adding multiple nodes with the same name is not
+ * permitted. <p> <p> Created: Thu Nov 11 20:52:34 2004 </p>
  *
- * <p>
- * Created: Thu Nov 11 20:52:34 2004
- * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  */
-public class NodeExistsException extends XMLDBException {
+public class NodeExistsException
+		extends XMLDBException {
 
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  public NodeExistsException() { super(); }
-  public NodeExistsException(String message) { super(message); }
-  public NodeExistsException(String message, Throwable cause) {
-    super(message, cause);
-  }
-  public NodeExistsException(Throwable cause) { super(cause); }
+	public NodeExistsException() {
+		super();
+	}
+
+	public NodeExistsException(String message) {
+		super(message);
+	}
+
+	public NodeExistsException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public NodeExistsException(Throwable cause) {
+		super(cause);
+	}
 
 } // NodeExistsException

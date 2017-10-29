@@ -23,16 +23,11 @@ package tigase.xml;
 import tigase.xml.annotations.TODO;
 
 /**
- * <code>SimpleHandler</code> - parser handler interface for event driven
- *  parser. It is very simplified version of
- *  <code>org.xml.sax.ContentHandler</code> interface created for
- *  <code>SimpleParser</code> needs. It allows to receive events like start
- *  element (with element attributes), end element, element cdata, other XML
- *  content and error event if XML error found.
+ * <code>SimpleHandler</code> - parser handler interface for event driven parser. It is very simplified version of
+ * <code>org.xml.sax.ContentHandler</code> interface created for <code>SimpleParser</code> needs. It allows to receive
+ * events like start element (with element attributes), end element, element cdata, other XML content and error event if
+ * XML error found. <p> <p> Created: Sat Oct  2 00:00:08 2004 </p>
  *
- * <p>
- * Created: Sat Oct  2 00:00:08 2004
- * </p>
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
  * @see SimpleParser
@@ -40,21 +35,20 @@ import tigase.xml.annotations.TODO;
 
 public interface SimpleHandler {
 
-  void error(String errorMessage);
+	void error(String errorMessage);
 
-  void startElement(StringBuilder name,
-    StringBuilder[] attr_names, StringBuilder[] attr_values);
+	void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values);
 
-  void elementCData(StringBuilder cdata);
+	void elementCData(StringBuilder cdata);
 
-  boolean endElement(StringBuilder name);
+	boolean endElement(StringBuilder name);
 
-  void otherXML(StringBuilder other);
+	void otherXML(StringBuilder other);
 
-  @TODO(note="Use generic types to store parser data.")
-  void saveParserState(Object state);
+	@TODO(note = "Use generic types to store parser data.")
+	void saveParserState(Object state);
 
-  @TODO(note="Use generic types to store parser data.")
-  Object restoreParserState();
+	@TODO(note = "Use generic types to store parser data.")
+	Object restoreParserState();
 
 }// SimpleHandler
