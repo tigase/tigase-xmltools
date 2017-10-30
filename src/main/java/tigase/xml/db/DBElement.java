@@ -76,48 +76,18 @@ public class DBElement
 
 	//~--- constructors ---------------------------------------------------------
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param argName
-	 */
 	public DBElement(String argName) {
 		super(argName);
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param argName
-	 * @param attname
-	 * @param attvalue
-	 */
 	public DBElement(String argName, String attname, String attvalue) {
 		super(argName, new String[]{attname}, new String[]{attvalue});
 	}
 
-	/**
-	 * Constructs ...
-	 *
-	 * @param argName
-	 * @param argCData
-	 * @param att_names
-	 * @param att_values
-	 */
 	public DBElement(String argName, String argCData, StringBuilder[] att_names, StringBuilder[] att_values) {
 		super(argName, argCData, att_names, att_values);
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param indent
-	 * @param step
-	 *
-	 * @return
-	 */
 	public final String formatedString(int indent, int step) {
 		StringBuilder result = new StringBuilder();
 
@@ -153,14 +123,6 @@ public class DBElement
 		return result.toString();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param indent
-	 * @param step
-	 *
-	 * @return
-	 */
 	public final String childrenFormatedString(int indent, int step) {
 		StringBuilder result = new StringBuilder();
 
@@ -181,13 +143,6 @@ public class DBElement
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param name
-	 *
-	 * @return
-	 */
 	public final DBElement getSubnode(String name) {
 		if (children == null) {
 			return null;
@@ -207,11 +162,6 @@ public class DBElement
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
 	public final String[] getSubnodes() {
 		if ((children == null) || (children.size() == 1)) {
 			return null;
@@ -239,13 +189,6 @@ public class DBElement
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param nodePath
-	 *
-	 * @return
-	 */
 	public final DBElement findNode(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
 
@@ -262,11 +205,6 @@ public class DBElement
 		return node;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param nodePath
-	 */
 	public final void removeNode(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
 		DBElement node = this;
@@ -283,15 +221,6 @@ public class DBElement
 		}    // end of if (parent != null && node != null)
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param nodePath
-	 *
-	 * @return
-	 */
 	public final DBElement getSubnodePath(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
 		DBElement node = this;
@@ -310,15 +239,6 @@ public class DBElement
 		return node;
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param nodePath
-	 *
-	 * @return
-	 */
 	public final DBElement buildNodesTree(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
 		DBElement node = this;
@@ -341,13 +261,6 @@ public class DBElement
 		return node;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param name
-	 *
-	 * @return
-	 */
 	public final DBElement newSubnode(String name) {
 		DBElement node = new DBElement(NODE, NAME, name);
 
@@ -357,13 +270,6 @@ public class DBElement
 		return node;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 *
-	 * @return
-	 */
 	public final DBElement findEntry(String key) {
 		DBElement result = null;
 		List<Element> entries = getChild(MAP).getChildren();
@@ -383,11 +289,6 @@ public class DBElement
 		return result;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 */
 	public final void removeEntry(String key) {
 		List<Element> entries = getChild(MAP).getChildren();
 
@@ -411,11 +312,6 @@ public class DBElement
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @return
-	 */
 	public final String[] getEntryKeys() {
 		List<Element> entries = getChild(MAP).getChildren();
 
@@ -438,13 +334,6 @@ public class DBElement
 		return null;
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 *
-	 * @return
-	 */
 	public final DBElement getEntry(String key) {
 		DBElement result = findEntry(key);
 
@@ -456,14 +345,6 @@ public class DBElement
 		return result;
 	}
 
-	//~--- set methods ----------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param value
-	 */
 	public final void setEntry(String key, Object value) {
 		Types.DataType type = Types.DataType.valueof(value.getClass().getSimpleName());
 		DBElement entry = getEntry(key);
@@ -508,28 +389,10 @@ public class DBElement
 		}        // end of if (value.getClass().isArray()) else
 	}
 
-	//~--- methods --------------------------------------------------------------
-
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final String getEntryStringValue(String key, String def) {
 		return (String) getEntryValue(key, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final String[] getEntryStringArrValue(String key, String[] def) {
 		Object result = getEntryValue(key, def);
 		DBElement entry = findEntry(key);
@@ -556,62 +419,22 @@ public class DBElement
 
 	//~--- get methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final int getEntryIntValue(String key, int def) {
 		return ((Integer) getEntryValue(key, Integer.valueOf(def))).intValue();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final int[] getEntryIntArrValue(String key, int[] def) {
 		return (int[]) getEntryValue(key, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final double getEntryDoubleValue(String key, double def) {
 		return ((Double) getEntryValue(key, new Double(def))).doubleValue();
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final double[] getEntryDoubleArrValue(String key, double[] def) {
 		return (double[]) getEntryValue(key, def);
 	}
 
-	/**
-	 * Method description
-	 *
-	 * @param key
-	 * @param def
-	 *
-	 * @return
-	 */
 	public final Object getEntryValue(String key, Object def) {
 		DBElement entry = findEntry(key);
 
@@ -721,14 +544,10 @@ public class DBElement
 		}    // end of try-catch
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	private boolean parseBool(final String val) {
 		return (val != null) &&
 				(val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on"));
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	private final String[] getEntryValues(String key) {
 		Element entry = findEntry(key);
@@ -750,26 +569,7 @@ public class DBElement
 
 		return null;
 	}
-
-///**
-// * Method <code>compareTo</code> is used to perform
-// *
-// * @param elem an <code>Object</code> value
-// * @return an <code>int</code> value
-// */
-//public int compareTo(final DBElement elem) {
-//  return getAttribute("name").compareTo(elem.getAttribute("name"));
-//}
-//  public boolean equals(Object obj) {
-// if (obj instanceof DBElement) {
-//   DBElement elem = (DBElement)obj;
-//   return getAttribute("name").equals(elem.getAttribute("name"));
-// }
-// return false;
-//  }
-//  public int hashCode() {
-// return getAttribute("name").hashCode();
-//  }
+	
 }    // DBElement
 
 //~ Formatted in Tigase Code Convention on 13/02/20

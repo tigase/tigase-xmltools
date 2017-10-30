@@ -122,14 +122,6 @@ public class SimpleParser {
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @param handler
-	 * @param data
-	 * @param off
-	 * @param len
-	 */
 	@TODO(note = "1. Better XML errors detection. 2. Add XML comments handling. " +
 			"3. Character overflow detection i.e. limit max number of characters for each entity.")
 	public final void parse(SimpleHandler handler, char[] data, int off, int len) {

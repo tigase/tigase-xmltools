@@ -55,33 +55,18 @@ public class ElementTest
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @throws Exception
-	 */
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 	}
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @throws Exception
-	 */
 	@AfterClass
 	public static void tearDownClass() throws Exception {
 	}
 
 	//~--- set methods ----------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @throws Exception
-	 */
 	@Before
 	public void setUp() throws Exception {
 		value = "correct-value";
@@ -103,11 +88,6 @@ public class ElementTest
 
 	//~--- methods --------------------------------------------------------------
 
-	/**
-	 * Method description
-	 *
-	 * @throws Exception
-	 */
 	@After
 	public void tearDown() throws Exception {
 		parent = null;
@@ -119,9 +99,6 @@ public class ElementTest
 		c_att_value = null;
 	}
 
-	/**
-	 * Method description
-	 */
 	@Test
 	public void testGetChildCData() {
 		String result = parent.getChildCData(str_path);
