@@ -28,7 +28,7 @@ import java.io.PrintStream;
  * This is temporary code used for testing purposes only. It is subject to change or remove at any time of server
  * development. It has been created to format <em>XML</em> files to make them easier to read and modify by a human. With
  * current <code>XMLDB</code> implementation however it is not necessary to use this formatter for configuration files
- * and user repositories as they are saved in proper format. <p> <p> Created: Thu Oct 21 14:49:41 2004 </p>
+ * and user repositories as they are saved in proper format. <p> Created: Thu Oct 21 14:49:41 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$
@@ -42,11 +42,6 @@ public class XMLFormatter
 	private PrintStream output = null;
 	private Object parserData = null;
 
-	/**
-	 * Describe <code>main</code> method here.
-	 *
-	 * @param args a <code>String[]</code> value
-	 */
 	public static void main(final String[] args) throws Exception {
 
 		if (args.length < 1) {
@@ -72,32 +67,15 @@ public class XMLFormatter
 		formatter = null;
 	}
 
-	// Implementation of tigase.xml.SimpleHandler
-
-	/**
-	 * Creates a new <code>XMLFormatter</code> instance.
-	 */
 	public XMLFormatter(OutputStream out) {
 		output = new PrintStream(out);
 	}
 
-	/**
-	 * Describe <code>error</code> method here.
-	 *
-	 * @param errorMessage
-	 */
 	@Override
 	public void error(String errorMessage) {
 		System.err.println(errorMessage);
 	}
 
-	/**
-	 * Describe <code>startElement</code> method here.
-	 *
-	 * @param name a <code>StringBuilder</code> value
-	 * @param att_names a <code>StringBuilder[]</code> value
-	 * @param att_values a <code>StringBuilder[]</code> value
-	 */
 	@Override
 	public void startElement(final StringBuilder name, final StringBuilder[] att_names,
 							 final StringBuilder[] att_values) {
@@ -122,11 +100,6 @@ public class XMLFormatter
 		openedElement = true;
 	}
 
-	/**
-	 * Describe <code>elementCData</code> method here.
-	 *
-	 * @param cdata a <code>StringBuilder</code> value
-	 */
 	@Override
 	public void elementCData(final StringBuilder cdata) {
 		output.print(">");
@@ -135,11 +108,6 @@ public class XMLFormatter
 		cdataWritten = true;
 	}
 
-	/**
-	 * Describe <code>endElement</code> method here.
-	 *
-	 * @param name a <code>StringBuilder</code> value
-	 */
 	@Override
 	public boolean endElement(final StringBuilder name) {
 		if (cdataWritten) {
@@ -157,31 +125,16 @@ public class XMLFormatter
 		return true;
 	}
 
-	/**
-	 * Describe <code>otherXML</code> method here.
-	 *
-	 * @param other a <code>StringBuilder</code> value
-	 */
 	@Override
 	public void otherXML(final StringBuilder other) {
 		output.println("<" + other + ">");
 	}
 
-	/**
-	 * Describe <code>saveParserState</code> method here.
-	 *
-	 * @param object an <code>Object</code> value
-	 */
 	@Override
 	public void saveParserState(final Object object) {
 		parserData = object;
 	}
 
-	/**
-	 * Describe <code>restoreParserState</code> method here.
-	 *
-	 * @return an <code>Object</code> value
-	 */
 	@Override
 	public Object restoreParserState() {
 		return parserData;

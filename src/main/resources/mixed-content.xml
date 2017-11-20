@@ -8,12 +8,12 @@ config-type=--gen-config-def
 --debug=server
 </body>
 <html xmlns="http://jabber.org/protocol/xhtml-im">
-<body xmlns="http://www.w3.org/1999/xhtml">w inicie jest domyślnie tak :<br/>
-config-type=--gen-config-def<br/>
---admins=admin@$HOST_NAME<br/>
---virt-hosts = $HOST_NAME<br/>
---debug=server<br/>
-<br/>
+<body xmlns="http://www.w3.org/1999/xhtml">w inicie jest domyślnie tak :<br>
+config-type=--gen-config-def<br>
+--admins=admin@$HOST_NAME<br>
+--virt-hosts = $HOST_NAME<br>
+--debug=server<br>
+<br>
 </body>
 </html>
 <x xmlns="google:nosave" value="disabled" />

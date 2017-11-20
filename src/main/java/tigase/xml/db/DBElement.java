@@ -39,7 +39,7 @@ import java.util.StringTokenizer;
  * data base operations like searching for some specific nodes, add data entries, remove data, and all other common
  * operations not directly related to pure <em>XML</em> processing. Pure <em>XML</em> processing is of course
  * implemented in <code>tigase.xml.Element</code>. The are also some methods which make it easier to save <em>XML</em>
- * tree from memory to disk file in a form which is easier to read by a human. <p> <p> Created: Tue Oct 26 22:01:47 2004
+ * tree from memory to disk file in a form which is easier to read by a human. <p> Created: Tue Oct 26 22:01:47 2004
  * </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>

@@ -65,7 +65,6 @@
                             </dependencySourceIncludes>
 
                             <finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
-                            <additionalparam>-Xdoclint:none</additionalparam>
                         </configuration>
                     </execution>
                 </executions>
@@ -415,7 +414,6 @@
                                     <finalName>${project.artifactId}-${project.version}-b${gitVersion}</finalName>
                                     <jarOutputDirectory>pack</jarOutputDirectory>
 
-                                    <additionalparam>-Xdoclint:none</additionalparam>
                                 </configuration>
                             </execution>
                         </executions>

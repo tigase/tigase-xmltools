@@ -25,7 +25,6 @@ import java.util.TreeMap;
 /**
  * Describe class Types here.
  * <p>
- * <p>
  * Created: Wed Dec 28 21:54:43 2005
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
@@ -35,7 +34,6 @@ public abstract class Types {
 
 	/**
 	 * Describe class DataType here.
-	 * <p>
 	 * <p>
 	 * Created: Tue Dec  6 17:34:22 2005
 	 *

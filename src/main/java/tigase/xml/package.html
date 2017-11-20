@@ -104,7 +104,7 @@
         time. It also supports creation of multiple, sperate document trees if parsed
         buffer contains a few <em>XML</em> documents. As a result of work it returns
         always <code>Queue</code> containing all found <em>XML</em> trees in the
-        same order as they were found in network data.<br/>
+        same order as they were found in network data.<br>
         Document trees created by this <em>DOM</em> builder consist of instances of
         <code>Element</code> class or instances of class extending
         <code>Element</code> class. To receive trees built with instances of proper
@@ -148,7 +148,7 @@
         Since <code>SimpleParser</code> if fully thread safe implementation there is
         no sense to use multiple instances of this class. This in particular useful
         when processing a lot of network connections sending <em>XML</em> streams
-        and using one instance for all connections can save some resources.<br/>
+        and using one instance for all connections can save some resources.<br>
         Of course it is still possible to create as many instances of
         <code>SimpleParser</code> you like in normal way using public constructor.
     </li>

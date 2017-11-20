@@ -26,7 +26,8 @@ import tigase.xml.annotations.TODO;
  * <code>SimpleHandler</code> - parser handler interface for event driven parser. It is very simplified version of
  * <code>org.xml.sax.ContentHandler</code> interface created for <code>SimpleParser</code> needs. It allows to receive
  * events like start element (with element attributes), end element, element cdata, other XML content and error event if
- * XML error found. <p> <p> Created: Sat Oct  2 00:00:08 2004 </p>
+ * XML error found.
+ * <p> Created: Sat Oct  2 00:00:08 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  * @version $Rev$

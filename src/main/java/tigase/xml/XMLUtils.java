@@ -30,7 +30,6 @@ import java.util.Queue;
 /**
  * Describe class XMLUtil here.
  * <p>
- * <p>
  * Created: Tue Jan 23 20:59:30 2007
  *
  * @author <a href="mailto:artur.hefczyc@gmail.com">Artur Hefczyc</a>

@@ -23,7 +23,7 @@ package tigase.xml;
 /**
  * Created: Feb 9, 2009 12:21:23 PM
  *
- * @param <T>
+ * @param <T> type extending {@link XMLNodeIfc}
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */

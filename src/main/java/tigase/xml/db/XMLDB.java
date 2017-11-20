@@ -47,24 +47,23 @@ import java.util.logging.Logger;
  * level under <em>node1</em> level. There can be any number of <em>subnodes</em> on any level. <em>Subnodes</em> have
  * always '<code>node</code>' element name and this can't be changed.</li> </ol> <p>All <em>node1</em> nodes and
  * <em>subnodes</em> can contains any number of data associated with keys. With some keys there ca be more than one
- * value assigned. Such kind of data are called <em>data lists</em>.<br/> Although element name for <em>subnode</em> can
+ * value assigned. Such kind of data are called <em>data lists</em>.<br> Although element name for <em>subnode</em> can
  * not be defined it is actually not important. Because user database doesn't use subnode element names. He doesn't even
  * use neiher <em>root</em> node element name nor <em>node1</em> element name. database user uses <em><b>node
  * name</b></em> what is quite different from <b><em>node element name</em></b>. Let see example below:</p>
- * <pre>&#60;node name='roster'/&#62;</pre>
- * <p>In this example <em>node element name</em> is <b>node</b> and <em>node name</em> is <b>roster.</b><br/> database
- * users (actually developers) use only <em>node names</em>.<br/> If you want to access subnode on some level you need
+ * <pre>{@code <node name='roster'/>}</pre>
+ * <p>In this example <em>node element name</em> is <b>node</b> and <em>node name</em> is <b>roster.</b><br> database
+ * users (actually developers) use only <em>node names</em>.<br> If you want to access subnode on some level you need
  * to give full path to this subnode. For example, let's assume we have following database:</p>
- * <pre>  &#60;node name='tigase'>
- * &#60;node name='server'>
- * &#60;/node>
- * &#60;node name='xmpp'>
- * &#60;/node>
- * &#60;/node></pre>
+ * <pre>{@code
+ * <node name='tigase'>
+ *      <node name='server'></node>
+ *      <node name='xmpp'></node>
+ * </node>}</pre>
  * <p>If you need to access '<code>server</code>' subnode you need to call method with '<code>/tigase/server</code>' as
  * subnode path and for subnode '<code>xmpp</code>' proper subnode path is of course '<code>/tigase/xmpp</code>'. If you
  * skip subnode path or give <code>null</code> as a parameter you will be accessing data on <em>node1</em> level. You
- * can not access or save data on root node level.</p> <p> <p> Created: Tue Oct 26 15:27:33 2004 </p>
+ * can not access or save data on root node level.</p> <p> Created: Tue Oct 26 15:27:33 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
  */
@@ -139,8 +138,8 @@ public class XMLDB {
 	 * @param db_file indicates path to the file on disk to/from which write/read; if parameter starts with "memory://"
 	 * then memory mode (without actual file usage) is enabled
 	 *
-	 * @throws IOException
-	 * @throws XMLDBException
+	 * @throws IOException when the file doesn't exist
+	 * @throws XMLDBException when there is a problem with XML DB
 	 */
 	public XMLDB(String db_file) throws IOException, XMLDBException {
 		dbFile = db_file;
@@ -248,7 +247,7 @@ public class XMLDB {
 	 *
 	 * @param node1_id name of the node to add
 	 *
-	 * @throws NodeExistsException
+	 * @throws NodeExistsException when the node already exists
 	 */
 	public void addNode1(String node1_id) throws NodeExistsException {
 		lock.lock();
@@ -275,7 +274,7 @@ public class XMLDB {
 	 *
 	 * @param node1_id name of the node to remove
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public void removeNode1(String node1_id) throws NodeNotFoundException {
 		lock.lock();
@@ -299,7 +298,7 @@ public class XMLDB {
 	 * @param key under which save the data
 	 * @param value actual value to be saved
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public void setData(String node1_id, String subnode, String key, Object value) throws NodeNotFoundException {
 		log.log(Level.FINEST, "Getting node, node1_id: {0}, subnode: {1}, key: {2}, value: {3} @ {4}",
@@ -315,7 +314,7 @@ public class XMLDB {
 	 * @param key under which save the data
 	 * @param value actual value to be saved
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public void setData(String node1_id, String key, Object value) throws NodeNotFoundException {
 		setData(node1_id, null, key, value);
@@ -330,7 +329,7 @@ public class XMLDB {
 	 *
 	 * @return array of Strings
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public String[] getDataList(String node1_id, String subnode, String key) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -347,7 +346,7 @@ public class XMLDB {
 	 *
 	 * @return array of Integers
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public int[] getDataIntList(String node1_id, String subnode, String key) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -364,7 +363,7 @@ public class XMLDB {
 	 *
 	 * @return array of Doubles
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public double[] getDataDoubleList(String node1_id, String subnode, String key) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -382,7 +381,7 @@ public class XMLDB {
 	 *
 	 * @return Object with value
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public Object getData(String node1_id, String subnode, String key, Object def) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -400,7 +399,7 @@ public class XMLDB {
 	 *
 	 * @return Integer value
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public int getDataInt(String node1_id, String subnode, String key, int def) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -418,7 +417,7 @@ public class XMLDB {
 	 *
 	 * @return Double value
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public double getDataDouble(String node1_id, String subnode, String key, double def) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -435,7 +434,7 @@ public class XMLDB {
 	 *
 	 * @return Object value
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public Object getData(String node1_id, String subnode, String key) throws NodeNotFoundException {
 		return getData(node1_id, subnode, key, null);
@@ -449,7 +448,7 @@ public class XMLDB {
 	 *
 	 * @return Double value
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public Object getData(String node1_id, String key) throws NodeNotFoundException {
 		return getData(node1_id, null, key, null);
@@ -463,7 +462,7 @@ public class XMLDB {
 	 *
 	 * @return arrays of subnodes names
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public String[] getSubnodes(String node1_id, String subnode) throws NodeNotFoundException {
 
@@ -479,7 +478,7 @@ public class XMLDB {
 	 *
 	 * @return arrays of subnodes names
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public String[] getSubnodes(String node1_id) throws NodeNotFoundException {
 		return getSubnodes(node1_id, null);
@@ -493,7 +492,7 @@ public class XMLDB {
 	 *
 	 * @return arrays of keys names
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public String[] getKeys(String node1_id, String subnode) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -508,7 +507,7 @@ public class XMLDB {
 	 *
 	 * @return arrays of subnodes names
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public String[] getKeys(String node1_id) throws NodeNotFoundException {
 		return getKeys(node1_id, null);
@@ -521,7 +520,7 @@ public class XMLDB {
 	 * @param subnode path to the node
 	 * @param key name of the key
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public void removeData(String node1_id, String subnode, String key) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -538,7 +537,7 @@ public class XMLDB {
 	 * @param node1_id name of the node
 	 * @param key name of the key
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public void removeData(String node1_id, String key) throws NodeNotFoundException {
 		removeData(node1_id, null, key);
@@ -550,7 +549,7 @@ public class XMLDB {
 	 * @param node1_id name of the node
 	 * @param subnode path to the node
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	public void removeSubnode(String node1_id, String subnode) throws NodeNotFoundException {
 		DBElement node = getNode(node1_id, subnode, false);
@@ -564,7 +563,7 @@ public class XMLDB {
 	/**
 	 * Performs synchronization with the file
 	 *
-	 * @throws IOException
+	 * @throws IOException when the file doesn't exist
 	 */
 	public void sync() throws IOException {
 		write();
@@ -601,8 +600,8 @@ public class XMLDB {
 	/**
 	 * Loads XML from file
 	 *
-	 * @throws IOException
-	 * @throws XMLDBException
+	 * @throws IOException when the file doesn't exist
+	 * @throws XMLDBException when root node doesn't exist
 	 */
 	protected void loadDB() throws IOException, XMLDBException {
 		InputStreamReader file = new InputStreamReader(new FileInputStream(dbFile), "UTF-8");
@@ -644,13 +643,6 @@ public class XMLDB {
 		}
 	}
 
-	/**
-	 * @param node1_id
-	 *
-	 * @return
-	 *
-	 * @throws NodeNotFoundException
-	 */
 	protected final DBElement getNode1(String node1_id) throws NodeNotFoundException {
 		DBElement result = findNode1(node1_id);
 
@@ -668,9 +660,9 @@ public class XMLDB {
 	 * @param subnode path to the node
 	 * @param auto_create whether to create path if it's missing
 	 *
-	 * @return
+	 * @return retrieved node
 	 *
-	 * @throws NodeNotFoundException
+	 * @throws NodeNotFoundException when node doesn't exist on first level
 	 */
 	protected final DBElement getNode(String node1_id, String subnode, boolean auto_create)
 			throws NodeNotFoundException {
@@ -695,7 +687,7 @@ public class XMLDB {
 	/**
 	 * Writes XMLDB to file
 	 *
-	 * @throws IOException
+	 * @throws IOException when the file doesn't exist
 	 */
 	private void write() throws IOException {
 		lock.lock();
@@ -740,9 +732,6 @@ public class XMLDB {
 	class DBSaver
 			implements Runnable {
 
-		/**
-		 * Constructor...
-		 */
 		public DBSaver() {
 		}
 

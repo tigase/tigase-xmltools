@@ -51,21 +51,16 @@ import java.util.function.Function;
 public class Element
 		implements XMLNodeIfc<Element> {
 
-	/** Field description */
 	protected XMLIdentityHashMap<String, String> attributes = null;
 
-	/** Field description */
 	protected LinkedList<XMLNodeIfc> children = null;
 
 	// protected String cdata = null;
 
-	/** Field description */
 	protected String defxmlns = null;
 
-	/** Field description */
 	protected String name = null;
 
-	/** Field description */
 	protected String xmlns = null;
 
 	public static void main(String[] args) throws Exception {
@@ -338,6 +333,10 @@ public class Element
 	}
 
 	/**
+	 * @param elementPath
+	 *
+	 * @return an Element
+	 *
 	 * @deprecated use {@link #findChild(java.lang.String[])} instead.
 	 */
 	@Deprecated
