@@ -48,30 +48,22 @@ import java.util.StringTokenizer;
 public class DBElement
 		extends Element {
 
-	/** Field description */
 	public static final String ENTRY = "entry";
 
-	/** Field description */
 	public static final String KEY = "key";
 
-	/** Field description */
 	public static final String MAP = "map";
 
-	/** Field description */
 	public static final String NAME = "name";
 
-	/** Field description */
 	public static final String NODE = "node";
 
-	/** Field description */
 	public static final String TYPE = "type";
 
-	/** Field description */
 	public static final String VALUE = "value";
 
 	//~--- fields ---------------------------------------------------------------
 
-	/** Field description */
 	public boolean removed = false;
 
 	//~--- constructors ---------------------------------------------------------

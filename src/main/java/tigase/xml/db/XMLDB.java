@@ -69,9 +69,6 @@ import java.util.logging.Logger;
  */
 public class XMLDB {
 
-	/**
-	 *
-	 */
 	private static Logger log = Logger.getLogger("tigase.xml.db.XMLDB");
 
 	//~--- fields ---------------------------------------------------------------
