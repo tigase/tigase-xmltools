@@ -71,7 +71,6 @@ public class XMLDB {
 
 	private static Logger log = Logger.getLogger("tigase.xml.db.XMLDB");
 
-	//~--- fields ---------------------------------------------------------------
 	/** file saver task */
 	private final DBSaver db_saver = new DBSaver();
 	/** DBElementComparator filed */
@@ -701,8 +700,6 @@ public class XMLDB {
 			lock.unlock();
 		}    // end of try-finally
 	}
-
-	//~--- inner classes --------------------------------------------------------
 
 	/**
 	 * Helper class for comparing elements

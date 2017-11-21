@@ -20,8 +20,6 @@
 
 package tigase.xml.db;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.Element;
 import tigase.xml.XMLNodeIfc;
 
@@ -31,8 +29,6 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * <code>DBElement</code> class extends <code>tigase.xml.Element</code>. It adds some extra functionality useful for
@@ -62,11 +58,7 @@ public class DBElement
 
 	public static final String VALUE = "value";
 
-	//~--- fields ---------------------------------------------------------------
-
 	public boolean removed = false;
-
-	//~--- constructors ---------------------------------------------------------
 
 	public DBElement(String argName) {
 		super(argName);
@@ -133,8 +125,6 @@ public class DBElement
 		return result.toString();
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public final DBElement getSubnode(String name) {
 		if (children == null) {
 			return null;
@@ -178,8 +168,6 @@ public class DBElement
 
 		return result;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	public final DBElement findNode(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
@@ -302,8 +290,6 @@ public class DBElement
 		}
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	public final String[] getEntryKeys() {
 		List<Element> entries = getChild(MAP).getChildren();
 
@@ -408,8 +394,6 @@ public class DBElement
 
 		return (String[]) result;
 	}
-
-	//~--- get methods ----------------------------------------------------------
 
 	public final int getEntryIntValue(String key, int def) {
 		return ((Integer) getEntryValue(key, Integer.valueOf(def))).intValue();
@@ -564,4 +548,3 @@ public class DBElement
 	
 }    // DBElement
 
-//~ Formatted in Tigase Code Convention on 13/02/20

@@ -20,12 +20,8 @@
 
 package tigase.xml;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.FileReader;
 import java.util.Queue;
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * Describe class XMLUtil here.
@@ -42,8 +38,6 @@ public abstract class XMLUtils {
 
 	private static final String[] decoded_1 = {"<", ">", "\"", "\'", "&"};
 	private static final String[] encoded_1 = {"&lt;", "&gt;", "&quot;", "&apos;", "&amp;"};
-
-	//~--- methods --------------------------------------------------------------
 
 	public static String escape(String input) {
 		if (input != null) {

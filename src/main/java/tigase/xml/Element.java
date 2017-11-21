@@ -20,16 +20,12 @@
 
 package tigase.xml;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.annotations.TODO;
 
 import java.io.FileReader;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-//~--- JDK imports ------------------------------------------------------------
 
 //import java.util.StringTokenizer;
 

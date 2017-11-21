@@ -20,15 +20,9 @@
 
 package tigase.xml;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import tigase.xml.annotations.TODO;
 
 import java.util.Arrays;
-
-//~--- JDK imports ------------------------------------------------------------
-
-//~--- classes ----------------------------------------------------------------
 
 /**
  * <code>SimpleParser</code> - implementation of <em>SAX</em> parser. This is very basic implementation of <em>XML</em>
@@ -102,13 +96,11 @@ public class SimpleParser {
 	public int MAX_ATTRIBS_NUMBER = 6;
 	public int MAX_ATTRIBUTE_NAME_SIZE = 1024;
 
-	//~--- constant enums -------------------------------------------------------
 	public int MAX_ATTRIBUTE_VALUE_SIZE = 10 * 1024;
 	public int MAX_CDATA_SIZE = 1024 * 1024;
 
 	;
 
-	//~--- static initializers --------------------------------------------------
 	public int MAX_ELEMENT_NAME_SIZE = 1024;
 
 	public SimpleParser() {
@@ -119,8 +111,6 @@ public class SimpleParser {
 		MAX_ATTRIBUTE_VALUE_SIZE = Integer.getInteger(MAX_ATTRIBUTE_VALUE_SIZE_PROP_KEY, MAX_ATTRIBUTE_VALUE_SIZE);
 		MAX_CDATA_SIZE = Integer.getInteger(MAX_CDATA_SIZE_PROP_KEY, MAX_CDATA_SIZE);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@TODO(note = "1. Better XML errors detection. 2. Add XML comments handling. " +
 			"3. Character overflow detection i.e. limit max number of characters for each entity.")
@@ -627,8 +617,6 @@ public class SimpleParser {
 		return false;
 	}
 
-	//~--- get methods ----------------------------------------------------------
-
 	//private boolean ignore(char chr) {
 //  return Arrays.binarySearch(IGNORE_CHARS, chr) >= 0;
 //}
@@ -639,8 +627,6 @@ public class SimpleParser {
 
 		return array;
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	private boolean isWhite(char chr) {
 
@@ -690,8 +676,6 @@ public class SimpleParser {
 		ENTITY
 	}
 
-	//~--- inner classes --------------------------------------------------------
-
 	protected static class ParserState {
 
 		StringBuilder[] attrib_names = null;
@@ -708,6 +692,4 @@ public class SimpleParser {
 	}
 }    // SimpleParser
 
-//~ Formatted in Sun Code Convention
 
-//~ Formatted by Jindent --- http://www.jindent.com

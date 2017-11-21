@@ -20,15 +20,11 @@
 
 package tigase.xml;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import junit.framework.TestCase;
 import org.junit.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
-//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Simple tests for Element class
@@ -43,8 +39,6 @@ public class ElementTest
 	private static final String str_slash_path = "/parent/child";
 	private static final String xmlns = "xmlns:1";
 
-	//~--- fields ---------------------------------------------------------------
-
 	private String c_att_name = null;
 	private String c_att_value = null;
 	private Element child = null;
@@ -53,19 +47,13 @@ public class ElementTest
 	private Element parent = null;
 	private String value = null;
 
-	//~--- set methods ----------------------------------------------------------
-
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 	}
 
-	//~--- methods --------------------------------------------------------------
-
 	@AfterClass
 	public static void tearDownClass() throws Exception {
 	}
-
-	//~--- set methods ----------------------------------------------------------
 
 	@Before
 	public void setUp() throws Exception {
@@ -85,8 +73,6 @@ public class ElementTest
 		c_att_value = "child_att_value";
 		child.setAttribute(c_att_name, c_att_value);
 	}
-
-	//~--- methods --------------------------------------------------------------
 
 	@After
 	public void tearDown() throws Exception {
@@ -417,4 +403,3 @@ public class ElementTest
 	}
 }
 
-//~ Formatted in Tigase Code Convention on 13/02/20
