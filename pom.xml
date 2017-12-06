@@ -133,7 +133,7 @@
                                 } catch (Exception e) {
                                     version = '0'
                                 }
-                                println "setting revision to: " + version
+                                log.info("setting revision to: " + version)
 
                                 project.properties.setProperty('gitVersion', version)
 
@@ -151,25 +151,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <packageName>tigase/</packageName>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-                        <manifestEntries>
-                            <Implementation-Title>${project.name}</Implementation-Title>
-                            <Implementation-Version>${project.version}-b${gitVersion}/${buildNumber}
-                            </Implementation-Version>
-                            <Implementation-Build>${gitVersion}/${buildNumber} (${maven.build.timestamp})
-                            </Implementation-Build>
-                        </manifestEntries>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
