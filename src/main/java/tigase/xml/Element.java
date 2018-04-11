@@ -939,6 +939,37 @@ public class Element
 		}
 	}
 
+	public Element withAttribute(String attName, String attValue) {
+		setAttribute(attName, attValue);
+		return this;
+	}
+
+	public Element withElement(String name, Consumer<Element> consumer) {
+		return withElement(name, null, consumer);
+	}
+
+	public Element withElement(String name, String xmlns, String cdata) {
+		Element el = new Element(name);
+		if (xmlns != null) {
+			el.setXMLNS(xmlns);
+		}
+		if (cdata != null) {
+			el.addCData(cdata);
+		}
+		addChild(el);
+		return this;
+	}
+
+	public Element withElement(String name, String xmlns, Consumer<Element> consumer) {
+		Element el = new Element(name);
+		if (xmlns != null) {
+			el.setXMLNS(xmlns);
+		}
+		consumer.accept(el);
+		addChild(el);
+		return this;
+	}
+
 	protected String cdataToString() {
 		StringBuilder result = new StringBuilder();
 
