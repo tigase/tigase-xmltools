@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd/HH:mm:ss</maven.build.timestamp.format>
@@ -8,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>tigase</groupId>
     <artifactId>tigase-xmltools</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
     <name>Tigase XML Tools</name>
     <packaging>bundle</packaging>
     <description>Tigase XML Tools</description>
@@ -36,7 +35,7 @@
         <connection>scm:git:https://git.tigase.tech/tigase-xmltools.git</connection>
         <developerConnection>scm:git:https://git.tigase.tech/tigase-xmltools.git</developerConnection>
         <url>https://tigase.tech/projects/tigase-xmltools/repository</url>
-        <tag>HEAD</tag>
+        <tag>tigase-xmltools-4.0.0</tag>
     </scm>
     <organization>
         <name>Tigase</name>
@@ -196,7 +195,7 @@
             <properties>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
             </properties>
-            <build/>
+            <build />
         </profile>
 
         <profile>
@@ -308,10 +307,10 @@
                                     <ignoreImageScaling>true</ignoreImageScaling>
                                     <postProcess>
                                         <copy todir="${guide_path}/webhelp/css">
-                                            <fileset dir="src/main/asciidoc/css"/>
+                                            <fileset dir="src/main/asciidoc/css" />
                                         </copy>
                                         <copy todir="${guide_path}/webhelp/images">
-                                            <fileset dir="src/main/asciidoc/images"/>
+                                            <fileset dir="src/main/asciidoc/images" />
                                         </copy>
                                     </postProcess>
 
@@ -331,8 +330,7 @@
                                     <!--<defaultImageWidth>3cm</defaultImageWidth>-->
                                     <!--<ignoreImageScaling>true</ignoreImageScaling>-->
                                     <postProcess>
-                                        <move file="${guide_path}/pdf/index.pdf"
-                                              tofile="${guide_path}/pdf/${guide_name}_Guide.pdf" failonerror="false"/>
+                                        <move file="${guide_path}/pdf/index.pdf" tofile="${guide_path}/pdf/${guide_name}_Guide.pdf" failonerror="false" />
                                     </postProcess>
                                 </configuration>
                             </execution>
@@ -352,10 +350,10 @@
                                     <htmlStylesheet>css/docbook-xsl.css</htmlStylesheet>
                                     <postProcess>
                                         <copy todir="${guide_path}/html_chunk/css">
-                                            <fileset dir="src/main/asciidoc/css"/>
+                                            <fileset dir="src/main/asciidoc/css" />
                                         </copy>
                                         <copy todir="${guide_path}/html_chunk/images">
-                                            <fileset dir="src/main/asciidoc/images"/>
+                                            <fileset dir="src/main/asciidoc/images" />
                                         </copy>
                                     </postProcess>
                                 </configuration>
@@ -439,7 +437,7 @@
     </dependencies>
     <repositories>
         <repository>
-            <snapshots/>
+            <snapshots />
             <id>tigase</id>
             <name>Tigase repository</name>
             <url>https://maven-repo.tigase.net/repository/release</url>
