@@ -12,7 +12,7 @@
     <name>Tigase XML Tools</name>
     <packaging>bundle</packaging>
     <description>Tigase XML Tools</description>
-    <url>http://www.tigase.org/</url>
+    <url>http://www.tigase.net/</url>
     <issueManagement>
         <system>Redmine</system>
         <url>https://projects.tigase.org/projects/tigase-xmltools</url>
@@ -33,9 +33,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://repository.tigase.org/git/tigase-xmltools.git</connection>
-        <developerConnection>scm:git:https://repository.tigase.org/git/tigase-xmltools.git</developerConnection>
-        <url>https://projects.tigase.org/projects/tigase-xmltools/repository</url>
+        <connection>scm:git:https://git.tigase.tech/tigase-xmltools.git</connection>
+        <developerConnection>scm:git:https://git.tigase.tech/tigase-xmltools.git</developerConnection>
+        <url>https://tigase.tech/projects/tigase-xmltools/repository</url>
         <tag>HEAD</tag>
     </scm>
     <organization>
@@ -442,12 +442,12 @@
             <snapshots/>
             <id>tigase</id>
             <name>Tigase repository</name>
-            <url>http://maven-repo.tigase.org/repository/release</url>
+            <url>https://maven-repo.tigase.net/repository/release</url>
         </repository>
         <repository>
             <id>tigase-snapshot</id>
             <name>Tigase repository</name>
-            <url>http://maven-repo.tigase.org/repository/snapshot</url>
+            <url>https://maven-repo.tigase.net/repository/snapshot</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -457,12 +457,12 @@
         <repository>
             <id>tigase</id>
             <name>Tigase repository</name>
-            <url>http://maven-repo.tigase.org/repository/release</url>
+            <url>https://maven-repo.tigase.net/repository/release</url>
         </repository>
         <snapshotRepository>
             <id>tigase-snapshot</id>
             <name>Tigase snapshot repository</name>
-            <url>http://maven-repo.tigase.org/repository/snapshot</url>
+            <url>https://maven-repo.tigase.net/repository/snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
