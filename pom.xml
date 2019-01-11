@@ -52,6 +52,8 @@
                 <configuration>
                     <instructions combine.inherited="append">
                         <Export-Package>tigase.xml.*;version=${project.version}</Export-Package>
+                        <Embed-Dependency>*;scope=compile|runtime;artifactId=!junit|org.osgi.core|slf4j-api
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
