@@ -19,6 +19,9 @@ package tigase.xml;
 
 import tigase.xml.annotations.TODO;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.Arrays;
 
 /**
@@ -96,8 +99,6 @@ public class SimpleParser {
 	public int MAX_ATTRIBUTE_VALUE_SIZE = 10 * 1024;
 	public int MAX_CDATA_SIZE = 1024 * 1024;
 
-	;
-
 	public int MAX_ELEMENT_NAME_SIZE = 1024;
 
 	public SimpleParser() {
@@ -107,6 +108,10 @@ public class SimpleParser {
 		MAX_ATTRIBUTE_NAME_SIZE = Integer.getInteger(MAX_ATTRIBUTE_NAME_SIZE_PROP_KEY, MAX_ATTRIBUTE_NAME_SIZE);
 		MAX_ATTRIBUTE_VALUE_SIZE = Integer.getInteger(MAX_ATTRIBUTE_VALUE_SIZE_PROP_KEY, MAX_ATTRIBUTE_VALUE_SIZE);
 		MAX_CDATA_SIZE = Integer.getInteger(MAX_CDATA_SIZE_PROP_KEY, MAX_CDATA_SIZE);
+	}
+
+	public final void parse(SimpleHandler handler, String input) {
+		parse(handler, input.toCharArray(), 0,input.length());
 	}
 
 	@TODO(note = "1. Better XML errors detection. 2. Add XML comments handling. " +
