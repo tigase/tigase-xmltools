@@ -59,8 +59,7 @@ public class DomBuilderHandler
 	}
 
 	public void error(String errorMessage) {
-		log.warning("XML content parse error.");
-		log.warning(errorMessage);
+		log.log(Level.WARNING, "XML content parse error: {0}\n\n===", errorMessage);
 	}
 
 	public void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values) {
