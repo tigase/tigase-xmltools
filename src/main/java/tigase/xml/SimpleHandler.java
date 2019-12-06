@@ -1,4 +1,4 @@
-/**
+/*
  * Tigase XML Tools - Tigase XML Tools
  * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
