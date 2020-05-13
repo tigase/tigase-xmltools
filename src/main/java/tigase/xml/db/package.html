@@ -104,18 +104,18 @@
     even use neiher <em>root</em> node element name nor <em>node1</em> element
     name. Data base user uses <em><b>node name</b></em> what is quite different
     from <b><em>node element name</em></b>. Let see example below:</p>
-<pre>&#60;node name='roster'/&#62;</pre>
+<pre>&lt;node name='roster'/&#62;</pre>
 <p>In this example <em>node element name</em> is <b>node</b> and
     <em>node name</em> is <b>roster.</b><br>
     Data base users (actually developers) use only <em>node names</em>.<br>
     If you want to access subnode on some level you need to give full path to
     this subnode. For example, let's assume we have following data base:</p>
-<pre>  &#60;node name='tigase'>
-   &#60;node name='server'>
-   &#60;/node>
-   &#60;node name='xmpp'>
-   &#60;/node>
-  &#60;/node></pre>
+<pre>  &lt;;node name='tigase'&gt;
+   &lt;node name='server'&gt;
+   &lt;/node&gt;
+   &lt;node name='xmpp'&gt;
+   &lt;/node&gt;
+  &lt;/node&gt;</pre>
 <p>If you need to access '<code>server</code>' subnode you need to call method
     with '<code>/tigase/server</code>' as subnode path and for subnode
     '<code>xmpp</code>' proper subnode path is of course

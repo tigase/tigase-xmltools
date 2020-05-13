@@ -326,10 +326,6 @@ public class Element
 	}
 
 	/**
-	 * @param elementPath
-	 *
-	 * @return an Element
-	 *
 	 * @deprecated use {@link #findChild(java.lang.String[])} instead.
 	 */
 	@Deprecated
