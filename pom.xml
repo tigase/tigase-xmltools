@@ -21,8 +21,8 @@
     <description>Tigase XML Tools</description>
 
     <issueManagement>
-        <system>Redmine</system>
-        <url>https://projects.tigase.org/projects/tigase-xmltools</url>
+        <system>GitHub</system>
+        <url>https://github.com/tigase/tigase-xmltools</url>
     </issueManagement>
 
     <developers>
@@ -43,9 +43,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://git.tigase.tech/tigase-xmltools.git</connection>
-        <developerConnection>scm:git:https://git.tigase.tech/tigase-xmltools.git</developerConnection>
-        <url>https://tigase.tech/projects/tigase-xmltools/repository</url>
+        <connection>scm:git:https://github.com/tigase/tigase-xmltools.git</connection>
+        <developerConnection>scm:git:https://github.com/tigase/tigase-xmltools.git</developerConnection>
+        <url>https://github.com/tigase/tigase-xmltools</url>
     </scm>
 
     <build>
