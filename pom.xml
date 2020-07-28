@@ -5,13 +5,16 @@
     <parent>
         <groupId>tigase</groupId>
         <artifactId>tigase-projects-parent</artifactId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.3</version>
         <relativePath />
     </parent>
 
     <properties>
         <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
         <source_generation.main.phase>package</source_generation.main.phase>
+
+        <documentation_phases.all_converters>generate-resources</documentation_phases.all_converters>
+        <guide_name>Tigase_XML_Tools</guide_name>
     </properties>
 
     <artifactId>tigase-xmltools</artifactId>
@@ -23,7 +26,6 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/tigase/tigase-xmltools</url>
     </issueManagement>
 
     <developers>
@@ -44,11 +46,11 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/tigase/tigase-xmltools.git</connection>
-        <developerConnection>scm:git:https://github.com/tigase/tigase-xmltools.git</developerConnection>
-        <url>https://github.com/tigase/tigase-xmltools</url>
-      <tag>HEAD</tag>
-  </scm>
+        <connection>scm:git:${scm_repo_base}/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:${scm_repo_base}/${project.artifactId}.git</developerConnection>
+        <url>${scm_repo_base}/${project.artifactId}</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <build>
         <plugins>
@@ -66,66 +68,7 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <maven.javadoc.skip>true</maven.javadoc.skip>
-            </properties>
-            <build />
-        </profile>
-
-        <profile>
-            <id>dist</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>dist</name>
-                </property>
-            </activation>
-            <properties>
-                <maven.javadoc.skip>false</maven.javadoc.skip>
-                <guide_name>Tigase_XML_Tools</guide_name>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctor-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>output-html</id>
-                                <phase>generate-resources</phase>
-                            </execution>
-                            <execution>
-                                <id>output-docbook</id>
-                                <phase>generate-resources</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>com.agilejava.docbkx</groupId>
-                        <artifactId>docbkx-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>generate-webhelp</id>
-                                <phase>generate-resources</phase>
-                            </execution>
-                            <execution>
-                                <id>generate-pdf</id>
-                                <phase>generate-resources</phase>
-                            </execution>
-                            <execution>
-                                <id>generate-html</id>
-                                <phase>generate-resources</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <dependencies></dependencies>
 
     <repositories>
         <repository>
