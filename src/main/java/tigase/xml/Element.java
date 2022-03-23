@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 //import java.util.StringTokenizer;
 
@@ -402,6 +403,14 @@ public class Element
 				Element el = (Element) node;
 				consumer.accept(el);
 			}
+		}
+	}
+
+	public Stream<Element> streamChildren() {
+		if (children == null) {
+			return Stream.empty();
+		} else {
+			return children.stream().filter(Element.class::isInstance).map(Element.class::cast);
 		}
 	}
 
