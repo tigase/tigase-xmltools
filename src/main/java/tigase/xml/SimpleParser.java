@@ -438,7 +438,12 @@ public class SimpleParser {
 						break;
 					}    // end of if (chr == SINGLE_QUOTE || chr == DOUBLE_QUOTE)
 
-					parser_state.attrib_values[parser_state.current_attr].append(chr);
+					if (chr == DOUBLE_QUOTE) {
+						parser_state.attrib_values[parser_state.current_attr].append("&quot;");
+					} else {
+						parser_state.attrib_values[parser_state.current_attr].append(chr);
+					}
+
 					switch (chr) {
 						case '&':
 							parser_state.parentState = parser_state.state;
@@ -471,9 +476,12 @@ public class SimpleParser {
 
 						break;
 					}    // end of if (chr == SINGLE_QUOTE || chr == DOUBLE_QUOTE)
+					if (chr == SINGLE_QUOTE) {
+						parser_state.attrib_values[parser_state.current_attr].append("&apos;");
+					} else {
+						parser_state.attrib_values[parser_state.current_attr].append(chr);
+					}
 
-					parser_state.attrib_values[parser_state.current_attr].append(chr);
-					
 					switch (chr) {
 						case '&':
 							parser_state.parentState = parser_state.state;
