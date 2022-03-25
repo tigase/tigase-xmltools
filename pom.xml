@@ -18,7 +18,7 @@
     </properties>
 
     <artifactId>tigase-xmltools</artifactId>
-    <version>4.1.0</version>
+    <version>4.1.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>Tigase XML Tools</name>
