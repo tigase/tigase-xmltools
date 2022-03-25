@@ -31,9 +31,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:https://repository.tigase.org/git/tigase-xmltools.git</connection>
-		<developerConnection>scm:git:https://repository.tigase.org/git/tigase-xmltools.git</developerConnection>
-		<url>https://projects.tigase.org/projects/tigase-xmltools/repository</url>
+		<connection>scm:git:https://github.com/tigase/tigase-xmltools.git</connection>
+		<developerConnection>scm:git:https://github.com/tigase/tigase-xmltools.git</developerConnection>
+		<url>https://github.com/tigase/tigase-xmltools</url>
   </scm>
 	<organization>
 		<name>Tigase</name>
@@ -183,12 +183,12 @@
 			<snapshots />
 			<id>tigase</id>
 			<name>Tigase repository</name>
-			<url>http://maven-repo.tigase.org/repository/release</url>
+			<url>https://maven-repo.tigase.org/repository/release</url>
 		</repository>
 		<repository>
 			<id>tigase-snapshot</id>
 			<name>Tigase repository</name>
-			<url>http://maven-repo.tigase.org/repository/snapshot</url>
+			<url>https://maven-repo.tigase.org/repository/snapshot</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -198,12 +198,12 @@
 		<repository>
 			<id>tigase</id>
 			<name>Tigase repository</name>
-			<url>http://maven-repo.tigase.org/repository/release</url>
+			<url>https://maven-repo.tigase.org/repository/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>tigase-snapshot</id>
 			<name>Tigase snapshot repository</name>
-			<url>http://maven-repo.tigase.org/repository/snapshot</url>
+			<url>https://maven-repo.tigase.org/repository/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
