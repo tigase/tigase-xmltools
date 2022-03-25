@@ -32,9 +32,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://git.tigase.tech/tigase-xmltools.git</connection>
-        <developerConnection>scm:git:https://git.tigase.tech/tigase-xmltools.git</developerConnection>
-        <url>https://tigase.tech/projects/tigase-xmltools/repository</url>
+        <connection>scm:git:https://github.com/tigase/tigase-xmltools.git</connection>
+        <developerConnection>scm:git:https://github.com/tigase/tigase-xmltools.git</developerConnection>
+        <url>https://github.com/tigase/tigase-xmltools</url>
         <tag>tigase-xmltools-4.0.0</tag>
     </scm>
     <organization>
