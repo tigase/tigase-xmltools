@@ -18,7 +18,7 @@
     </properties>
 
     <artifactId>tigase-xmltools</artifactId>
-    <version>4.1.1</version>
+    <version>4.1.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>Tigase XML Tools</name>
@@ -50,7 +50,7 @@
         <connection>scm:git:https://github.com/tigase/tigase-xmltools.git</connection>
         <developerConnection>scm:git:https://github.com/tigase/tigase-xmltools.git</developerConnection>
         <url>https://github.com/tigase/tigase-xmltools</url>
-      <tag>tigase-xmltools-4.1.1</tag>
+      <tag>tigase-xmltools-4.1.0</tag>
   </scm>
 
     <build>
