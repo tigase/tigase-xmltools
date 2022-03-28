@@ -59,9 +59,12 @@ public class ElementPerformanceTest {
 	@State(Scope.Thread)
 	public static class BenchmarkState {
 		Element element;
+		String name;
 
 		@Setup(Level.Trial)
 		public void initialize() {
+			int i = 1;
+			name = "child-" + i;
 			element = new Element("root").withElement("child-1", c -> c.withElement("subchild-1", null))
 					.withElement("child-2", c -> c.withElement("subchild-1", null))
 					.withElement("child-3", c -> c.withElement("subchild-1", null));
@@ -149,7 +152,7 @@ public class ElementPerformanceTest {
 			}
 		}
 	}
-	
+
 	@Benchmark
 	@Measurement(iterations = 10)
 	@BenchmarkMode(Mode.AverageTime)
@@ -221,7 +224,7 @@ public class ElementPerformanceTest {
 			blackhole.consume(state.map.get(getOptimizedString(item)));
 		}
 	}
-	
+
 	@State(Scope.Thread)
 	public static class BenchmarkState8 {
 		List<String> strings = List.of(FROM, TO, NAME, ID, XMLNS, LABEL, VAR);
@@ -284,7 +287,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildNew(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(state.element.findChild(el -> "child-1".equals(el.getName())));
+			blackhole.consume(state.element.findChild(el -> (state.name).equals(el.getName())));
 		}
 	}
 
@@ -293,7 +296,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildNewX(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(state.element.findChild(Element.Matcher.byName("child-1")));
+			blackhole.consume(state.element.findChild(Element.Matcher.byName(state.name)));
 		}
 	}
 
@@ -395,7 +398,7 @@ public class ElementPerformanceTest {
 		public void initialize() {
 		}
 	}
-	
+
 	@Benchmark
 	@Measurement(iterations = 100)
 	@BenchmarkMode(Mode.AverageTime)
