@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 //import java.util.StringTokenizer;
@@ -48,7 +49,6 @@ public class Element
 	protected XMLIdentityHashMap<String, String> attributes = null;
 
 	protected LinkedList<XMLNodeIfc> children = null;
-
 	// protected String cdata = null;
 
 	protected String defxmlns = null;
@@ -105,6 +105,16 @@ public class Element
 		}
 	}
 
+	public Element(String name, String xmlns, String cdata) {
+		setName(name);
+		if (xmlns != null) {
+			setXMLNS(xmlns);
+		}
+		if (cdata != null) {
+			setCData(cdata);
+		}
+	}
+
 	public Element(String argName, String[] att_names, String[] att_values) {
 		setName(argName);
 		if (att_names != null) {
@@ -140,6 +150,17 @@ public class Element
 		}    // end of if (att_names != null)
 	}
 
+	public Element(String name, Consumer<Element> builder) {
+		setName(name);
+		builder.accept(this);
+	}
+
+	public Element(String name, String xmlns, Consumer<Element> builder) {
+		setName(name);
+		setXMLNS(xmlns);
+		builder.accept(this);
+	}
+
 	public void addAttribute(String attName, String attValue) {
 		setAttribute(attName, attValue);
 	}
@@ -165,7 +186,6 @@ public class Element
 			children = new LinkedList<XMLNodeIfc>();
 		}    // end of if (children == null)
 		children.add(child);
-
 		// Collections.sort(children);
 	}
 
@@ -289,7 +309,7 @@ public class Element
 		return false;
 	}
 
-	public Element findChildStaticStr(String[] elementPath) {
+	public Element findChildByPathStaticStr(String[] elementPath) {
 		if (elementPath[0] != getName()) {
 			return null;
 		}
@@ -306,7 +326,7 @@ public class Element
 		return child;
 	}
 
-	public Element findChild(String[] elemPath) {
+	public Element findChildByPath(String[] elemPath) {
 		if (elemPath[0].isEmpty()) {
 			elemPath = Arrays.copyOfRange(elemPath, 1, elemPath.length);
 		}
@@ -327,16 +347,16 @@ public class Element
 	}
 
 	/**
-	 * @deprecated use {@link #findChild(java.lang.String[])} instead.
+	 * @deprecated use {@link #findChildByPath(java.lang.String[])} instead.
 	 */
 	@Deprecated
-	public Element findChild(String elementPath) {
+	public Element findChildByPath(String elementPath) {
 
 		// For performance reasons, replace StringTokenizer with split
-		return findChild(elementPath.split("/"));
+		return findChildByPath(elementPath.split("/"));
 	}
 
-	public Element findChild(Matcher<Element> matcher) {
+	public Element findChild(Predicate<Element> matcher) {
 		if (children != null) {
 			for (XMLNodeIfc node : children) {
 				if (!(node instanceof Element)) {
@@ -344,7 +364,7 @@ public class Element
 				}
 
 				Element el = (Element) node;
-				if (matcher.match(el)) {
+				if (matcher.test(el)) {
 					return el;
 				}
 			}
@@ -352,8 +372,8 @@ public class Element
 
 		return null;
 	}
-
-	public List<Element> findChildren(Matcher<Element> matcher) {
+	
+	public List<Element> findChildren(Predicate<Element> matcher) {
 		if (children != null) {
 			LinkedList<Element> result = new LinkedList<Element>();
 
@@ -363,7 +383,7 @@ public class Element
 				}
 
 				Element el = (Element) node;
-				if (matcher.match(el)) {
+				if (matcher.test(el)) {
 					result.add(el);
 				}
 			}
@@ -371,7 +391,7 @@ public class Element
 			return result;
 		}
 
-		return null;
+		return Collections.emptyList();
 	}
 
 	public <R> List<R> flatMapChildren(Function<Element, Collection<? extends R>> mapper) {
@@ -390,7 +410,7 @@ public class Element
 			return result;
 		}
 
-		return null;
+		return Collections.emptyList();
 	}
 
 	public void forEachChild(Consumer<Element> consumer) {
@@ -406,11 +426,20 @@ public class Element
 		}
 	}
 
+	/**
+	 * This is optimized version of getChildren().stream()
+	 */
 	public Stream<Element> streamChildren() {
 		if (children == null) {
 			return Stream.empty();
 		} else {
-			return children.stream().filter(Element.class::isInstance).map(Element.class::cast);
+			Stream.Builder<Element> stream = Stream.builder();
+			for (XMLNodeIfc node : children) {
+				if (node instanceof Element) {
+					stream.accept((Element) node);
+				}
+			}
+			return stream.build();
 		}
 	}
 
@@ -461,33 +490,33 @@ public class Element
 	}
 
 	/**
-	 * @deprecated use  {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) } instead.
+	 * @deprecated use  {@link #getAttributeFromChildAtPath(java.lang.String[], java.lang.String) } instead.
 	 */
 	@Deprecated
-	public String getAttribute(String elementPath, String att_name) {
-		Element child = findChild(elementPath);
+	public String getAttributeFromChildAtPath(String elementPath, String att_name) {
+		Element child = findChildByPath(elementPath);
 
 		return (child != null) ? child.getAttribute(att_name) : null;
 	}
 
 	/**
-	 * @deprecated {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) } instead.
+	 * @deprecated {@link #getAttributeFromChildAtPathStaticStr(java.lang.String[], java.lang.String) } instead.
 	 */
 	@Deprecated
-	public String getAttribute(String[] elementPath, String att_name) {
-		Element child = findChild(elementPath);
+	public String getAttributeFromChildAtPath(String[] elementPath, String att_name) {
+		Element child = findChildByPath(elementPath);
 
 		return (child != null) ? child.getAttribute(att_name) : null;
 	}
 
-	public String getAttributeStaticStr(String[] elementPath, String att_name) {
-		Element child = findChildStaticStr(elementPath);
+	public String getAttributeFromChildAtPathStaticStr(String[] elementPath, String att_name) {
+		Element child = findChildByPathStaticStr(elementPath);
 
 		return (child != null) ? child.getAttributeStaticStr(att_name) : null;
 	}
 
 	public Map<String, String> getAttributes() {
-		return ((attributes != null) ? new LinkedHashMap<String, String>(attributes) : null);
+		return ((attributes != null) ? new LinkedHashMap<String, String>(attributes) : Collections.emptyMap());
 	}
 
 	public void setAttributes(Map<String, String> newAttributes) {
@@ -500,19 +529,19 @@ public class Element
 	}
 
 	/**
-	 * @deprecated use {@link #getCData(java.lang.String[]) } instead.
+	 * @deprecated use {@link #getCDataFromChildAtPath(java.lang.String[]) } instead.
 	 */
 	@Deprecated
-	public String getCData(String elementPath) {
-		return getChildCData(elementPath);
+	public String getCDataFromChildAtPath(String elementPath) {
+		return getCDataOfChildAtPath(elementPath);
 	}
 
-	public String getCData(String[] elementPath) {
-		return getChildCData(elementPath);
+	public String getCDataFromChildAtPath(String[] elementPath) {
+		return getCDataOfChildAtPath(elementPath);
 	}
 
-	public String getCDataStaticStr(String[] elementPath) {
-		return getChildCDataStaticStr(elementPath);
+	public String getCDataFromChildAtPathStaticStr(String[] elementPath) {
+		return getCDataOfChildAtPathStaticStr(elementPath);
 	}
 
 	public String getCData() {
@@ -608,28 +637,28 @@ public class Element
 	}
 
 	/**
-	 * @deprecated use {@link #getCData(java.lang.String[]) } instead.
+	 * @deprecated use {@link #getCDataOfChildAtPath(java.lang.String[]) } instead.
 	 */
 	@Deprecated
-	public String getChildCData(String elementPath) {
-		Element child = findChild(elementPath);
+	public String getCDataOfChildAtPath(String elementPath) {
+		Element child = findChildByPath(elementPath);
 
 		return (child != null) ? child.getCData() : null;
 	}
 
-	public String getChildCData(String[] elementPath) {
-		Element child = findChild(elementPath);
+	public String getCDataOfChildAtPath(String[] elementPath) {
+		Element child = findChildByPath(elementPath);
 
 		return (child != null) ? child.getCData() : null;
 	}
 
-	public String getChildCDataStaticStr(String[] elementPath) {
-		Element child = findChildStaticStr(elementPath);
+	public String getCDataOfChildAtPathStaticStr(String[] elementPath) {
+		Element child = findChildByPathStaticStr(elementPath);
 
 		return (child != null) ? child.getCData() : null;
 	}
 
-	public String getChildCData(Matcher<Element> matcher) {
+	public String getChildCData(Predicate<Element> matcher) {
 		Element child = findChild(matcher);
 
 		return (child != null) ? child.getCData() : null;
@@ -648,7 +677,7 @@ public class Element
 			return result;
 		}
 
-		return null;
+		return Collections.emptyList();
 	}
 
 	public void setChildren(List<XMLNodeIfc> children) {
@@ -661,31 +690,31 @@ public class Element
 	}
 
 	/**
-	 * @deprecated use {@link #getChildren(java.lang.String[]) } instead.
+	 * @deprecated use {@link #getChildrenOfChildAtPath(java.lang.String[]) } instead.
 	 */
 	@Deprecated
-	public List<Element> getChildren(String elementPath) {
-		Element child = findChild(elementPath);
+	public List<Element> getChildrenOfChildAtPath(String elementPath) {
+		Element child = findChildByPath(elementPath);
 
-		return (child != null) ? child.getChildren() : null;
+		return (child != null) ? child.getChildren() : Collections.emptyList();
 	}
 
-	public List<Element> getChildren(String[] elementPath) {
-		Element child = findChild(elementPath);
+	public List<Element> getChildrenOfChildAtPath(String[] elementPath) {
+		Element child = findChildByPath(elementPath);
 
-		return (child != null) ? child.getChildren() : null;
+		return (child != null) ? child.getChildren() : Collections.emptyList();
 	}
 
-	public List<Element> getChildrenStaticStr(String[] elementPath) {
-		Element child = findChildStaticStr(elementPath);
+	public List<Element> getChildrenOfChildAtPathStaticStr(String[] elementPath) {
+		Element child = findChildByPathStaticStr(elementPath);
 
-		return (child != null) ? child.getChildren() : null;
+		return (child != null) ? child.getChildren() : Collections.emptyList();
 	}
 
-	public List<Element> getChildren(Matcher<Element> matcher) {
+	public List<Element> getChildren(Predicate<Element> matcher) {
 		Element child = findChild(matcher);
 
-		return (child != null) ? child.getChildren() : null;
+		return (child != null) ? child.getChildren() : Collections.emptyList();
 	}
 
 	public String getName() {
@@ -716,23 +745,23 @@ public class Element
 	}
 
 	/**
-	 * @deprecated use {@link #getXMLNS(java.lang.String[]) } instead.
+	 * @deprecated use {@link #getXMLNSOfChildAtPath(java.lang.String[]) } instead.
 	 */
 	@Deprecated
-	public String getXMLNS(String elementPath) {
-		Element child = findChild(elementPath);
+	public String getXMLNSOfChildAtPath(String elementPath) {
+		Element child = findChildByPath(elementPath);
 
 		return (child != null) ? child.getXMLNS() : null;
 	}
 
-	public String getXMLNS(String[] elementPath) {
-		Element child = findChild(elementPath);
+	public String getXMLNSOfChildAtPath(String[] elementPath) {
+		Element child = findChildByPath(elementPath);
 
 		return (child != null) ? child.getXMLNS() : null;
 	}
 
-	public String getXMLNSStaticStr(String[] elementPath) {
-		Element child = findChildStaticStr(elementPath);
+	public String getXMLNSOfChildAtPathStaticStr(String[] elementPath) {
+		Element child = findChildByPathStaticStr(elementPath);
 
 		return (child != null) ? child.getXMLNS() : null;
 	}
@@ -741,7 +770,7 @@ public class Element
 	public int hashCode() {
 		return toStringNoChildren().hashCode();
 	}
-
+	
 	public <R> R map(Function<Element, ? extends R> mapper) {
 		return mapper.apply(this);
 	}
@@ -750,7 +779,7 @@ public class Element
 		return mapChildren(null, mapper);
 	}
 
-	public <R> List<R> mapChildren(Matcher<Element> matcher, Function<Element, ? extends R> mapper) {
+	public <R> List<R> mapChildren(Predicate<Element> matcher, Function<Element, ? extends R> mapper) {
 		if (children != null) {
 			LinkedList<R> result = new LinkedList<R>();
 
@@ -760,7 +789,7 @@ public class Element
 				}
 
 				Element el = (Element) node;
-				if (matcher == null || matcher.match(el)) {
+				if (matcher == null || matcher.test(el)) {
 					result.add(mapper.apply(el));
 				}
 			}
@@ -768,11 +797,11 @@ public class Element
 			return result;
 		}
 
-		return null;
+		return Collections.emptyList();
 	}
 
-	public boolean matches(Matcher<Element> matcher) {
-		return matcher.match(this);
+	public boolean matches(Predicate<Element> matcher) {
+		return matcher.test(this);
 	}
 
 	public void removeAttribute(String key) {
@@ -791,8 +820,17 @@ public class Element
 		return res;
 	}
 
-	public void setAttributeStaticStr(String elementPath[], String att_name, String att_value) {
-		Element child = findChildStaticStr(elementPath);
+	public boolean removeChild(String name, String xmlns) {
+		Element child = getChild(name, xmlns);
+		if (child == null) {
+			return false;
+		}
+
+		return removeChild(child);
+	}
+
+	public void setAttributeOfChildAtPathStaticStr(String elementPath[], String att_name, String att_value) {
+		Element child = findChildByPathStaticStr(elementPath);
 
 		if (child != null) {
 			child.setAttribute(att_name, att_value);
@@ -946,6 +984,11 @@ public class Element
 		return this;
 	}
 
+	public Element withCData(String cData) {
+		setCData(cData);
+		return this;
+	}
+
 	public Element withElement(String name, Consumer<Element> consumer) {
 		return withElement(name, null, consumer);
 	}
@@ -967,7 +1010,9 @@ public class Element
 		if (xmlns != null) {
 			el.setXMLNS(xmlns);
 		}
-		consumer.accept(el);
+		if (consumer != null) {
+			consumer.accept(el);
+		}
 		addChild(el);
 		return this;
 	}
@@ -989,18 +1034,31 @@ public class Element
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
-	public static interface Matcher<T> {
+	public static class Matcher {
 
-		boolean match(T item);
+		public static Predicate<Element> byName(String name) {
+			return el -> name.equals(el.getName());
+		}
 
+		public static Predicate<Element> byNameAndXMLNS(String name, String xmlns) {
+			return el -> name.equals(el.getName()) && xmlns.equals(el.getXMLNS());
+		}
+
+		public static Predicate<Element> byNameStatic(String name) {
+			return el -> name == name;
+		}
+
+		public static Predicate<Element> byNameAndXMLNSStatic(String name, String xmlns) {
+			return el -> name == el.getName() && xmlns == el.getXMLNS();
+		}
 	}
 
-	protected class XMLIdentityHashMap<K, V>
+	protected static class XMLIdentityHashMap<K, V>
 			extends IdentityHashMap<K, V> {
 
 		private static final long serialVersionUID = 1L;
 
-		private XMLIdentityHashMap(int size) {
+		public XMLIdentityHashMap(int size) {
 			super(size);
 		}
 
