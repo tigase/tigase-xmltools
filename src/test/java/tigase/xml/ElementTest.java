@@ -84,14 +84,14 @@ public class ElementTest
 
 	@Test
 	public void testGetChildCData() {
-		String result = parent.getChildCData(str_path);
+		String result = parent.getCDataOfChildAtPath(str_path);
 
 		assertEquals(value, result);
-		result = parent.getChildCData(str_path.split("/"));
+		result = parent.getCDataOfChildAtPath(str_path.split("/"));
 		assertEquals(value, result);
-		result = parent.getChildCDataStaticStr(str_path.split("/"));
+		result = parent.getCDataOfChildAtPathStaticStr(str_path.split("/"));
 		assertNull(result);
-		result = parent.getChildCDataStaticStr(static_str_arr);
+		result = parent.getCDataOfChildAtPathStaticStr(static_str_arr);
 		assertEquals(value, result);
 	}
 
@@ -148,12 +148,12 @@ public class ElementTest
 	 */
 	@Test
 	public void testFindChildStaticStr() {
-		Element result = parent.findChildStaticStr(str_path.split("/"));
+		Element result = parent.findChildByPathStaticStr(str_path.split("/"));
 
 		assertNull(result);
-		result = parent.findChildStaticStr(str_slash_path.split("/"));
+		result = parent.findChildByPathStaticStr(str_slash_path.split("/"));
 		assertNull(result);
-		result = parent.findChildStaticStr(static_str_arr);
+		result = parent.findChildByPathStaticStr(static_str_arr);
 		assertEquals(child, result);
 	}
 
@@ -162,10 +162,10 @@ public class ElementTest
 	 */
 	@Test
 	public void testFindChild_StringArr() {
-		Element result = parent.findChild(str_path.split("/"));
+		Element result = parent.findChildByPath(str_path.split("/"));
 
 		assertEquals(child, result);
-		result = parent.findChild(str_slash_path.split("/"));
+		result = parent.findChildByPath(str_slash_path.split("/"));
 		assertEquals(child, result);
 	}
 
@@ -174,10 +174,10 @@ public class ElementTest
 	 */
 	@Test
 	public void testFindChild_String() {
-		Element result = parent.findChild(str_path);
+		Element result = parent.findChildByPath(str_path);
 
 		assertEquals(child, result);
-		result = parent.findChild(str_slash_path);
+		result = parent.findChildByPath(str_slash_path);
 		assertEquals(child, result);
 	}
 
@@ -210,7 +210,7 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetAttribute_String_String() {
-		assertEquals(c_att_value, parent.getAttribute(str_slash_path, c_att_name));
+		assertEquals(c_att_value, parent.getAttributeFromChildAtPath(str_slash_path, c_att_name));
 	}
 
 	/**
@@ -218,8 +218,8 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetAttribute_StringArr_String() {
-		assertEquals(c_att_value, parent.getAttribute(str_slash_path.split("/"), c_att_name));
-		assertEquals(c_att_value, parent.getAttribute(static_str_arr, c_att_name));
+		assertEquals(c_att_value, parent.getAttributeFromChildAtPath(str_slash_path.split("/"), c_att_name));
+		assertEquals(c_att_value, parent.getAttributeFromChildAtPath(static_str_arr, c_att_name));
 	}
 
 	/**
@@ -227,8 +227,8 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetAttributeStaticStr_String_String() {
-		assertNull(parent.getAttributeStaticStr(str_slash_path.split("/"), c_att_name));
-		assertEquals(c_att_value, parent.getAttributeStaticStr(static_str_arr, c_att_name));
+		assertNull(parent.getAttributeFromChildAtPathStaticStr(str_slash_path.split("/"), c_att_name));
+		assertEquals(c_att_value, parent.getAttributeFromChildAtPathStaticStr(static_str_arr, c_att_name));
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetCData_String() {
-		assertEquals(value, parent.getCData(str_slash_path));
+		assertEquals(value, parent.getCDataOfChildAtPath(str_slash_path));
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetCData_StringArr() {
-		assertEquals(value, parent.getCData(str_slash_path.split("/")));
+		assertEquals(value, parent.getCDataOfChildAtPath(str_slash_path.split("/")));
 	}
 
 	/**
@@ -252,8 +252,8 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetCDataStaticStr() {
-		assertNull(parent.getCDataStaticStr(str_slash_path.split("/")));
-		assertEquals(value, parent.getCDataStaticStr(static_str_arr));
+		assertNull(parent.getCDataOfChildAtPathStaticStr(str_slash_path.split("/")));
+		assertEquals(value, parent.getCDataOfChildAtPathStaticStr(static_str_arr));
 	}
 
 	/**
@@ -296,8 +296,8 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetChildCData_String() {
-		assertEquals(value, parent.getChildCData(str_path));
-		assertEquals(value, parent.getChildCData(str_slash_path));
+		assertEquals(value, parent.getCDataOfChildAtPath(str_path));
+		assertEquals(value, parent.getCDataOfChildAtPath(str_slash_path));
 	}
 
 	/**
@@ -305,9 +305,9 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetChildCData_StringArr() {
-		assertEquals(value, parent.getChildCData(str_path.split("/")));
-		assertEquals(value, parent.getChildCData(str_slash_path.split("/")));
-		assertEquals(value, parent.getChildCData(static_str_arr));
+		assertEquals(value, parent.getCDataOfChildAtPath(str_path.split("/")));
+		assertEquals(value, parent.getCDataOfChildAtPath(str_slash_path.split("/")));
+		assertEquals(value, parent.getCDataOfChildAtPath(static_str_arr));
 	}
 
 	/**
@@ -315,9 +315,9 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetChildCDataStaticStr() {
-		assertNull(parent.getChildCDataStaticStr(str_path.split("/")));
-		assertNull(value, parent.getChildCDataStaticStr(str_slash_path.split("/")));
-		assertEquals(value, parent.getChildCDataStaticStr(static_str_arr));
+		assertNull(parent.getCDataOfChildAtPathStaticStr(str_path.split("/")));
+		assertNull(value, parent.getCDataOfChildAtPathStaticStr(str_slash_path.split("/")));
+		assertEquals(value, parent.getCDataOfChildAtPathStaticStr(static_str_arr));
 	}
 
 	/**
@@ -341,8 +341,8 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetXMLNS_String() {
-		assertEquals(xmlns, parent.getXMLNS(str_path));
-		assertEquals(xmlns, parent.getXMLNS(str_slash_path));
+		assertEquals(xmlns, parent.getXMLNSOfChildAtPath(str_path));
+		assertEquals(xmlns, parent.getXMLNSOfChildAtPath(str_slash_path));
 	}
 
 	/**
@@ -350,9 +350,9 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetXMLNS_StringArr() {
-		assertEquals(xmlns, parent.getXMLNS(str_path.split("/")));
-		assertEquals(xmlns, parent.getXMLNS(str_slash_path.split("/")));
-		assertEquals(xmlns, parent.getXMLNS(static_str_arr));
+		assertEquals(xmlns, parent.getXMLNSOfChildAtPath(str_path.split("/")));
+		assertEquals(xmlns, parent.getXMLNSOfChildAtPath(str_slash_path.split("/")));
+		assertEquals(xmlns, parent.getXMLNSOfChildAtPath(static_str_arr));
 	}
 
 	/**
@@ -360,9 +360,9 @@ public class ElementTest
 	 */
 	@Test
 	public void testGetXMLNSStaticStr() {
-		assertNull(parent.getXMLNSStaticStr(str_path.split("/")));
-		assertNull(parent.getXMLNSStaticStr(str_slash_path.split("/")));
-		assertEquals(xmlns, parent.getXMLNSStaticStr(static_str_arr));
+		assertNull(parent.getXMLNSOfChildAtPathStaticStr(str_path.split("/")));
+		assertNull(parent.getXMLNSOfChildAtPathStaticStr(str_slash_path.split("/")));
+		assertEquals(xmlns, parent.getXMLNSOfChildAtPathStaticStr(static_str_arr));
 	}
 
 	/**
