@@ -323,10 +323,34 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildOldEmpty(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(Optional.ofNullable(null));
+			blackhole.consume(Optional.ofNullable(state.element.getChildStaticStr("child-1")));
 		}
 	}
 
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.AverageTime)
+	public void benchmarkFindAndMapChild(BenchmarkState state, Blackhole blackhole) {
+		for (int i=0; i<1000; i++) {
+			blackhole.consume(state.element.findChild("child-1", null).map(Element::getName).get());
+		}
+	}
+	
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.AverageTime)
+	public void benchmarkFlatMapManual(BenchmarkState state, Blackhole blackhole) {
+		List<Element> children = state.element.getChildren();
+		List<Element> result = new LinkedList<>();
+		for (Element child : children) {
+			for (Element subchild : child.getChildren()) {
+				if (subchild.getName() == "subchild-1") {
+					result.add(subchild);
+				}
+			}
+		}
+		blackhole.consume(result);
+	}
 
 	@Benchmark
 	@Measurement(iterations = 100)
@@ -341,15 +365,26 @@ public class ElementPerformanceTest {
 		}
 		blackhole.consume(children2);
 	}
-
+//
+//	@Benchmark
+//	@Measurement(iterations = 100)
+//	@BenchmarkMode(Mode.AverageTime)
+//	public void benchmarkFlatMapStreamToList(BenchmarkState state, Blackhole blackhole) {
+//		List<Element> children = state.element.getChildren()
+//				.stream()
+//				.map(Element::getChildren)
+//				.flatMap(List::stream)
+//				.filter(el -> el.getName().equals("subchild-1"))
+//				.toList();
+//		blackhole.consume(children);
+//	}
+//
 	@Benchmark
 	@Measurement(iterations = 100)
 	@BenchmarkMode(Mode.AverageTime)
-	public void benchmarkFlatMapStreamToList(BenchmarkState state, Blackhole blackhole) {
-		List<Element> children = state.element.getChildren()
-				.stream()
-				.map(Element::getChildren)
-				.flatMap(List::stream)
+	public void benchmarkFlatMapStreamToList2(BenchmarkState state, Blackhole blackhole) {
+		List<Element> children = state.element.streamChildren()
+				.flatMap(Element::streamChildren)
 				.filter(el -> el.getName().equals("subchild-1"))
 				.toList();
 		blackhole.consume(children);
@@ -358,10 +393,21 @@ public class ElementPerformanceTest {
 	@Benchmark
 	@Measurement(iterations = 100)
 	@BenchmarkMode(Mode.AverageTime)
-	public void benchmarkFlatMapStreamToList2(BenchmarkState state, Blackhole blackhole) {
-		List<Element> children = state.element.streamChildren()
+	public void benchmarkFlatMapStreamToArray2(BenchmarkState state, Blackhole blackhole) {
+		Element[] children = state.element.streamChildren()
 				.flatMap(Element::streamChildren)
 				.filter(el -> el.getName().equals("subchild-1"))
+				.toArray(Element[]::new);
+		blackhole.consume(children);
+	}
+
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.AverageTime)
+	public void benchmarkMapStreamToList(BenchmarkState state, Blackhole blackhole) {
+		List<String> children = state.element.streamChildren()
+				.filter(el -> el.getName().equals("child-1"))
+				.map(Element::getName)
 				.toList();
 		blackhole.consume(children);
 	}
