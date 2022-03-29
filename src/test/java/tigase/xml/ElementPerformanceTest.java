@@ -365,20 +365,20 @@ public class ElementPerformanceTest {
 		}
 		blackhole.consume(children2);
 	}
-//
-//	@Benchmark
-//	@Measurement(iterations = 100)
-//	@BenchmarkMode(Mode.AverageTime)
-//	public void benchmarkFlatMapStreamToList(BenchmarkState state, Blackhole blackhole) {
-//		List<Element> children = state.element.getChildren()
-//				.stream()
-//				.map(Element::getChildren)
-//				.flatMap(List::stream)
-//				.filter(el -> el.getName().equals("subchild-1"))
-//				.toList();
-//		blackhole.consume(children);
-//	}
-//
+
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.AverageTime)
+	public void benchmarkFlatMapStreamToList(BenchmarkState state, Blackhole blackhole) {
+		List<Element> children = state.element.getChildren()
+				.stream()
+				.map(Element::getChildren)
+				.flatMap(List::stream)
+				.filter(el -> el.getName().equals("subchild-1"))
+				.toList();
+		blackhole.consume(children);
+	}
+
 	@Benchmark
 	@Measurement(iterations = 100)
 	@BenchmarkMode(Mode.AverageTime)
