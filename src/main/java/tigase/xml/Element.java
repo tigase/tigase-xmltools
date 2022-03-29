@@ -775,6 +775,49 @@ public class Element
 		return mapper.apply(this);
 	}
 
+	@FunctionalInterface
+	public interface OptionalMapper<T> {
+
+		T get();
+
+		default <R> OptionalMapper<R> map(Function<T,R> mapper) {
+			return () -> {
+				T value = get();
+				if (value == null) {
+					return null;
+				}
+				return mapper.apply(value);
+			};
+		}
+
+		default OptionalMapper<T> filter(Predicate<T> predicate) {
+			return () -> {
+				T value = get();
+				if (value != null && predicate.test(value)) {
+					return value;
+				}
+				return null;
+			};
+		}
+
+		default void ifPresent(Consumer<T> consumer) {
+			T value = get();
+			if (value != null) {
+				consumer.accept(value);
+			}
+		}
+
+		default T orElse(T defValue) {
+			T value = get();
+			return value != null ? value : defValue;
+		}
+
+	}
+
+	public OptionalMapper<Element> findChild(String name, String xmlns) {
+		return () -> getChild(name, xmlns);
+	}
+	
 	public <R> List<R> mapChildren(Function<Element, ? extends R> mapper) {
 		return mapChildren(null, mapper);
 	}
