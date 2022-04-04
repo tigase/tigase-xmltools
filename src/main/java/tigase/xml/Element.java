@@ -356,6 +356,18 @@ public class Element
 		return findChildByPath(elementPath.split("/"));
 	}
 
+	public Element findChildStreamDirect(Predicate<Element> matcher) {
+		return streamChildrenDirect().filter(matcher)
+//				.flatMap(Element::streamChildren)
+				.findFirst().orElse(null);
+	}
+
+	public Element findChildStream(Predicate<Element> matcher) {
+		return streamChildren().filter(matcher)
+//				.flatMap(Element::streamChildren)
+				.findFirst().orElse(null);
+	}
+
 	public Element findChild(Predicate<Element> matcher) {
 		if (children != null) {
 			for (XMLNodeIfc node : children) {
@@ -424,6 +436,12 @@ public class Element
 				consumer.accept(el);
 			}
 		}
+	}
+
+
+	public Stream<Element> streamChildrenDirect() {
+		return children == null ? Stream.empty() : children.stream().filter(xmlNodeIfc -> xmlNodeIfc.getClass().isAssignableFrom(Element.class)).map(Element.class::cast);
+//		return children == null ? Stream.empty() : children.stream().filter(node -> node instanceof Element).map(obj -> (Element)obj);
 	}
 
 	/**
