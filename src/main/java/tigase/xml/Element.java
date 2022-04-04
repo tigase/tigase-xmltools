@@ -17,6 +17,7 @@
  */
 package tigase.xml;
 
+import org.jetbrains.annotations.Nullable;
 import tigase.xml.annotations.TODO;
 
 import java.io.FileReader;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 //import java.util.StringTokenizer;
@@ -48,8 +50,8 @@ public class Element
 
 	protected XMLIdentityHashMap<String, String> attributes = null;
 
-	protected LinkedList<XMLNodeIfc> children = null;
-	// protected String cdata = null;
+	protected List<XMLNodeIfc> children = null;
+	protected static Supplier<List<XMLNodeIfc>> listSupplier = null;
 
 	protected String defxmlns = null;
 
@@ -183,10 +185,14 @@ public class Element
 			throw new NullPointerException("Element child can not be null.");
 		}
 		if (children == null) {
-			children = new LinkedList<XMLNodeIfc>();
+			this.children = getListInstance();
 		}    // end of if (children == null)
 		children.add(child);
 		// Collections.sort(children);
+	}
+
+	private List<XMLNodeIfc> getListInstance() {
+		return listSupplier != null? listSupplier.get() : new ArrayList<>();
 	}
 
 	public void addChildren(List<Element> children) {
@@ -194,7 +200,7 @@ public class Element
 			return;
 		}    // end of if (children == null)
 		if (this.children == null) {
-			this.children = new LinkedList<XMLNodeIfc>();
+			this.children = getListInstance();
 		}    // end of if (children == null)
 		for (XMLNodeIfc child : children) {
 			this.children.add(child.clone());
@@ -615,6 +621,7 @@ public class Element
 		return null;
 	}
 
+	@Nullable
 	public Element getChild(String name, String child_xmlns) {
 		if (child_xmlns == null) {
 			return getChild(name);
@@ -699,7 +706,7 @@ public class Element
 	}
 
 	public void setChildren(List<XMLNodeIfc> children) {
-		this.children = new LinkedList<XMLNodeIfc>();
+		this.children = getListInstance();
 		for (XMLNodeIfc child : children) {
 			this.children.add(child.clone());
 		}    // end of for (Element child: children)
