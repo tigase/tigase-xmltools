@@ -17,19 +17,19 @@
  */
 package tigase.xml;
 
-import junit.framework.TestCase;
 import org.junit.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * Simple tests for Element class
  *
  * @author andrzej
  */
-public class ElementTest
-		extends TestCase {
+public class ElementTest {
 
 	private static final String[] static_str_arr = {"parent", "child"};
 	private static final String str_path = "parent/child";
@@ -397,6 +397,19 @@ public class ElementTest
 	@Test
 	public void testSetCData() {
 		testGetCData_0args();
+	}
+
+	@Test
+	public void testFindChildVariants() {
+		Element element = new Element("root");
+		for (int childIdx = 0; childIdx < 10; childIdx++) {
+			element.addChild(new Element("child-" + childIdx).withElement("subchild-1", null));
+		}
+
+		assertEquals("child-1", element.findChild(el -> el.getName() == "child-1").getName());
+		assertEquals("child-1", element.findChildStream(el -> el.getName() == "child-1").getName());
+		assertEquals("child-1", element.findChild("child-1", null).map(Element::getName).get());
+		assertEquals("child-1", element.findChildStreamDirect(el -> el.getName() == "child-1").getName());
 	}
 }
 

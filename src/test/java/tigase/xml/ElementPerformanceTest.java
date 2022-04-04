@@ -19,6 +19,7 @@ package tigase.xml;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
@@ -39,6 +40,11 @@ public class ElementPerformanceTest {
 	public void launchBenchmark() throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(this.getClass().getName() + ".*")
+//				.include(this.getClass().getName() + ".benchmarkFlatMap*")
+//				.include(this.getClass().getName() + ".benchmarkFlatMapStreamToList*")
+//				.include(this.getClass().getName() + ".benchmarkFindChild*")
+//				.include(this.getClass().getName() + ".benchmarkFindChildStream*")
+//				.include(this.getClass().getName() + ".benchmarkFlatMapStream*")
 				// Set the following options as needed
 				.mode (Mode.AverageTime)
 				.timeUnit(TimeUnit.MICROSECONDS)
@@ -59,15 +65,25 @@ public class ElementPerformanceTest {
 	@State(Scope.Thread)
 	public static class BenchmarkState {
 		Element element;
+		int i;
+		
+		@Param({ "1", "5", "10", "20" })
+		int maxChild;
 		String name;
 
 		@Setup(Level.Trial)
-		public void initialize() {
-			int i = 1;
-			name = "child-" + i;
-			element = new Element("root").withElement("child-1", c -> c.withElement("subchild-1", null))
-					.withElement("child-2", c -> c.withElement("subchild-1", null))
-					.withElement("child-3", c -> c.withElement("subchild-1", null));
+		public void initializeElement() {
+			element = new Element("root");
+			for (int childIdx = 1; childIdx <= maxChild; childIdx++) {
+				element.addChild(new Element("child-" + childIdx).withElement("subchild-1", null));
+			}
+		}
+
+		@Setup(Level.Iteration)
+		public void initializeVariable() {
+			i = (new Random().nextInt(1, maxChild + 1));
+//			i = 1;
+			name = ("child-" + i);
 		}
 	}
 
@@ -279,7 +295,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildNewStatic(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(state.element.findChild(el -> el.getName() == "child-1"));
+			blackhole.consume(state.element.findChild(el -> el.getName() == state.name));
 		}
 	}
 	@Benchmark
@@ -288,6 +304,24 @@ public class ElementPerformanceTest {
 	public void benchmarkFindChildNew(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
 			blackhole.consume(state.element.findChild(el -> (state.name).equals(el.getName())));
+		}
+	}
+
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.AverageTime)
+	public void benchmarkFindChildStream(BenchmarkState state, Blackhole blackhole) {
+		for (int i=0; i<1000; i++) {
+			blackhole.consume(state.element.findChildStream(el -> el.getName() == state.name));
+		}
+	}
+
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.All)
+	public void benchmarkFindChildStreamDirect(BenchmarkState state, Blackhole blackhole) {
+		for (int i=0; i<1000; i++) {
+			blackhole.consume(state.element.findChildStreamDirect(el -> el.getName() == state.name));
 		}
 	}
 
@@ -305,7 +339,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildOldStatic(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(state.element.getChildStaticStr("child-1"));
+			blackhole.consume(state.element.getChildStaticStr(state.name));
 		}
 	}
 
@@ -314,7 +348,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildOldOptional(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(Optional.of(state.element.getChildStaticStr("child-1")));
+			blackhole.consume(Optional.ofNullable(state.element.getChildStaticStr(state.name)).orElse(null));
 		}
 	}
 
@@ -323,7 +357,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildOldEmpty(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(Optional.ofNullable(state.element.getChildStaticStr("child-1")));
+			blackhole.consume(Optional.ofNullable(state.element.getChildStaticStr(state.name)).orElse(null));
 		}
 	}
 
@@ -332,7 +366,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindAndMapChild(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			blackhole.consume(state.element.findChild("child-1", null).map(Element::getName).get());
+			blackhole.consume(state.element.findChild(state.name, null).map(Element::getName).orElse(null));
 		}
 	}
 	
@@ -393,6 +427,17 @@ public class ElementPerformanceTest {
 	@Benchmark
 	@Measurement(iterations = 100)
 	@BenchmarkMode(Mode.AverageTime)
+	public void benchmarkFlatMapStreamDirectToList3(BenchmarkState state, Blackhole blackhole) {
+		List<Element> children = state.element.streamChildrenDirect()
+				.flatMap(Element::streamChildrenDirect)
+				.filter(el -> el.getName().equals("subchild-1"))
+				.toList();
+		blackhole.consume(children);
+	}
+
+	@Benchmark
+	@Measurement(iterations = 100)
+	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFlatMapStreamToArray2(BenchmarkState state, Blackhole blackhole) {
 		Element[] children = state.element.streamChildren()
 				.flatMap(Element::streamChildren)
@@ -406,7 +451,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkMapStreamToList(BenchmarkState state, Blackhole blackhole) {
 		List<String> children = state.element.streamChildren()
-				.filter(el -> el.getName().equals("child-1"))
+				.filter(el -> el.getName().equals(state.name))
 				.map(Element::getName)
 				.toList();
 		blackhole.consume(children);
@@ -417,7 +462,7 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildAndClassic(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			Element el = state.element.getChild("child-1");
+			Element el = state.element.getChild(state.name);
 			if (el != null) {
 				blackhole.consume(el.getChildren());
 			}
@@ -429,8 +474,8 @@ public class ElementPerformanceTest {
 	@BenchmarkMode(Mode.AverageTime)
 	public void benchmarkFindChildAndOptional(BenchmarkState state, Blackhole blackhole) {
 		for (int i=0; i<1000; i++) {
-			Optional<List<Element>> result = Optional.ofNullable(state.element.getChild("child-1")).map(Element::getChildren);
-			blackhole.consume(result.get());
+			Optional<List<Element>> result = Optional.ofNullable(state.element.getChild(state.name)).map(Element::getChildren);
+			blackhole.consume(result.orElse(null));
 		}
 	}
 
