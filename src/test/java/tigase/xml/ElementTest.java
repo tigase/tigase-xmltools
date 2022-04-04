@@ -19,7 +19,9 @@ package tigase.xml;
 
 import org.junit.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -410,6 +412,21 @@ public class ElementTest {
 		assertEquals("child-1", element.findChildStream(el -> el.getName() == "child-1").getName());
 		assertEquals("child-1", element.findChild("child-1", null).map(Element::getName).get());
 		assertEquals("child-1", element.findChildStreamDirect(el -> el.getName() == "child-1").getName());
+	}
+
+	@Test
+	public void testSupplier() {
+		Element.listSupplier = ArrayList::new;
+		Element element = new Element("root");
+		element.addChild(new Element("child"));
+
+		assertEquals(ArrayList.class, element.children.getClass());
+		Element.listSupplier = LinkedList::new;
+		element = new Element("root");
+		element.addChild(new Element("child"));
+
+		assertEquals(LinkedList.class, element.children.getClass());
+		Element.listSupplier = null;
 	}
 }
 
