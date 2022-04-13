@@ -98,6 +98,16 @@ public class ElementPerformanceTest {
 	}
 
 	@State(Scope.Thread)
+	public static class BenchmarkStateStatic extends BenchmarkState {
+		@Setup(Level.Iteration)
+		@Override
+		public void initializeVariable() {
+			super.initializeVariable();
+			name = name.intern();
+		}
+	}
+
+	@State(Scope.Thread)
 	public static class BenchmarkState2 {
 		List<String> strings = List.of(FROM, TO, NAME, ID, XMLNS, LABEL, VAR);
 		Element.XMLIdentityHashMap<String,String> map = new Element.XMLIdentityHashMap<>(5);
@@ -340,14 +350,14 @@ public class ElementPerformanceTest {
 	@Benchmark
 	@Measurement(iterations = 1000)
 	@BenchmarkMode(Mode.Throughput)
-	public void benchmarkFindChildGetChildStaticStr(BenchmarkState state, Blackhole blackhole) {
+	public void benchmarkFindChildGetChildStaticStr(BenchmarkStateStatic state, Blackhole blackhole) {
 		blackhole.consume(state.element.getChildStaticStr(state.name));
 	}
 
 	@Benchmark
 	@Measurement(iterations = 1000)
 	@BenchmarkMode(Mode.Throughput)
-	public void benchmarkFindChildGetChildStaticStrOptional(BenchmarkState state, Blackhole blackhole) {
+	public void benchmarkFindChildGetChildStaticStrOptional(BenchmarkStateStatic state, Blackhole blackhole) {
 		blackhole.consume(Optional.ofNullable(state.element.getChildStaticStr(state.name)).orElse(null));
 	}
 
