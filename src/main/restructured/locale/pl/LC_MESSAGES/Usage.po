@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-04-21 15:54-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Usage.rst:2
+msgid "Usage"
+msgstr ""
+
+#: ../../Usage.rst:5
+msgid "Parsing XML"
+msgstr ""
+
+#: ../../Usage.rst:35
+msgid "Creating elements tree"
+msgstr ""
+
+#: ../../Usage.rst:37
+msgid ""
+"Creating ``message`` element with ``body`` inner element. Body element "
+"will contain a value ``Test``."
+msgstr ""
+
+#: ../../Usage.rst:39 ../../Usage.rst:63
+msgid "**Example.**"
+msgstr ""
+
+#: ../../Usage.rst:52 ../../Usage.rst:81
+msgid "**Result.**"
+msgstr ""
+
+#: ../../Usage.rst:59
+msgid "Modifying elements"
+msgstr ""
+
+#: ../../Usage.rst:61
+msgid ""
+"In ``messageElem`` variable we have a message element created in a "
+"previous example. Now we will set ``message`` attribute ``id`` to ``1``, "
+"remove ``body`` inner element and add new element ``test``."
+msgstr ""
+
+#: ../../Usage.rst:88
+msgid "Serializing to XML"
+msgstr ""
+
+#: ../../Usage.rst:90
+msgid ""
+"To serialize an element and its subelements to ``String`` you need to "
+"call its ``toString()`` method which will return serialized element."
+msgstr ""
+
