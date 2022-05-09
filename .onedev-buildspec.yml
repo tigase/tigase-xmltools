@@ -11,7 +11,7 @@ jobs:
   - !CommandStep
     name: detect build version
     runInContainer: true
-    image: '@script:builtin:maven:determine-docker-image@'
+    image: maven:3-eclipse-temurin-17
     interpreter: !DefaultInterpreter
       commands:
       - echo "Detecting project version (may require some time while downloading maven
@@ -27,7 +27,7 @@ jobs:
   - !CommandStep
     name: run unit tests
     runInContainer: true
-    image: '@script:builtin:maven:determine-docker-image@'
+    image: maven:3-eclipse-temurin-17
     interpreter: !DefaultInterpreter
       commands:
       - mvn clean test
