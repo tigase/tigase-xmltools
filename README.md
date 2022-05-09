@@ -5,6 +5,7 @@
     <img src="https://tc.tigase.net/app/rest/builds/buildType:(id:TigaseUtils_Build)/statusIcon" width="100"/>
 </p>
 
+(project currently available under our own, self-hosted 1dev: https://forge.tigase.net/projects/25/)
 
 # What it is
 
