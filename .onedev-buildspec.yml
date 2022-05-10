@@ -27,9 +27,10 @@ jobs:
   - !CommandStep
     name: maven build & deploy
     runInContainer: true
-    image: maven:3-eclipse-temurin-17
+    image: 1dev/build-environment:1.3
     interpreter: !DefaultInterpreter
       commands:
+      - mvn -version
       - mvn -Dmaven.deploy.username=jenkins -Dmaven.deploy.password=@secrets:maven-deploy-password@
         clean test deploy
     useTTY: false
