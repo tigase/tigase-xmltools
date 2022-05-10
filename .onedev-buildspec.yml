@@ -25,12 +25,13 @@ jobs:
     buildVersion: '@file:buildVersion@'
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
-    name: run unit tests
+    name: maven build & deploy
     runInContainer: true
     image: maven:3-eclipse-temurin-17
     interpreter: !DefaultInterpreter
       commands:
-      - mvn clean test
+      - mvn -Dmaven.deploy.username=jenkins -Dmaven.deploy.password=@secrets:maven-deploy-password@
+        clean test deploy
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   triggers:
