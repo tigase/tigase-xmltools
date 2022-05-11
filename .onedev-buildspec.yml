@@ -46,3 +46,18 @@ jobs:
   - key: maven-cache
     path: /root/.m2/repository
   timeout: 3600
+- name: Push to GitHub
+  steps:
+  - !PushRepository
+    name: Push to GitHub
+    remoteUrl: https://github.com/tigase/tigase-xmltools.git
+    passwordSecret: access-token
+    withLfs: false
+    force: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  cpuRequirement: 250
+  memoryRequirement: 256
+  timeout: 3600
