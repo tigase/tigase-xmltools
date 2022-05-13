@@ -27,11 +27,11 @@ jobs:
   - !CommandStep
     name: maven build & deploy
     runInContainer: true
-    image: 1dev/build-environment:1.3
+    image: tigase/tigase-maven-docker:3-temurin-17
     interpreter: !DefaultInterpreter
       commands:
       - mvn -version
-      - mvn -Dmaven.deploy.username=jenkins -Dmaven.deploy.password=@secrets:maven-deploy-password@
+      - mvn -Dtigase.internalrepo.username=@secret:maven-deploy-username@ -Dtigase.internalrepo.password=@secret:maven-deploy-password@
         clean test deploy
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
