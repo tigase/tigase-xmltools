@@ -48,7 +48,11 @@ import java.util.stream.Stream;
 public class Element
 		implements XMLNodeIfc<Element> {
 
-	protected XMLIdentityHashMap<String, String> attributes = null;
+	protected static Function<Integer,AttributesIfc> attributesProvider = AttributesIdentityMap::new;
+
+	protected static Function<String,String> stringDeduplicator;
+
+	protected AttributesIfc attributes = null;
 
 	protected List<XMLNodeIfc> children = null;
 	protected static Supplier<List<XMLNodeIfc>> listSupplier = null;
@@ -169,10 +173,10 @@ public class Element
 
 	public void addAttributes(Map<String, String> attrs) {
 		if (attributes == null) {
-			attributes = new XMLIdentityHashMap<String, String>(attrs.size());
+			attributes = attributesProvider.apply(attrs.size());
 		}
 		for (Map.Entry<String, String> entry : attrs.entrySet()) {
-			attributes.put(entry.getKey().intern(), entry.getValue());
+			attributes.put(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -286,7 +290,7 @@ public class Element
 			throw new InternalError();
 		}    // end of try-catch
 		if (attributes != null) {
-			result.attributes = (XMLIdentityHashMap<String, String>) attributes.clone();
+			result.attributes = attributes.clone();
 		} else {
 			result.attributes = null;
 		}    // end of else
@@ -473,7 +477,7 @@ public class Element
 	@Deprecated
 	public String getAttribute(String attName) {
 		if (attributes != null) {
-			return attributes.get(attName.intern());
+			return attributes.get(attName);
 		}    // end of if (attributes != null)
 
 		return null;
@@ -507,7 +511,7 @@ public class Element
 
 	public String getAttributeStaticStr(String attName) {
 		if (attributes != null) {
-			return attributes.get(attName);
+			return attributes.getStatic(attName);
 		}    // end of if (attributes != null)
 
 		return null;
@@ -540,11 +544,11 @@ public class Element
 	}
 
 	public Map<String, String> getAttributes() {
-		return ((attributes != null) ? new LinkedHashMap<String, String>(attributes) : Collections.emptyMap());
+		return ((attributes != null) ? new LinkedHashMap<String, String>(attributes.asMap()) : Collections.emptyMap());
 	}
 
 	public void setAttributes(Map<String, String> newAttributes) {
-		attributes = new XMLIdentityHashMap<String, String>(newAttributes.size());
+		attributes = attributesProvider.apply(newAttributes.size());
 		for (Map.Entry<String, String> entry : newAttributes.entrySet()) {
 			setAttribute(entry.getKey(), entry.getValue());
 
@@ -874,7 +878,7 @@ public class Element
 
 	public void removeAttribute(String key) {
 		if (attributes != null) {
-			attributes.remove(key.intern());
+			attributes.remove(key);
 		}    // end of if (attributes == null)
 	}
 
@@ -907,9 +911,9 @@ public class Element
 
 	public void setAttribute(String key, String value) {
 		if (attributes == null) {
-			attributes = new XMLIdentityHashMap<String, String>(5);
+			attributes = attributesProvider.apply(5);
 		}    // end of if (attributes == null)
-		String k = key.intern();
+		String k = key;
 		String v = value;
 
 		if (k == "xmlns") {
@@ -920,7 +924,7 @@ public class Element
 	}
 
 	public void setAttributes(StringBuilder[] names, StringBuilder[] values) {
-		attributes = new XMLIdentityHashMap<String, String>(names.length);
+		attributes = attributesProvider.apply(names.length);
 		for (int i = 0; i < names.length; i++) {
 			if (names[i] != null) {
 				setAttribute(names[i].toString(), values[i].toString());
@@ -931,7 +935,7 @@ public class Element
 	}
 
 	public void setAttributes(String[] names, String[] values) {
-		attributes = new XMLIdentityHashMap<String, String>(names.length);
+		attributes = attributesProvider.apply(names.length);
 		for (int i = 0; i < names.length; i++) {
 			if (names[i] != null) {
 				setAttribute(names[i], values[i]);
@@ -1140,5 +1144,168 @@ public class Element
 			return super.put(key, value);
 		}
 	}
+
+	protected interface AttributesIfc {
+
+		String get(String key);
+		String getStatic(String key);
+		String put(String key, String value);
+		String remove(String key);
+
+		AttributesIfc clone();
+
+		Set<String> keySet();
+
+		Map<String,String> asMap();
+	}
+
+	protected static final class AttributesIdentityMap implements AttributesIfc {
+
+		private final XMLIdentityHashMap<String, String> attributes;
+
+		public AttributesIdentityMap(int size) {
+			attributes = new XMLIdentityHashMap<>(10);
+		}
+
+		@Override
+		public String get(String key) {
+			return attributes.get(key.intern());
+		}
+
+		@Override
+		public String getStatic(String key) {
+			return attributes.remove(key);
+		}
+
+		@Override
+		public String put(String key, String value) {
+			return attributes.put(key.intern(), value);
+		}
+
+		@Override
+		public String remove(String key) {
+			return attributes.remove(key.intern());
+		}
+
+		@Override
+		public AttributesIfc clone() {
+			AttributesIdentityMap result = new AttributesIdentityMap(attributes.size());
+			result.attributes.putAll(attributes);
+			return result;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return attributes.keySet();
+		}
+
+		@Override
+		public Map<String, String> asMap() {
+			return attributes;
+		}
+	}
+
+	protected static final class AttributesHashMap implements AttributesIfc {
+
+		private final HashMap<String,String> attributes;
+
+		public AttributesHashMap(int size) {
+			attributes = new HashMap<>(size);
+		}
+
+		@Override
+		public String get(String key) {
+			return attributes.get(key);
+		}
+
+		@Override
+		public String getStatic(String key) {
+			return attributes.get(key);
+		}
+
+		@Override
+		public String put(String key, String value) {
+			return attributes.put(key, value);
+		}
+
+		@Override
+		public String remove(String key) {
+			return attributes.remove(key);
+		}
+		@Override
+		public AttributesIfc clone() {
+			AttributesHashMap result = new AttributesHashMap(attributes.size());
+			result.attributes.putAll(attributes);
+			return result;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return attributes.keySet();
+		}
+
+		@Override
+		public Map<String, String> asMap() {
+			return attributes;
+		}
+
+	}
+
+	protected static final class AttributesDedupHashMap implements AttributesIfc {
+
+		private static String dedupKey(String key) {
+			return switch (key) {
+				case "id" -> "id";
+				case "name" -> "name";
+				case "xmlns" -> "xmlns";
+				case "from" -> "from";
+				case "to" -> "to";
+				default -> key;
+			};
+		}
+		private final HashMap<String,String> attributes;
+
+		public AttributesDedupHashMap(int size) {
+			attributes = new HashMap<>(size);
+		}
+
+		@Override
+		public String get(String key) {
+			return attributes.get(key);
+		}
+
+		@Override
+		public String getStatic(String key) {
+			return attributes.get(key);
+		}
+
+		@Override
+		public String put(String key, String value) {
+			return attributes.put(dedupKey(key), value);
+		}
+
+		@Override
+		public String remove(String key) {
+			return attributes.remove(key);
+		}
+		@Override
+		public AttributesIfc clone() {
+			AttributesDedupHashMap result = new AttributesDedupHashMap(attributes.size());
+			result.attributes.putAll(attributes);
+			return result;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return attributes.keySet();
+		}
+
+		@Override
+		public Map<String, String> asMap() {
+			return attributes;
+		}
+
+	}
+
 }    // Element
 
