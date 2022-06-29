@@ -70,6 +70,9 @@ public class ElementAttributesPerformanceTest {
 		@Param({"IdentityMap", "HashMap", "DedupHashMap"})
 		String attributesClass;
 
+		@Param({"Dynamic", "Static"})
+		String attributeType;
+
 		@Setup(Level.Trial)
 		public void initializeElement() {
 			Element.listSupplier = ArrayList::new;
@@ -78,8 +81,11 @@ public class ElementAttributesPerformanceTest {
 				case "HashMap" -> Element.attributesProvider = Element.AttributesHashMap::new;
 				case "DedupHashMap" -> Element.attributesProvider = Element.AttributesDedupHashMap::new;
 			}
+			switch (attributeType) {
+				case "Dynamic" -> attributeName = "test-" + new Random().nextInt();
+				case "Static" -> attributeName = "id";
+			};
 
-			attributeName = "test-" + new Random().nextInt();
 			if (attributesClass.equals("IdentityMap")) {
 				attributeName = attributeName.intern();
 			}
