@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 //import java.util.StringTokenizer;
@@ -1251,7 +1252,7 @@ public class Element
 
 	}
 
-	protected static final class AttributesDedupHashMap implements AttributesIfc {
+	protected static final class AttributesDedupStaticHashMap implements AttributesIfc {
 
 		private static String dedupKey(String key) {
 			return switch (key) {
@@ -1265,7 +1266,7 @@ public class Element
 		}
 		private final HashMap<String,String> attributes;
 
-		public AttributesDedupHashMap(int size) {
+		public AttributesDedupStaticHashMap(int size) {
 			attributes = new HashMap<>(size);
 		}
 
@@ -1290,7 +1291,56 @@ public class Element
 		}
 		@Override
 		public AttributesIfc clone() {
-			AttributesDedupHashMap result = new AttributesDedupHashMap(attributes.size());
+			AttributesDedupStaticHashMap result = new AttributesDedupStaticHashMap(attributes.size());
+			result.attributes.putAll(attributes);
+			return result;
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return attributes.keySet();
+		}
+
+		@Override
+		public Map<String, String> asMap() {
+			return attributes;
+		}
+
+	}
+
+	protected static final class AttributesDedupHashHashMap implements AttributesIfc {
+
+		protected static Map<String, String> deduplicationMap = List.of("id", "name", "xmlns", "from", "to")
+				.stream()
+				.collect(Collectors.toMap(Function.identity(), Function.identity()));
+		private final HashMap<String,String> attributes;
+
+		public AttributesDedupHashHashMap(int size) {
+			attributes = new HashMap<>(size);
+		}
+
+		@Override
+		public String get(String key) {
+			return attributes.get(key);
+		}
+
+		@Override
+		public String getStatic(String key) {
+			return attributes.get(key);
+		}
+
+		@Override
+		public String put(String key, String value) {
+			return attributes.put(deduplicationMap.getOrDefault(key, key), value);
+		}
+
+		@Override
+		public String remove(String key) {
+			return attributes.remove(key);
+		}
+		@Override
+		public AttributesIfc clone() {
+			AttributesDedupHashHashMap result = new AttributesDedupHashHashMap(attributes.size());
 			result.attributes.putAll(attributes);
 			return result;
 		}
