@@ -186,7 +186,7 @@ public class XMLDB {
 			List<String> results = new ArrayList<String>(children.size());
 
 			for (Element child : children) {
-				results.add(child.getAttributeStaticStr(DBElement.NAME));
+				results.add(child.getAttribute(DBElement.NAME));
 			}    // end of for (Element child: children)
 
 			return results;
@@ -710,8 +710,8 @@ public class XMLDB {
 
 		@Override
 		public int compare(DBElement el1, DBElement el2) {
-			String name1 = el1.getAttributeStaticStr("name");
-			String name2 = el2.getAttributeStaticStr("name");
+			String name1 = el1.getAttribute("name");
+			String name2 = el2.getAttribute("name");
 
 			return name1.compareTo(name2);
 		}

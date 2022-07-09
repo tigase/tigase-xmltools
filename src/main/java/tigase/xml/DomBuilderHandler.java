@@ -105,13 +105,6 @@ public class DomBuilderHandler
 		}
 		Element elem = newElement(tmp_name, null, attr_names, attr_values);
 		String ns = elem.getXMLNS();
-		if (ns == null) {
-			if (el_stack.isEmpty() || el_stack.peek().getXMLNS() == null) {
-				//elem.setDefXMLNS(top_xmlns);
-			} else {
-				elem.setDefXMLNS(el_stack.peek().getXMLNS());
-			}
-		}
 		if (new_xmlns != null) {
 			elem.setXMLNS(new_xmlns);
 			elem.removeAttribute("xmlns:" + prefix);
@@ -157,7 +150,7 @@ public class DomBuilderHandler
 		} // end of if (tmp_name.equals())
 
 		Element elem = el_stack.pop();
-		if (elem.getName() != tmp_name.intern()) {
+		if (!elem.matches(ElementFilters.name(tmp_name))) {
 			return false;
 		}
 		if (el_stack.isEmpty()) {

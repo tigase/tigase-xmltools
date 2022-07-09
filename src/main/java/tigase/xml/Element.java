@@ -25,11 +25,10 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-//import java.util.StringTokenizer;
+import static tigase.xml.ElementFilters.name;
+import static tigase.xml.ElementFilters.xmlns;
 
 /**
  * <code>Element</code> - basic document tree node implementation. Supports Java 5.0 generic feature to make it easier
@@ -49,22 +48,7 @@ import java.util.stream.Stream;
 public class Element
 		implements XMLNodeIfc<Element> {
 
-	protected static Function<Integer,AttributesIfc> attributesProvider = AttributesIdentityMap::new;
-
-	protected static Function<String,String> stringDeduplicator;
-
-	protected AttributesIfc attributes = null;
-
-	protected List<XMLNodeIfc> children = null;
-	protected static Supplier<List<XMLNodeIfc>> listSupplier = null;
-
-	protected String defxmlns = null;
-
-	protected String name = null;
-
-	protected String xmlns = null;
-
-	public static void main(String[] args) throws Exception {
+	static void main(String[] args) throws Exception {
 		if (args.length < 1) {
 			System.err.println("You must give file name as parameter.");
 			System.exit(1);
@@ -88,17 +72,35 @@ public class Element
 			System.out.println(elem.toString());
 		}
 	}
+	// static reference to make things faster
+	private static final String ATTR_XMLNS_KEY = "xmlns";
 
-	public Element(Element element) {
-		Element src = element.clone();
+	protected static final Map<String, String> elementNameDeduplicationMap = List.of("message", "iq", "presence",
+																					 "query", "pubsub", "body",
+																					 "stanza-id")
+			.stream()
+			.collect(Collectors.toMap(Function.identity(), Function.identity()));
+	protected static Map<String, String> attributesDeduplicationMap = List.of("id", "name", ATTR_XMLNS_KEY, "from", "to")
+			.stream()
+			.collect(Collectors.toMap(Function.identity(), Function.identity()));
+	protected HashMap<String,String> attributes = null;
 
-		this.attributes = src.attributes;
+	protected ArrayList<XMLNodeIfc> children = null;
+
+	protected String name = null;
+
+	protected String xmlns = null;
+	
+	public Element(Element src) {
+		if (src.attributes != null) {
+			this.attributes = new HashMap<>(src.attributes);
+		}
 		this.name = src.name;
 
-		// this.cdata = src.cdata;
-		this.defxmlns = src.defxmlns;
 		this.xmlns = src.xmlns;
-		this.children = src.children;
+		if (src.children != null) {
+			this.children = new ArrayList<>(src.children);
+		}
 	}
 
 	public Element(String argName) {
@@ -122,6 +124,34 @@ public class Element
 		}
 	}
 
+	public Element(String argName, Map<String,String> attributes) {
+		setName(argName);
+		if (attributes != null) {
+			setAttributes(attributes);
+		}
+	}
+
+	public Element(String argName, Map<String,String> attributes, String cdata) {
+		this(argName, attributes);
+		if (cdata != null) {
+			setCData(cdata);
+		}
+	}
+
+	public Element(String argName, Map<String,String> attributes, Element[] children) {
+		this(argName, attributes);
+		if (children != null) {
+			addChildren(Arrays.asList(children));
+		}
+	}
+
+	public Element(String argName, Map<String,String> attributes, List<Element> children) {
+		this(argName, attributes);
+		if (children != null) {
+			addChildren(children);
+		}
+	}
+	
 	public Element(String argName, String[] att_names, String[] att_values) {
 		setName(argName);
 		if (att_names != null) {
@@ -157,6 +187,18 @@ public class Element
 		}    // end of if (att_names != null)
 	}
 
+	public Element(String name, List<Element> children) {
+		this(name);
+		if (children != null) {
+			addChildren(children);
+		}
+	}
+
+	public Element(String name, String xmlns, List<Element> children) {
+		this(name, children);
+		setXMLNS(xmlns);
+	}
+
 	public Element(String name, Consumer<Element> builder) {
 		setName(name);
 		builder.accept(this);
@@ -168,51 +210,49 @@ public class Element
 		builder.accept(this);
 	}
 
-	public void addAttribute(String attName, String attValue) {
-		setAttribute(attName, attValue);
+	public Element addAttribute(String attName, String attValue) {
+		return setAttribute(attName, attValue);
 	}
 
-	public void addAttributes(Map<String, String> attrs) {
+	public Element addAttributes(Map<String, String> attrs) {
 		if (attributes == null) {
-			attributes = attributesProvider.apply(attrs.size());
+			attributes = new HashMap<>(attrs.size());
 		}
 		for (Map.Entry<String, String> entry : attrs.entrySet()) {
-			attributes.put(entry.getKey(), entry.getValue());
+			setAttribute(entry.getKey(), entry.getValue());
 		}
+		return this;
 	}
 
-	public void addCData(String argCData) {
-		addChild(new CData(argCData));
+	public Element addCData(String argCData) {
+		return addChild(new CData(argCData));
 	}
 
-	public void addChild(XMLNodeIfc child) {
+	public Element addChild(XMLNodeIfc child) {
 		if (child == null) {
 			throw new NullPointerException("Element child can not be null.");
 		}
 		if (children == null) {
-			this.children = getListInstance();
+			this.children = new ArrayList<>();
 		}    // end of if (children == null)
 		children.add(child);
-		// Collections.sort(children);
+		return this;
 	}
 
-	private List<XMLNodeIfc> getListInstance() {
-		return listSupplier != null? listSupplier.get() : new ArrayList<>();
-	}
-
-	public void addChildren(List<Element> children) {
+	public Element addChildren(List<Element> children) {
 		if (children == null) {
-			return;
+			return this;
 		}    // end of if (children == null)
 		if (this.children == null) {
-			this.children = getListInstance();
+			this.children = new ArrayList<>(children.size());
 		}    // end of if (children == null)
 		for (XMLNodeIfc child : children) {
-			this.children.add(child.clone());
+			this.children.add(child);
 		}    // end of for (Element child: children)
 
 		// this.children.addAll(children);
 		// Collections.sort(children);
+		return this;
 	}
 
 	public String childrenToString() {
@@ -247,9 +287,10 @@ public class Element
 
 				// This is weird but if there is a bug in some other component
 				// it may add null children to the element, let's be save here.
-				if (child != null) {
+				// FIXME: there are protections against adding null as a child
+				// if (child != null) {
 					result.append(child.toStringPretty());
-				}
+				//}
 			}    // end of for ()
 		}        // end of if (child != null)
 
@@ -269,117 +310,46 @@ public class Element
 
 				// This is weird but if there is a bug in some other component
 				// it may add null children to the element, let's be save here.
-				if (child != null) {
+				// FIXME: there are protections against adding null as a child
+				// if (child != null) {
 					if (child instanceof Element) {
 						((Element) child).toStringSecure(result);
 					} else {
 						result.append(child.toStringSecure());
 					}
-				}
+				// }
 			}    // end of for ()
 		}        // end of if (child != null)
 	}
-
-	@SuppressWarnings({"unchecked"})
+	
 	@Override
 	public Element clone() {
-		Element result = null;
-
-		try {
-			result = (Element) super.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new InternalError();
-		}    // end of try-catch
-		if (attributes != null) {
-			result.attributes = attributes.clone();
-		} else {
-			result.attributes = null;
-		}    // end of else
-		if (children != null) {
-			result.setChildren(children);
-		} else {
-			result.children = null;
-		}    // end of else
-
-		return result;
-	}
-
-	@Override
-	public int compareTo(Element elem) {
-		return toStringNoChildren().compareTo(elem.toStringNoChildren());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Element) {
-			Element elem = (Element) obj;
-
-			return toStringNoChildren().equals(elem.toStringNoChildren());
-		}
-
-		return false;
-	}
-
-	public Element findChildByPathStaticStr(String[] elementPath) {
-		if (elementPath[0] != getName()) {
-			return null;
-		}
-
-		Element child = this;
-
-		// we must start with 1 not 0 as 0 is name of parent element
-		for (int i = 1; (i < elementPath.length) && (child != null); i++) {
-			String str = elementPath[i];
-
-			child = child.getChildStaticStr(str);
-		}
-
-		return child;
-	}
-
-	public Element findChildByPath(String[] elemPath) {
-		if (elemPath[0].isEmpty()) {
-			elemPath = Arrays.copyOfRange(elemPath, 1, elemPath.length);
-		}
-		if (!elemPath[0].equals(getName())) {
-			return null;
-		}
-
-		Element child = this;
-
-		// we must start with 1 not 0 as 0 is name of parent element
-		for (int i = 1; (i < elemPath.length) && (child != null); i++) {
-			String str = elemPath[i];
-
-			child = child.getChild(str);
-		}
-
-		return child;
+		return new Element(this);
 	}
 
 	/**
-	 * @deprecated use {@link #findChildByPath(java.lang.String[])} instead.
+	 * Methods checks equality of instances of `Element` excluding list of children
+	 * @param obj
+	 * @return
 	 */
-	@Deprecated
-	public Element findChildByPath(String elementPath) {
-
-		// For performance reasons, replace StringTokenizer with split
-		return findChildByPath(elementPath.split("/"));
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Element)) {
+			return false;
+		}
+		Element elem = (Element) obj;
+		if (Objects.equals(getName(), elem.getName()) && Objects.equals(getXMLNS(), elem.getXMLNS())) {
+			for (Map.Entry<String,String> entry : attributes.entrySet()) {
+				if (!Objects.equals(entry.getValue(), elem.getAttribute(entry.getKey()))) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
-	public Element findChildStreamDirect(Predicate<Element> matcher) {
-		return streamChildrenDirect().filter(matcher)
-//				.flatMap(Element::streamChildren)
-				.findFirst().orElse(null);
-	}
-
-	public Element findChildStream(Predicate<Element> matcher) {
-		return streamChildren().filter(matcher)
-//				.flatMap(Element::streamChildren)
-				.findFirst().orElse(null);
-	}
-
-	public Element findChild(Predicate<Element> matcher) {
+	public @Nullable Element findChild(Predicate<Element> matcher) {
 		if (children != null) {
 			for (XMLNodeIfc node : children) {
 				if (!(node instanceof Element)) {
@@ -395,7 +365,19 @@ public class Element
 
 		return null;
 	}
-	
+
+	public @Nullable Element findChild(String name) {
+		return findChild(name(name));
+	}
+
+	public @Nullable Element findChild(String name, String child_xmlns) {
+		return findChild(name(name).and(xmlns(child_xmlns)));
+	}
+
+	public @Nullable Element findChildAt(Path path) {
+		return path.evaluate(this);
+	}
+
 	public List<Element> findChildren(Predicate<Element> matcher) {
 		if (children != null) {
 			LinkedList<Element> result = new LinkedList<Element>();
@@ -416,66 +398,11 @@ public class Element
 
 		return Collections.emptyList();
 	}
-
-	public <R> List<R> flatMapChildren(Function<Element, Collection<? extends R>> mapper) {
-		if (children != null) {
-			LinkedList<R> result = new LinkedList<R>();
-
-			for (XMLNodeIfc node : children) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
-
-				Element el = (Element) node;
-				result.addAll(mapper.apply(el));
-			}
-
-			return result;
-		}
-
-		return Collections.emptyList();
+	
+	public @Nullable List<Element> findChildrenAt(Path path) {
+		return path.evaluateAll(this);
 	}
 
-	public void forEachChild(Consumer<Element> consumer) {
-		if (children != null) {
-			for (XMLNodeIfc node : children) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
-
-				Element el = (Element) node;
-				consumer.accept(el);
-			}
-		}
-	}
-
-
-	public Stream<Element> streamChildrenDirect() {
-		return children == null ? Stream.empty() : children.stream().filter(xmlNodeIfc -> xmlNodeIfc.getClass().isAssignableFrom(Element.class)).map(Element.class::cast);
-//		return children == null ? Stream.empty() : children.stream().filter(node -> node instanceof Element).map(obj -> (Element)obj);
-	}
-
-	/**
-	 * This is optimized version of getChildren().stream()
-	 */
-	public Stream<Element> streamChildren() {
-		if (children == null) {
-			return Stream.empty();
-		} else {
-			Stream.Builder<Element> stream = Stream.builder();
-			for (XMLNodeIfc node : children) {
-				if (node instanceof Element) {
-					stream.accept((Element) node);
-				}
-			}
-			return stream.build();
-		}
-	}
-
-	/**
-	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String) } instead.
-	 */
-	@Deprecated
 	public String getAttribute(String attName) {
 		if (attributes != null) {
 			return attributes.get(attName);
@@ -483,116 +410,61 @@ public class Element
 
 		return null;
 	}
-
-	/**
-	 * @deprecated use {@link #getChildAttributeStaticStr(java.lang.String, java.lang.String) } instead.
-	 */
-	@Deprecated
-	public String getChildAttribute(String childName, String attName) {
-		String result = null;
-		Element child = getChild(childName);
-
-		if (child != null) {
-			result = child.getAttribute(attName);
+	
+	public @Nullable String getAttributeAt(Path path, String attName) {
+		Element subchild = findChildAt(path);
+		if (subchild == null) {
+			return null;
 		}
-
-		return result;
-	}
-
-	public String getChildAttributeStaticStr(String childName, String attName) {
-		String result = null;
-		Element child = getChild(childName);
-
-		if (child != null) {
-			result = child.getAttributeStaticStr(attName);
-		}
-
-		return result;
-	}
-
-	public String getAttributeStaticStr(String attName) {
-		if (attributes != null) {
-			return attributes.getStatic(attName);
-		}    // end of if (attributes != null)
-
-		return null;
-	}
-
-	/**
-	 * @deprecated use  {@link #getAttributeFromChildAtPath(java.lang.String[], java.lang.String) } instead.
-	 */
-	@Deprecated
-	public String getAttributeFromChildAtPath(String elementPath, String att_name) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getAttribute(att_name) : null;
-	}
-
-	/**
-	 * @deprecated {@link #getAttributeFromChildAtPathStaticStr(java.lang.String[], java.lang.String) } instead.
-	 */
-	@Deprecated
-	public String getAttributeFromChildAtPath(String[] elementPath, String att_name) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getAttribute(att_name) : null;
-	}
-
-	public String getAttributeFromChildAtPathStaticStr(String[] elementPath, String att_name) {
-		Element child = findChildByPathStaticStr(elementPath);
-
-		return (child != null) ? child.getAttributeStaticStr(att_name) : null;
+		return subchild.getAttribute(attName);
 	}
 
 	public Map<String, String> getAttributes() {
-		return ((attributes != null) ? new LinkedHashMap<String, String>(attributes.asMap()) : Collections.emptyMap());
+		return ((attributes != null) ? Collections.unmodifiableMap(attributes) : Collections.emptyMap());
 	}
 
-	public void setAttributes(Map<String, String> newAttributes) {
-		attributes = attributesProvider.apply(newAttributes.size());
+
+	public Element setAttributes(Map<String, String> newAttributes) {
+		attributes = new HashMap<>(newAttributes.size());
 		for (Map.Entry<String, String> entry : newAttributes.entrySet()) {
 			setAttribute(entry.getKey(), entry.getValue());
+		}
+		return this;
+	}
 
-			// attributes.put(entry.getKey().intern(), entry.getValue());
+	private void setAttributes(String[] names, String[] values) {
+		attributes = new HashMap<>(names.length);
+		for (int i=0; i<names.length; i++) {
+			setAttribute(names[i], values[i]);
 		}
 	}
 
-	/**
-	 * @deprecated use {@link #getCDataFromChildAtPath(java.lang.String[]) } instead.
-	 */
-	@Deprecated
-	public String getCDataFromChildAtPath(String elementPath) {
-		return getCDataOfChildAtPath(elementPath);
-	}
-
-	public String getCDataFromChildAtPath(String[] elementPath) {
-		return getCDataOfChildAtPath(elementPath);
-	}
-
-	public String getCDataFromChildAtPathStaticStr(String[] elementPath) {
-		return getCDataOfChildAtPathStaticStr(elementPath);
+	private void setAttributes(StringBuilder[] names, StringBuilder[] values) {
+		attributes = new HashMap<>();
+		for (int i=0; i<names.length; i++) {
+			if (names[i] != null) {
+				setAttribute(names[i].toString(), values[i].toString());
+			}
+		}
 	}
 
 	public String getCData() {
 		return cdataToString();
 	}
-
-	public void setCData(String argCData) {
-
-		if (children != null) {
-			for (XMLNodeIfc child : children) {
-
-				// This is weird but if there is a bug in some other component
-				// it may add null children to the element, let's be save here.
-				if ((child != null) && (child instanceof CData)) {
-					((CData) child).setCdata(argCData);
-					return;
-				}
-			}    // end of for ()
-		}        // end of if (child != null)
-
-		addChild(new CData(argCData));
+	
+	public String getCDataAt(Path path) {
+		Element subchild = findChildAt(path);
+		if (subchild == null) {
+			return null;
+		}
+		return subchild.getCData();
 	}
+
+	public Element setCData(String argCData) {
+		children = new ArrayList<>();
+		return addChild(new CData(argCData));
+	}
+
 
 	public Element getChild(String name) {
 		if (children != null) {
@@ -610,21 +482,6 @@ public class Element
 		return null;
 	}
 
-	public Element getChildStaticStr(String name) {
-		if (children != null) {
-			for (XMLNodeIfc el : children) {
-				if (el instanceof Element) {
-					Element elem = (Element) el;
-
-					if (elem.getName() == name) {
-						return elem;
-					}
-				}
-			}
-		}    // end of if (children != null)
-
-		return null;
-	}
 
 	@Nullable
 	public Element getChild(String name, String child_xmlns) {
@@ -647,53 +504,6 @@ public class Element
 		return null;
 	}
 
-	public Element getChildStaticStr(String name, String child_xmlns) {
-		if (child_xmlns == null) {
-			return getChildStaticStr(name);
-		}
-		if (children != null) {
-			for (XMLNodeIfc el : children) {
-				if (el instanceof Element) {
-					Element elem = (Element) el;
-
-					if (elem.getName() == name && elem.getXMLNS() == child_xmlns) {
-						return elem;
-					}
-				}
-			}
-		}    // end of if (children != null)
-
-		return null;
-	}
-
-	/**
-	 * @deprecated use {@link #getCDataOfChildAtPath(java.lang.String[]) } instead.
-	 */
-	@Deprecated
-	public String getCDataOfChildAtPath(String elementPath) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getCData() : null;
-	}
-
-	public String getCDataOfChildAtPath(String[] elementPath) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getCData() : null;
-	}
-
-	public String getCDataOfChildAtPathStaticStr(String[] elementPath) {
-		Element child = findChildByPathStaticStr(elementPath);
-
-		return (child != null) ? child.getCData() : null;
-	}
-
-	public String getChildCData(Predicate<Element> matcher) {
-		Element child = findChild(matcher);
-
-		return (child != null) ? child.getCData() : null;
-	}
-
 	public List<Element> getChildren() {
 		if (children != null) {
 			LinkedList<Element> result = new LinkedList<Element>();
@@ -710,90 +520,41 @@ public class Element
 		return Collections.emptyList();
 	}
 
-	public void setChildren(List<XMLNodeIfc> children) {
-		this.children = getListInstance();
+
+	public Element setChildren(List<XMLNodeIfc> children) {
+		this.children = new ArrayList<>(children.size());
 		for (XMLNodeIfc child : children) {
 			this.children.add(child.clone());
 		}    // end of for (Element child: children)
-
-		// Collections.sort(children);
+		return this;
 	}
-
-	/**
-	 * @deprecated use {@link #getChildrenOfChildAtPath(java.lang.String[]) } instead.
-	 */
-	@Deprecated
-	public List<Element> getChildrenOfChildAtPath(String elementPath) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getChildren() : Collections.emptyList();
-	}
-
-	public List<Element> getChildrenOfChildAtPath(String[] elementPath) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getChildren() : Collections.emptyList();
-	}
-
-	public List<Element> getChildrenOfChildAtPathStaticStr(String[] elementPath) {
-		Element child = findChildByPathStaticStr(elementPath);
-
-		return (child != null) ? child.getChildren() : Collections.emptyList();
-	}
-
-	public List<Element> getChildren(Predicate<Element> matcher) {
-		Element child = findChild(matcher);
-
-		return (child != null) ? child.getChildren() : Collections.emptyList();
-	}
-
+	
 	public String getName() {
 		return this.name;
 	}
 
-	public void setName(String argName) {
-		this.name = argName.intern();
+	private void setName(String argName) {
+		this.name = elementNameDeduplicationMap.getOrDefault(argName, argName);
 	}
 
 	public String getXMLNS() {
 		if (xmlns == null) {
-			xmlns = getAttributeStaticStr("xmlns");
-			xmlns = ((xmlns != null) ? xmlns.intern() : null);
+			xmlns = getAttribute(ATTR_XMLNS_KEY);
 		}
 
-		return (xmlns != null) ? xmlns : defxmlns;
+		return xmlns;
 	}
 
 	public void setXMLNS(String ns) {
 		if (ns == null) {
-			xmlns = null;
-			removeAttribute("xmlns");
+			// FIXME: leaving setting `xmlns` to removeAttribute()/setAttribute() methods
+			//xmlns = null;
+			removeAttribute(ATTR_XMLNS_KEY);
 		} else {
-			xmlns = ns.intern();
-			setAttribute("xmlns", xmlns);
+			// FIXME: leaving setting `xmlns` to removeAttribute()/setAttribute() methods
+			//xmlns = ns;
+			setAttribute(ATTR_XMLNS_KEY, xmlns);
 		}
-	}
-
-	/**
-	 * @deprecated use {@link #getXMLNSOfChildAtPath(java.lang.String[]) } instead.
-	 */
-	@Deprecated
-	public String getXMLNSOfChildAtPath(String elementPath) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getXMLNS() : null;
-	}
-
-	public String getXMLNSOfChildAtPath(String[] elementPath) {
-		Element child = findChildByPath(elementPath);
-
-		return (child != null) ? child.getXMLNS() : null;
-	}
-
-	public String getXMLNSOfChildAtPathStaticStr(String[] elementPath) {
-		Element child = findChildByPathStaticStr(elementPath);
-
-		return (child != null) ? child.getXMLNS() : null;
 	}
 
 	@Override
@@ -805,54 +566,7 @@ public class Element
 		return mapper.apply(this);
 	}
 
-	@FunctionalInterface
-	public interface OptionalMapper<T> {
-
-		T get();
-
-		default <R> OptionalMapper<R> map(Function<T,R> mapper) {
-			return () -> {
-				T value = get();
-				if (value == null) {
-					return null;
-				}
-				return mapper.apply(value);
-			};
-		}
-
-		default OptionalMapper<T> filter(Predicate<T> predicate) {
-			return () -> {
-				T value = get();
-				if (value != null && predicate.test(value)) {
-					return value;
-				}
-				return null;
-			};
-		}
-
-		default void ifPresent(Consumer<T> consumer) {
-			T value = get();
-			if (value != null) {
-				consumer.accept(value);
-			}
-		}
-
-		default T orElse(T defValue) {
-			T value = get();
-			return value != null ? value : defValue;
-		}
-
-	}
-
-	public OptionalMapper<Element> findChild(String name, String xmlns) {
-		return () -> getChild(name, xmlns);
-	}
-	
-	public <R> List<R> mapChildren(Function<Element, ? extends R> mapper) {
-		return mapChildren(null, mapper);
-	}
-
-	public <R> List<R> mapChildren(Predicate<Element> matcher, Function<Element, ? extends R> mapper) {
+	public <R> List<R> compactMapChildren(Function<Element, ? extends R> mapper) {
 		if (children != null) {
 			LinkedList<R> result = new LinkedList<R>();
 
@@ -862,9 +576,49 @@ public class Element
 				}
 
 				Element el = (Element) node;
-				if (matcher == null || matcher.test(el)) {
-					result.add(mapper.apply(el));
+				R val = mapper.apply(el);
+				if (val != null) {
+					result.add(val);
 				}
+			}
+
+			return result;
+		}
+
+		return Collections.emptyList();
+	}
+
+	// FIXME: I'm not sure if this should still be here
+	public <R> List<R> flatMapChildren(Function<Element, Collection<? extends R>> mapper) {
+		if (children != null) {
+			LinkedList<R> result = new LinkedList<R>();
+
+			for (XMLNodeIfc node : children) {
+				if (!(node instanceof Element)) {
+					continue;
+				}
+
+				Element el = (Element) node;
+				result.addAll(mapper.apply(el));
+			}
+
+			return result;
+		}
+
+		return Collections.emptyList();
+	}
+
+	public <R> List<R> mapChildren(Function<Element, ? extends R> mapper) {
+		if (children != null) {
+			LinkedList<R> result = new LinkedList<R>();
+
+			for (XMLNodeIfc node : children) {
+				if (!(node instanceof Element)) {
+					continue;
+				}
+
+				Element el = (Element) node;
+				result.add(mapper.apply(el));
 			}
 
 			return result;
@@ -879,6 +633,9 @@ public class Element
 
 	public void removeAttribute(String key) {
 		if (attributes != null) {
+			if (ATTR_XMLNS_KEY.equals(key)) {
+				xmlns = null;
+			}
 			attributes.remove(key);
 		}    // end of if (attributes == null)
 	}
@@ -901,53 +658,36 @@ public class Element
 
 		return removeChild(child);
 	}
-
-	public void setAttributeOfChildAtPathStaticStr(String elementPath[], String att_name, String att_value) {
-		Element child = findChildByPathStaticStr(elementPath);
-
+	
+	public boolean removeChild(Predicate<Element> predicate) {
+		Element child = findChild(predicate);
 		if (child != null) {
-			child.setAttribute(att_name, att_value);
-		}    // end of if (child != null)
+			children.remove(child);
+		}
+		return child != null;
+	}
+	
+	public boolean hasAttribute(String key) {
+		return getAttribute(key) != null;
 	}
 
-	public void setAttribute(String key, String value) {
+	public boolean hasAttribute(String key, String value) {
+		return Objects.equals(value, getAttribute(key));
+	}
+
+	public Element setAttribute(String key, String value) {
+		assert value != null;
 		if (attributes == null) {
-			attributes = attributesProvider.apply(5);
+			attributes = new HashMap<>(5);
 		}    // end of if (attributes == null)
-		String k = key;
+		String k = attributesDeduplicationMap.getOrDefault(key, key);
 		String v = value;
 
-		if (k == "xmlns") {
-			xmlns = value.intern();
-			v = xmlns;
+		if (ATTR_XMLNS_KEY.equals(k)) {
+			xmlns = v;
 		}
 		attributes.put(k, v);
-	}
-
-	public void setAttributes(StringBuilder[] names, StringBuilder[] values) {
-		attributes = attributesProvider.apply(names.length);
-		for (int i = 0; i < names.length; i++) {
-			if (names[i] != null) {
-				setAttribute(names[i].toString(), values[i].toString());
-
-				// attributes.put(names[i].toString().intern(), values[i].toString());
-			}    // end of if (names[i] != null)
-		}      // end of for (int i = 0; i < names.length; i++)
-	}
-
-	public void setAttributes(String[] names, String[] values) {
-		attributes = attributesProvider.apply(names.length);
-		for (int i = 0; i < names.length; i++) {
-			if (names[i] != null) {
-				setAttribute(names[i], values[i]);
-
-				// attributes.put(names[i].intern(), values[i]);
-			}    // end of if (names[i] != null)
-		}      // end of for (int i = 0; i < names.length; i++)
-	}
-
-	public void setDefXMLNS(String ns) {
-		defxmlns = ns.intern();
+		return this;
 	}
 
 	@Override
@@ -1051,46 +791,8 @@ public class Element
 			result.append("/>");
 		}
 	}
-
-	public Element withAttribute(String attName, String attValue) {
-		setAttribute(attName, attValue);
-		return this;
-	}
-
-	public Element withCData(String cData) {
-		setCData(cData);
-		return this;
-	}
-
-	public Element withElement(String name, Consumer<Element> consumer) {
-		return withElement(name, null, consumer);
-	}
-
-	public Element withElement(String name, String xmlns, String cdata) {
-		Element el = new Element(name);
-		if (xmlns != null) {
-			el.setXMLNS(xmlns);
-		}
-		if (cdata != null) {
-			el.addCData(cdata);
-		}
-		addChild(el);
-		return this;
-	}
-
-	public Element withElement(String name, String xmlns, Consumer<Element> consumer) {
-		Element el = new Element(name);
-		if (xmlns != null) {
-			el.setXMLNS(xmlns);
-		}
-		if (consumer != null) {
-			consumer.accept(el);
-		}
-		addChild(el);
-		return this;
-	}
-
-	protected String cdataToString() {
+	
+	public String cdataToString() {
 		StringBuilder result = new StringBuilder();
 
 		if (children != null) {
@@ -1105,256 +807,6 @@ public class Element
 		}        // end of if (child != null)
 
 		return (result.length() > 0) ? result.toString() : null;
-	}
-
-	public static class Matcher {
-
-		public static Predicate<Element> byName(String name) {
-			return el -> name.equals(el.getName());
-		}
-
-		public static Predicate<Element> byNameAndXMLNS(String name, String xmlns) {
-			return el -> name.equals(el.getName()) && xmlns.equals(el.getXMLNS());
-		}
-
-		public static Predicate<Element> byNameStatic(String name) {
-			return el -> name == name;
-		}
-
-		public static Predicate<Element> byNameAndXMLNSStatic(String name, String xmlns) {
-			return el -> name == el.getName() && xmlns == el.getXMLNS();
-		}
-	}
-
-	protected static class XMLIdentityHashMap<K, V>
-			extends IdentityHashMap<K, V> {
-
-		private static final long serialVersionUID = 1L;
-
-		public XMLIdentityHashMap(int size) {
-			super(size);
-		}
-
-		@Override
-		public V put(K key, V value) {
-			if ((key == null) || (value == null)) {
-				throw new NullPointerException(
-						"Neither attribute key or value can be set to null. Attribute: " + key + ", value: " + value);
-			}
-
-			return super.put(key, value);
-		}
-	}
-
-	protected interface AttributesIfc {
-
-		String get(String key);
-		String getStatic(String key);
-		String put(String key, String value);
-		String remove(String key);
-
-		AttributesIfc clone();
-
-		Set<String> keySet();
-
-		Map<String,String> asMap();
-	}
-
-	protected static final class AttributesIdentityMap implements AttributesIfc {
-
-		private final XMLIdentityHashMap<String, String> attributes;
-
-		public AttributesIdentityMap(int size) {
-			attributes = new XMLIdentityHashMap<>(10);
-		}
-
-		@Override
-		public String get(String key) {
-			return attributes.get(key.intern());
-		}
-
-		@Override
-		public String getStatic(String key) {
-			return attributes.remove(key);
-		}
-
-		@Override
-		public String put(String key, String value) {
-			return attributes.put(key.intern(), value);
-		}
-
-		@Override
-		public String remove(String key) {
-			return attributes.remove(key.intern());
-		}
-
-		@Override
-		public AttributesIfc clone() {
-			AttributesIdentityMap result = new AttributesIdentityMap(attributes.size());
-			result.attributes.putAll(attributes);
-			return result;
-		}
-
-		@Override
-		public Set<String> keySet() {
-			return attributes.keySet();
-		}
-
-		@Override
-		public Map<String, String> asMap() {
-			return attributes;
-		}
-	}
-
-	protected static final class AttributesHashMap implements AttributesIfc {
-
-		private final HashMap<String,String> attributes;
-
-		public AttributesHashMap(int size) {
-			attributes = new HashMap<>(size);
-		}
-
-		@Override
-		public String get(String key) {
-			return attributes.get(key);
-		}
-
-		@Override
-		public String getStatic(String key) {
-			return attributes.get(key);
-		}
-
-		@Override
-		public String put(String key, String value) {
-			return attributes.put(key, value);
-		}
-
-		@Override
-		public String remove(String key) {
-			return attributes.remove(key);
-		}
-		@Override
-		public AttributesIfc clone() {
-			AttributesHashMap result = new AttributesHashMap(attributes.size());
-			result.attributes.putAll(attributes);
-			return result;
-		}
-
-		@Override
-		public Set<String> keySet() {
-			return attributes.keySet();
-		}
-
-		@Override
-		public Map<String, String> asMap() {
-			return attributes;
-		}
-
-	}
-
-	protected static final class AttributesDedupStaticHashMap implements AttributesIfc {
-
-		private static String dedupKey(String key) {
-			return switch (key) {
-				case "id" -> "id";
-				case "name" -> "name";
-				case "xmlns" -> "xmlns";
-				case "from" -> "from";
-				case "to" -> "to";
-				default -> key;
-			};
-		}
-		private final HashMap<String,String> attributes;
-
-		public AttributesDedupStaticHashMap(int size) {
-			attributes = new HashMap<>(size);
-		}
-
-		@Override
-		public String get(String key) {
-			return attributes.get(key);
-		}
-
-		@Override
-		public String getStatic(String key) {
-			return attributes.get(key);
-		}
-
-		@Override
-		public String put(String key, String value) {
-			return attributes.put(dedupKey(key), value);
-		}
-
-		@Override
-		public String remove(String key) {
-			return attributes.remove(key);
-		}
-		@Override
-		public AttributesIfc clone() {
-			AttributesDedupStaticHashMap result = new AttributesDedupStaticHashMap(attributes.size());
-			result.attributes.putAll(attributes);
-			return result;
-		}
-
-		@Override
-		public Set<String> keySet() {
-			return attributes.keySet();
-		}
-
-		@Override
-		public Map<String, String> asMap() {
-			return attributes;
-		}
-
-	}
-
-	protected static final class AttributesDedupHashHashMap implements AttributesIfc {
-
-		protected static Map<String, String> deduplicationMap = List.of("id", "name", "xmlns", "from", "to")
-				.stream()
-				.collect(Collectors.toMap(Function.identity(), Function.identity()));
-		private final HashMap<String,String> attributes;
-
-		public AttributesDedupHashHashMap(int size) {
-			attributes = new HashMap<>(size);
-		}
-
-		@Override
-		public String get(String key) {
-			return attributes.get(key);
-		}
-
-		@Override
-		public String getStatic(String key) {
-			return attributes.get(key);
-		}
-
-		@Override
-		public String put(String key, String value) {
-			return attributes.put(deduplicationMap.getOrDefault(key, key), value);
-		}
-
-		@Override
-		public String remove(String key) {
-			return attributes.remove(key);
-		}
-		@Override
-		public AttributesIfc clone() {
-			AttributesDedupHashHashMap result = new AttributesDedupHashHashMap(attributes.size());
-			result.attributes.putAll(attributes);
-			return result;
-		}
-
-		@Override
-		public Set<String> keySet() {
-			return attributes.keySet();
-		}
-
-		@Override
-		public Map<String, String> asMap() {
-			return attributes;
-		}
-
 	}
 
 }    // Element

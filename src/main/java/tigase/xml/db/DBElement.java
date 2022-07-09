@@ -131,7 +131,7 @@ public class DBElement
 				if (el instanceof Element) {
 					Element elem = (Element) el;
 
-					if (elem.getName().equals(NODE) && elem.getAttributeStaticStr(NAME).equals(name)) {
+					if (elem.getName().equals(NODE) && elem.getAttribute(NAME).equals(name)) {
 						return (DBElement) elem;
 					}    //
 				}
@@ -157,7 +157,7 @@ public class DBElement
 					Element elem = (Element) el;
 
 					if (elem.getName().equals(NODE)) {
-						result[idx++] = elem.getAttributeStaticStr(NAME);
+						result[idx++] = elem.getAttribute(NAME);
 					}    //
 				}
 			}        // end of for (DBElement node : children)
@@ -169,7 +169,7 @@ public class DBElement
 	public final DBElement findNode(String nodePath) {
 		StringTokenizer strtok = new StringTokenizer(nodePath, "/", false);
 
-		if (!getName().equals(NODE) || !getAttributeStaticStr(NAME).equals(strtok.nextToken())) {
+		if (!getName().equals(NODE) || !getAttribute(NAME).equals(strtok.nextToken())) {
 			return null;
 		}    // end of if (!strtok.nextToken().equals(child.getName()))
 
@@ -254,7 +254,7 @@ public class DBElement
 		if (entries != null) {
 			synchronized (entries) {
 				for (Element elem : entries) {
-					if (elem.getAttributeStaticStr(KEY).equals(key)) {
+					if (elem.getAttribute(KEY).equals(key)) {
 						result = (DBElement) elem;
 
 						break;
@@ -274,7 +274,7 @@ public class DBElement
 				Element toRemove = null;
 				for (ListIterator<Element> it = entries.listIterator(); it.hasNext(); ) {
 					Element el = it.next();
-					if (el.getAttributeStaticStr(KEY).equals(key)) {
+					if (el.getAttribute(KEY).equals(key)) {
 						toRemove = el;
 
 						break;
@@ -299,7 +299,7 @@ public class DBElement
 				int cnt = 0;
 
 				for (Element dbe : entries) {
-					result[cnt++] = dbe.getAttributeStaticStr(KEY);
+					result[cnt++] = dbe.getAttribute(KEY);
 				}    // end of for (DBElement dbe : entries)
 			}
 
@@ -376,7 +376,7 @@ public class DBElement
 			return def;
 		}
 
-		Types.DataType type = Types.DataType.valueof(entry.getAttributeStaticStr(TYPE));
+		Types.DataType type = Types.DataType.valueof(entry.getAttribute(TYPE));
 
 		switch (type) {
 			case STRING_ARR:
@@ -401,7 +401,7 @@ public class DBElement
 	}
 
 	public final double getEntryDoubleValue(String key, double def) {
-		return ((Double) getEntryValue(key, new Double(def))).doubleValue();
+		return ((Double) getEntryValue(key, def)).doubleValue();
 	}
 
 	public final double[] getEntryDoubleArrValue(String key, double[] def) {
@@ -415,7 +415,7 @@ public class DBElement
 			return def;
 		}
 
-		Types.DataType type = Types.DataType.valueof(entry.getAttributeStaticStr(TYPE));
+		Types.DataType type = Types.DataType.valueof(entry.getAttribute(TYPE));
 		Object result = def;
 		String[] tmp_s = getEntryValues(key);
 		int idx = -1;
@@ -423,7 +423,7 @@ public class DBElement
 		try {
 			switch (type) {
 				case INTEGER:
-					result = Integer.decode(entry.getAttributeStaticStr(VALUE));
+					result = Integer.decode(entry.getAttribute(VALUE));
 
 					break;
 
@@ -438,7 +438,7 @@ public class DBElement
 					break;
 
 				case LONG:
-					result = Long.decode(entry.getAttributeStaticStr(VALUE));
+					result = Long.decode(entry.getAttribute(VALUE));
 
 					break;
 
@@ -458,7 +458,7 @@ public class DBElement
 					break;
 
 				case DOUBLE:
-					result = new Double(Double.parseDouble(entry.getAttributeStaticStr(VALUE)));
+					result = Double.parseDouble(entry.getAttribute(VALUE));
 
 					break;
 
@@ -473,7 +473,7 @@ public class DBElement
 					break;
 
 				case BOOLEAN:
-					result = Boolean.valueOf(parseBool(entry.getAttributeStaticStr(VALUE)));
+					result = Boolean.valueOf(parseBool(entry.getAttribute(VALUE)));
 
 					break;
 
@@ -489,7 +489,7 @@ public class DBElement
 
 				case STRING:
 				default:
-					result = decode(entry.getAttributeStaticStr(VALUE));
+					result = decode(entry.getAttribute(VALUE));
 
 					break;
 			}      // end of switch (type)
@@ -533,7 +533,7 @@ public class DBElement
 				int cnt = 0;
 
 				for (Element item : items) {
-					result[cnt++] = decode(item.getAttributeStaticStr(VALUE));
+					result[cnt++] = decode(item.getAttribute(VALUE));
 				}    // end of for (DBElement dbe : entries)
 
 				return result;
