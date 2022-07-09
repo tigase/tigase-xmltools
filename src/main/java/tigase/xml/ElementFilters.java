@@ -17,20 +17,28 @@
  */
 package tigase.xml;
 
-/**
- * Created: Feb 9, 2009 12:21:23 PM
- *
- * @param <T> type extending {@link XMLNodeIfc}
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- */
-public interface XMLNodeIfc<T extends XMLNodeIfc>
-		extends Cloneable {
+import java.util.function.Predicate;
 
-	T clone();
+public class ElementFilters {
 
-	String toStringSecure();
+	public static Predicate<Element> xmlns(String xmlns) {
+		return el -> xmlns.equals(el.getXMLNS());
+	}
 
-	String toStringPretty();
+	public static Predicate<Element> name(String name) {
+		return el -> name.equals(el.getName());
+	}
+
+	public static Predicate<Element> attribute(String attrName, String attrValue) {
+		return el -> attrValue.equals(el.getAttribute(attrName));
+	}
+
+	public static Predicate<Element> nameAndAttribute(String name, String attrName, String attrValue) {
+		return name(name).and(attribute(attrName, attrValue));
+	}
+
+	public static Predicate<Element> nameAndXMLNS(String name, String xmlns) {
+		return name(name).and(xmlns(xmlns));
+	}
 
 }

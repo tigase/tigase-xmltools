@@ -66,9 +66,5 @@ public class CData
 	public String toStringSecure() {
 		return (((cdata != null) && (cdata.length() > 2)) ? "CData size: " + cdata.length() : cdata);
 	}
-
-	@Override
-	public int compareTo(CData o) {
-		return cdata.compareTo(o.cdata);
-	}
+	
 }

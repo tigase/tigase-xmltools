@@ -17,20 +17,18 @@
  */
 package tigase.xml;
 
-/**
- * Created: Feb 9, 2009 12:21:23 PM
- *
- * @param <T> type extending {@link XMLNodeIfc}
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- */
-public interface XMLNodeIfc<T extends XMLNodeIfc>
-		extends Cloneable {
+import java.util.Collections;
+import java.util.List;
 
-	T clone();
+public class PathTest {
 
-	String toStringSecure();
-
-	String toStringPretty();
-
+	public static void test() throws Path.PathFormatException {
+		Path path = Path.of(new ElementMatcher("command", "http://jabber.org/protocol/command",
+													 List.of(new ElementMatcher.Attribute("status", "executing"))))
+				.then(new ElementMatcher("x", "jabber:x:data", Collections.emptyList()));
+		System.out.println(path.toString());
+		String str = path.toString();
+		Path path1 = Path.parse(str);
+		System.out.println(path1.toString());
+	}
 }
