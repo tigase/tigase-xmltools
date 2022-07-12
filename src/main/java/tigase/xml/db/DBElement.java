@@ -25,6 +25,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -77,10 +78,9 @@ public class DBElement
 			result.append(" ");
 		}
 		result.append("<" + name);
-		if (attributes != null) {
-			for (String key : attributes.keySet()) {
-				result.append(" " + key + "=\"" + attributes.get(key) + "\"");
-			}
+		Map<String,String> attributes = getAttributes();
+		for (String key : attributes.keySet()) {
+			result.append(" " + key + "=\"" + attributes.get(key) + "\"");
 		}
 
 		String childrenStr = childrenFormatedString(indent + step, step);
@@ -107,14 +107,13 @@ public class DBElement
 	public final String childrenFormatedString(int indent, int step) {
 		StringBuilder result = new StringBuilder();
 
-		if (children != null) {
-			synchronized (children) {
-				for (XMLNodeIfc child : children) {
-					if (child instanceof DBElement) {
-						result.append(((DBElement) child).formatedString(indent, step));
-					} else {
-						result.append(child.toString());
-					}
+		List<Element> children = getChildren();
+		synchronized (children) {
+			for (XMLNodeIfc child : children) {
+				if (child instanceof DBElement) {
+					result.append(((DBElement) child).formatedString(indent, step));
+				} else {
+					result.append(child.toString());
 				}
 			}
 		}
@@ -123,9 +122,7 @@ public class DBElement
 	}
 
 	public final DBElement getSubnode(String name) {
-		if (children == null) {
-			return null;
-		}
+		List<Element> children = getChildren();
 		synchronized (children) {
 			for (XMLNodeIfc el : children) {
 				if (el instanceof Element) {
@@ -142,7 +139,8 @@ public class DBElement
 	}
 
 	public final String[] getSubnodes() {
-		if ((children == null) || (children.size() == 1)) {
+		List<Element> children = getChildren();
+		if (children.size() <= 1) {
 			return null;
 		}
 
