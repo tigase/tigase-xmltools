@@ -83,9 +83,9 @@ public class Element
 	protected static Map<String, String> attributesDeduplicationMap = List.of("id", "name", ATTR_XMLNS_KEY, "from", "to")
 			.stream()
 			.collect(Collectors.toMap(Function.identity(), Function.identity()));
-	protected HashMap<String,String> attributes = null;
+	private Map<String,String> attributes = null;
 
-	protected ArrayList<XMLNodeIfc> children = null;
+	private List<XMLNodeIfc> children = null;
 
 	protected String name = null;
 
@@ -210,22 +210,22 @@ public class Element
 		builder.accept(this);
 	}
 
-	public Element addAttribute(String attName, String attValue) {
-		return setAttribute(attName, attValue);
+	public Element addAttribute(String name, String value) {
+		return setAttribute(name, value);
 	}
 
-	public Element addAttributes(Map<String, String> attrs) {
-		if (attributes == null) {
-			attributes = new HashMap<>(attrs.size());
+	public Element addAttributes(Map<String, String> attributes) {
+		if (this.attributes == null) {
+			this.attributes = new HashMap<>(attributes.size());
 		}
-		for (Map.Entry<String, String> entry : attrs.entrySet()) {
+		for (Map.Entry<String, String> entry : attributes.entrySet()) {
 			setAttribute(entry.getKey(), entry.getValue());
 		}
 		return this;
 	}
 
-	public Element addCData(String argCData) {
-		return addChild(new CData(argCData));
+	public Element addCData(String cdata) {
+		return addChild(new CData(cdata));
 	}
 
 	public Element addChild(XMLNodeIfc child) {
@@ -370,8 +370,8 @@ public class Element
 		return findChild(name(name));
 	}
 
-	public @Nullable Element findChild(String name, String child_xmlns) {
-		return findChild(name(name).and(xmlns(child_xmlns)));
+	public @Nullable Element findChild(String name, String xmlns) {
+		return findChild(name(name).and(xmlns(xmlns)));
 	}
 
 	public @Nullable Element findChildAt(Path path) {
@@ -403,20 +403,20 @@ public class Element
 		return path.evaluateAll(this);
 	}
 
-	public String getAttribute(String attName) {
+	public String getAttribute(String name) {
 		if (attributes != null) {
-			return attributes.get(attName);
+			return attributes.get(name);
 		}    // end of if (attributes != null)
 
 		return null;
 	}
 	
-	public @Nullable String getAttributeAt(Path path, String attName) {
+	public @Nullable String getAttributeAt(Path path, String name) {
 		Element subchild = findChildAt(path);
 		if (subchild == null) {
 			return null;
 		}
-		return subchild.getAttribute(attName);
+		return subchild.getAttribute(name);
 	}
 
 	public Map<String, String> getAttributes() {
@@ -424,19 +424,20 @@ public class Element
 	}
 
 
-	public Element setAttributes(Map<String, String> newAttributes) {
-		attributes = new HashMap<>(newAttributes.size());
-		for (Map.Entry<String, String> entry : newAttributes.entrySet()) {
+	public Element setAttributes(Map<String, String> attributes) {
+		this.attributes = new HashMap<>(attributes.size());
+		for (Map.Entry<String, String> entry : attributes.entrySet()) {
 			setAttribute(entry.getKey(), entry.getValue());
 		}
 		return this;
 	}
 
-	private void setAttributes(String[] names, String[] values) {
+	public Element setAttributes(String[] names, String[] values) {
 		attributes = new HashMap<>(names.length);
 		for (int i=0; i<names.length; i++) {
 			setAttribute(names[i], values[i]);
 		}
+		return this;
 	}
 
 	private void setAttributes(StringBuilder[] names, StringBuilder[] values) {
@@ -460,9 +461,9 @@ public class Element
 		return subchild.getCData();
 	}
 
-	public Element setCData(String argCData) {
+	public Element setCData(String cdata) {
 		children = new ArrayList<>();
-		return addChild(new CData(argCData));
+		return addChild(new CData(cdata));
 	}
 
 
@@ -473,28 +474,6 @@ public class Element
 					Element elem = (Element) el;
 
 					if (elem.getName().equals(name)) {
-						return elem;
-					}
-				}
-			}
-		}    // end of if (children != null)
-
-		return null;
-	}
-
-
-	@Nullable
-	public Element getChild(String name, String child_xmlns) {
-		if (child_xmlns == null) {
-			return getChild(name);
-		}
-		if (children != null) {
-			for (XMLNodeIfc el : children) {
-				if (el instanceof Element) {
-					Element elem = (Element) el;
-
-					if (elem.getName().equals(name) &&
-							((elem.getXMLNS() == child_xmlns) || child_xmlns.equals(elem.getXMLNS()))) {
 						return elem;
 					}
 				}
@@ -651,7 +630,7 @@ public class Element
 	}
 
 	public boolean removeChild(String name, String xmlns) {
-		Element child = getChild(name, xmlns);
+		Element child = findChild(name, xmlns);
 		if (child == null) {
 			return false;
 		}
@@ -675,18 +654,18 @@ public class Element
 		return Objects.equals(value, getAttribute(key));
 	}
 
-	public Element setAttribute(String key, String value) {
+	public Element setAttribute(String name, String value) {
 		assert value != null;
 		if (attributes == null) {
 			attributes = new HashMap<>(5);
 		}    // end of if (attributes == null)
-		String k = attributesDeduplicationMap.getOrDefault(key, key);
+		String n = attributesDeduplicationMap.getOrDefault(name, name);
 		String v = value;
 
-		if (ATTR_XMLNS_KEY.equals(k)) {
+		if (ATTR_XMLNS_KEY.equals(n)) {
 			xmlns = v;
 		}
-		attributes.put(k, v);
+		attributes.put(n, v);
 		return this;
 	}
 

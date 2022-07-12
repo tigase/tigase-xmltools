@@ -27,7 +27,10 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Map.entry;
 
 @Ignore
 public class ElementPerformanceTest {
@@ -86,11 +89,73 @@ public class ElementPerformanceTest {
 		}
 	}
 	
+//	@Benchmark
+//	@Measurement(iterations = 1000)
+//	@BenchmarkMode(Mode.Throughput)
+//	public void benchmarkFindChildEquality(BenchmarkState state, Blackhole blackhole) {
+//		blackhole.consume(state.element.findChild(el -> (state.name).equals(el.getName())));
+//	}
+
+	public static final String[] ATTRIBUTE_NAMES = { "id", "name", "from", "to", "xmlns" };
+
 	@Benchmark
 	@Measurement(iterations = 1000)
 	@BenchmarkMode(Mode.Throughput)
-	public void benchmarkFindChildEquality(BenchmarkState state, Blackhole blackhole) {
-		blackhole.consume(state.element.findChild(el -> (state.name).equals(el.getName())));
+	public void benchmarkElementWithAttributesCreationStaticArray(Blackhole blackhole) {
+		blackhole.consume(new Element("test", ATTRIBUTE_NAMES, ATTRIBUTE_NAMES));
 	}
-	
+
+	@Benchmark
+	@Measurement(iterations = 1000)
+	@BenchmarkMode(Mode.Throughput)
+	public void benchmarkElementWithAttributesCreationDynamicArray(Blackhole blackhole) {
+		blackhole.consume(new Element("test", new String[] { "id", "name", "from", "to", "xmlns" },
+									  new String[]{"id", "name", "from", "to", "xmlns"}));
+	}
+
+	@Benchmark
+	@Measurement(iterations = 1000)
+	@BenchmarkMode(Mode.Throughput)
+	public void benchmarkElementWithAttributesCreationBuilder(Blackhole blackhole) {
+		Element test = new Element("test");
+		for (String name : ATTRIBUTE_NAMES) {
+			{
+				test.addAttribute(name, name);
+			}
+		}
+		blackhole.consume(test);
+	}
+
+	@Benchmark
+	@Measurement(iterations = 1000)
+	@BenchmarkMode(Mode.Throughput)
+	public void benchmarkElementWithAttributesCreationMixedStatic(Blackhole blackhole) {
+		blackhole.consume(new Element("test").setAttributes(ATTRIBUTE_NAMES,ATTRIBUTE_NAMES));
+	}
+
+	private static final Map<String,String> ATTRIBUTES_MAP = Map.of("id", "id", "name", "name", "from", "from", "to", "to", "xmlns", "xmlns");
+	@Benchmark
+	@Measurement(iterations = 1000)
+	@BenchmarkMode(Mode.Throughput)
+	public void benchmarkElementWithAttributesCreationDynamicMap(Blackhole blackhole) {
+		blackhole.consume(new Element("test").setAttributes(
+				Map.of("id", "id", "name", "name", "from", "from", "to", "to", "xmlns", "xmlns")));
+	}
+
+	@Benchmark
+	@Measurement(iterations = 1000)
+	@BenchmarkMode(Mode.Throughput)
+	public void benchmarkElementWithAttributesCreationDynamicMapOfEntries(Blackhole blackhole) {
+		blackhole.consume(new Element("test").setAttributes(
+				Map.ofEntries(entry("id", "id"), entry("name", "name"), entry("from", "from"), entry("to", "to"),
+							  entry("xmlns", "xmlns"))));
+	}
+
+	@Benchmark
+	@Measurement(iterations = 1000)
+	@BenchmarkMode(Mode.Throughput)
+	public void benchmarkElementWithAttributesCreationStaticMap(Blackhole blackhole) {
+		blackhole.consume(new Element("test").setAttributes(ATTRIBUTES_MAP));
+	}
+
 }
