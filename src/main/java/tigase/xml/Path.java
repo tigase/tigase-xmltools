@@ -35,6 +35,10 @@ public class Path {
 	 */
 	public static class PathFormatException extends Throwable {
 
+		public PathFormatException(String message) {
+			super(message);
+		}
+
 	}
 
 	/**
@@ -45,20 +49,22 @@ public class Path {
 	 */
 	public static @NotNull Path parse(@NotNull String text) throws PathFormatException {
 		if (!text.startsWith("/")) {
-			throw new PathFormatException();
+			throw new PathFormatException("Path cannot start without '/'");
 		}
 
-		State state = new State();
-		state.text = text;
+		State state = new State(text);
+		state.text = state.text.substring(1);
 		List<ElementMatcher> matchers = new ArrayList<>();
 		while(!state.text.isEmpty()) {
-			state.text = state.text.substring(1);
 			matchers.add(ElementMatcher.parse(state));
 			if (state.text.startsWith("/")) {
 				state.text = state.text.substring(1);
 			} else if (!state.text.isEmpty()) {
-				throw new PathFormatException();
+				throw new PathFormatException("Path cannot have empty element name");
 			}
+		}
+		if (matchers.isEmpty()) {
+			throw new PathFormatException("Path cannot be empty!");
 		}
 		return new Path(matchers.toArray(ElementMatcher[]::new));
 	}
@@ -72,9 +78,7 @@ public class Path {
 	public static @NotNull Path of(@NotNull String... matcherStrings) throws PathFormatException {
 		ArrayList<ElementMatcher> matchers = new ArrayList<>();
 		for (String str : matcherStrings) {
-			State state = new State();
-			state.text = str;
-			matchers.add(ElementMatcher.parse(state));
+			matchers.add(ElementMatcher.parse(str));
 		}
 		return new Path(matchers.toArray(ElementMatcher[]::new));
 	}
@@ -86,11 +90,17 @@ public class Path {
 	 * @return
 	 */
 	public static @NotNull Path of(@NotNull ElementMatcher... matchers) {
+		if (matchers.length == 0) {
+			throw new IllegalArgumentException("At least 1 matcher is required!");
+		}
 		return new Path(matchers);
 	}
 
 	protected static class State {
 		String text;
+		public State(String text) {
+			this.text = text;
+		}
 	}
 
 	private final ElementMatcher[] matchers;
@@ -106,11 +116,14 @@ public class Path {
 	 */
 	public @Nullable Element evaluate(@NotNull Element element) {
 		Element el = element;
-		for (ElementMatcher predicate : matchers) {
+		if (!matchers[0].test(el)) {
+			return null;
+		}
+		for (int i = 1; i < matchers.length; i++) {
 			if (el == null) {
 				return null;
 			}
-			el = el.findChild(predicate);
+			el = el.findChild(matchers[i]);
 		}
 		return el;
 	}
@@ -125,12 +138,15 @@ public class Path {
 			// FIXME: I'm not sure about this.. maybe assert would be a better option..
 			return Collections.emptyList();
 		}
+		if (!matchers[0].test(element)) {
+			return Collections.emptyList();
+		}
 
 		List<Element> result = List.of(element);
-		for (ElementMatcher predicate : matchers) {
+		for (int i = 1; i < matchers.length; i++) {
 			List<Element> tmp = new ArrayList<>();
 			for (Element el : result) {
-				tmp.addAll(el.findChildren(predicate));
+				tmp.addAll(el.findChildren(matchers[i]));
 			}
 			result = tmp;
 		}

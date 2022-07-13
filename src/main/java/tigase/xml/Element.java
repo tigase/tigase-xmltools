@@ -309,12 +309,20 @@ public class Element
 		}
 		Element elem = (Element) obj;
 		if (Objects.equals(getName(), elem.getName()) && Objects.equals(getXMLNS(), elem.getXMLNS())) {
-			for (Map.Entry<String,String> entry : attributes.entrySet()) {
-				if (!Objects.equals(entry.getValue(), elem.getAttribute(entry.getKey()))) {
-					return false;
+			if ((attributes == null || attributes.isEmpty()) == (elem.attributes == null || attributes.isEmpty())) {
+				if (attributes != null && !attributes.isEmpty()) {
+					for (Map.Entry<String, String> entry : attributes.entrySet()) {
+						if (!Objects.equals(entry.getValue(), elem.getAttribute(entry.getKey()))) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return true;
 				}
+			} else {
+				return false;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -566,7 +574,7 @@ public class Element
 		} else {
 			// FIXME: leaving setting `xmlns` to removeAttribute()/setAttribute() methods
 			//xmlns = ns;
-			setAttribute(ATTR_XMLNS_KEY, xmlns);
+			setAttribute(ATTR_XMLNS_KEY, ns);
 		}
 		return this;
 	}

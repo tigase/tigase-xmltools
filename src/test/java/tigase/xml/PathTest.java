@@ -17,18 +17,39 @@
  */
 package tigase.xml;
 
+import org.junit.Test;
+
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class PathTest {
 
-	public static void test() throws Path.PathFormatException {
+	@Test
+	public void testParseAndSerialize() throws Path.PathFormatException {
 		Path path = Path.of(new ElementMatcher("command", "http://jabber.org/protocol/command",
-													 List.of(new ElementMatcher.Attribute("status", "executing"))))
+											   List.of(new ElementMatcher.Attribute("status", "executing"))))
 				.then(new ElementMatcher("x", "jabber:x:data", Collections.emptyList()));
-		System.out.println(path.toString());
-		String str = path.toString();
-		Path path1 = Path.parse(str);
-		System.out.println(path1.toString());
+		String str1 = path.toString();
+		Path path1 = Path.parse(str1);
+		String str2 = path1.toString();
+		assertEquals(str1, str2);
+	}
+
+	@Test
+	public void testMatching() {
+		Path path = Path.of(new ElementMatcher().setName("command")
+									.setXMLNS("http://jabber.org/protocol/command")
+									.addAttribute("status", "executing"))
+				.then(new ElementMatcher().setName("x").setXMLNS("jabber:x:data"));
+		Element el = new Element("command").setXMLNS("http://jabber.org/protocol/command")
+				.setAttribute("status", "executing")
+				.addChild(new Element("x").setXMLNS("jabber:x:data"));
+		Element result = path.evaluate(el);
+		assertNotNull(result);
+		assertEquals("x", result.getName());
+		el.findChild("x").setXMLNS("test");
+		assertNull(path.evaluate(el));
 	}
 }

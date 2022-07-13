@@ -42,6 +42,9 @@ public class ElementMatcher implements Predicate<Element> {
 		}
 		int nameEndIdx = Math.min(slashIdx, squareIdx);
 		String name = state.text.substring(0, nameEndIdx);
+		if (name.isEmpty()) {
+			throw new Path.PathFormatException("Element name cannot be empty!");
+		}
 		if ("*".equals(name)) {
 			name = null;
 		}
@@ -64,10 +67,27 @@ public class ElementMatcher implements Predicate<Element> {
 		}
 	}
 
-	private final String name;
-	private final String xmlns;
+	/**
+	 * Method parses <code>String</code> into matcher
+	 * @param text
+	 * @return
+	 * @throws Path.PathFormatException
+	 */
+	public static @NotNull ElementMatcher parse(@NotNull String text) throws Path.PathFormatException {
+		Path.State state = new Path.State(text);
+		return parse(state);
+	}
 
-	private final Attribute[] attributes;
+	private String name;
+	private String xmlns;
+
+	private Attribute[] attributes;
+
+	public ElementMatcher() {
+		name = null;
+		xmlns = null;
+		attributes = new Attribute[0];
+	}
 
 	/**
 	 * Constructor to create instance
@@ -76,9 +96,48 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @param attributes - to match or empty list
 	 */
 	public ElementMatcher(@Nullable String name, @Nullable String xmlns, @NotNull List<Attribute> attributes) {
+		this(name, xmlns, attributes.toArray(Attribute[]::new));
+	}
+
+	/**
+	 * Method sets matcher name to compare (or sets it to null to match any name)
+	 * @param name
+	 * @return
+	 */
+	public @NotNull ElementMatcher setName(@Nullable String name) {
+		this.name = name;
+		return this;
+	}
+
+	/**
+	 * Method sets matcher xmlns to compare (or sets it to null to match any xmlns)
+	 * @param xmlns
+	 * @return
+	 */
+	public @NotNull ElementMatcher setXMLNS(@Nullable String xmlns) {
+		this.xmlns = xmlns;
+		return this;
+	}
+
+	/**
+	 * Method add attribute to the matcher
+	 * @param name - attribute name
+	 * @param value - attribute value or null to accept any value
+	 * @return
+	 */
+	public @NotNull ElementMatcher addAttribute(@NotNull String name, @Nullable String value) {
+		if (name == null) {
+			throw new NullPointerException("Attribute name cannot be null!");
+		}
+		attributes = Arrays.copyOf(attributes, attributes.length + 1);
+		attributes[attributes.length - 1] = new Attribute(name, value);
+		return this;
+	}
+
+	private ElementMatcher(@Nullable String name, @Nullable String xmlns, @NotNull Attribute[] attributes) {
 		this.name = name;
 		this.xmlns = xmlns;
-		this.attributes = attributes.toArray(Attribute[]::new);
+		this.attributes = attributes;
 	}
 
 	@Override
@@ -139,6 +198,13 @@ public class ElementMatcher implements Predicate<Element> {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		toStringBuilder(sb);
+		return sb.toString();
+	}
+
 	public void toStringBuilder(StringBuilder sb) {
 		if (name == null) {
 			sb.append("*");
@@ -166,7 +232,7 @@ public class ElementMatcher implements Predicate<Element> {
 
 		protected static @NotNull Attribute parse(@NotNull Path.State state) throws Path.PathFormatException {
 			if (!state.text.startsWith("[@") || state.text.length() < 2) {
-				throw new Path.PathFormatException();
+				throw new Path.PathFormatException("Invalid attribute format");
 			}
 
 			state.text = state.text.substring(2);
@@ -178,17 +244,17 @@ public class ElementMatcher implements Predicate<Element> {
 					state.text = state.text.substring(quoteIdx+1);
 					int endIdx = state.text.indexOf('\'');
 					if (endIdx < 0) {
-						throw new Path.PathFormatException();
+						throw new Path.PathFormatException("Invalid attribute format - missing end of value");
 					}
 					String value = state.text.substring(0, endIdx);
 					state.text = state.text.substring(endIdx+2);
 					return new ElementMatcher.Attribute(name, value);
 				} else {
-					throw new Path.PathFormatException();
+					throw new Path.PathFormatException("Invalid attribute format - missing value");
 				}
 			} else {
 				if (squareIdx <= 1) {
-					throw new Path.PathFormatException();
+					throw new Path.PathFormatException("Invalid attribute format - empty attribute condition");
 				}
 				state.text = state.text.substring(squareIdx+1);
 				return new ElementMatcher.Attribute(state.text.substring(0, squareIdx), null);
