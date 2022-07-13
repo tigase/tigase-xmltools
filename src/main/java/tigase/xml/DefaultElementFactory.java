@@ -39,7 +39,25 @@ public class DefaultElementFactory
 
 	public final Element elementInstance(final String name, final String cdata, final StringBuilder[] attnames,
 										 final StringBuilder[] attvals) {
-		return new Element(name, cdata, attnames, attvals);
+		Element result = new Element(name);
+		if (cdata != null) {
+			result.addCData(cdata);
+		}
+		if (attnames != null && attvals != null) {
+			for (int i=0; i<attnames.length; i++) {
+				StringBuilder attnameBuilder = attnames[i];
+				StringBuilder attvalueBuilder = attvals[i];
+				if (attnameBuilder == null || attvalueBuilder == null) {
+					continue;
+				}
+				String attname = attnameBuilder.toString();
+				if (attname.isEmpty()) {
+					continue;
+				}
+				result.addAttribute(attname, attvalueBuilder.toString());
+			}
+		}
+		return result;
 	}
 
 } // DefaultElementFactory

@@ -101,21 +101,6 @@ public class ElementPerformanceTest {
 	@Benchmark
 	@Measurement(iterations = 1000)
 	@BenchmarkMode(Mode.Throughput)
-	public void benchmarkElementWithAttributesCreationStaticArray(Blackhole blackhole) {
-		blackhole.consume(new Element("test", ATTRIBUTE_NAMES, ATTRIBUTE_NAMES));
-	}
-
-	@Benchmark
-	@Measurement(iterations = 1000)
-	@BenchmarkMode(Mode.Throughput)
-	public void benchmarkElementWithAttributesCreationDynamicArray(Blackhole blackhole) {
-		blackhole.consume(new Element("test", new String[] { "id", "name", "from", "to", "xmlns" },
-									  new String[]{"id", "name", "from", "to", "xmlns"}));
-	}
-
-	@Benchmark
-	@Measurement(iterations = 1000)
-	@BenchmarkMode(Mode.Throughput)
 	public void benchmarkElementWithAttributesCreationBuilder(Blackhole blackhole) {
 		Element test = new Element("test");
 		for (String name : ATTRIBUTE_NAMES) {

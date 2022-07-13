@@ -63,11 +63,31 @@ public class DBElement
 	}
 
 	public DBElement(String argName, String attname, String attvalue) {
-		super(argName, new String[]{attname}, new String[]{attvalue});
+		super(argName);
+		if (attname != null && !attname.isEmpty()) {
+			addAttribute(attname, attvalue);
+		}
 	}
 
 	public DBElement(String argName, String argCData, StringBuilder[] att_names, StringBuilder[] att_values) {
-		super(argName, argCData, att_names, att_values);
+		super(argName);
+		if (argCData != null) {
+			addCData(argCData);
+		}
+		if (att_names != null && att_values != null) {
+			for (int i=0; i<att_names.length; i++) {
+				StringBuilder attnameBuilder = att_names[i];
+				StringBuilder attvalueBuilder = att_values[i];
+				if (attnameBuilder == null || attvalueBuilder == null) {
+					continue;
+				}
+				String attname = attnameBuilder.toString();
+				if (attname.isEmpty()) {
+					continue;
+				}
+				addAttribute(attname, attvalueBuilder.toString());
+			}
+		}
 	}
 
 	public final String formatedString(int indent, int step) {
@@ -77,7 +97,7 @@ public class DBElement
 		for (int i = 0; i < indent; i++) {
 			result.append(" ");
 		}
-		result.append("<" + name);
+		result.append("<" + getName());
 		Map<String,String> attributes = getAttributes();
 		for (String key : attributes.keySet()) {
 			result.append(" " + key + "=\"" + attributes.get(key) + "\"");
@@ -96,7 +116,7 @@ public class DBElement
 			for (int i = 0; i < indent; i++) {
 				result.append(" ");
 			}
-			result.append("</" + name + ">");
+			result.append("</" + getName() + ">");
 		} else {
 			result.append("/>");
 		}
@@ -247,7 +267,7 @@ public class DBElement
 
 	public final DBElement findEntry(String key) {
 		DBElement result = null;
-		List<Element> entries = getChild(MAP).getChildren();
+		List<Element> entries = findChild(MAP).getChildren();
 
 		if (entries != null) {
 			synchronized (entries) {
@@ -265,7 +285,7 @@ public class DBElement
 	}
 
 	public final void removeEntry(String key) {
-		List<Element> entries = getChild(MAP).getChildren();
+		List<Element> entries = findChild(MAP).getChildren();
 
 		if (entries != null) {
 			synchronized (entries) {
@@ -279,14 +299,14 @@ public class DBElement
 					}    //
 				}      // end of for (DBElement node : children)
 				if (toRemove != null) {
-					getChild(MAP).removeChild(toRemove);
+					findChild(MAP).removeChild(toRemove);
 				}
 			}
 		}
 	}
 
 	public final String[] getEntryKeys() {
-		List<Element> entries = getChild(MAP).getChildren();
+		List<Element> entries = findChild(MAP).getChildren();
 
 		if (entries != null) {
 			String[] result = null;
@@ -312,7 +332,7 @@ public class DBElement
 
 		if (result == null) {
 			result = new DBElement(ENTRY, KEY, key);
-			getChild(MAP).addChild(result);
+			findChild(MAP).addChild(result);
 		}    // end of if (result == null)
 
 		return result;
