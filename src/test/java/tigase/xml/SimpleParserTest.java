@@ -175,7 +175,7 @@ public class SimpleParserTest {
 		parser.parse(handler, data, 0, data.length);
 		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
 		assertFalse(error.get());
-		assertEquals("© §      ∉ ⇒ ", handler.getParsedElements().poll().getChild("body").getCData());
+		assertEquals("© §      ∉ ⇒ ", handler.getParsedElements().poll().findChild("body").getCData());
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 
@@ -183,7 +183,7 @@ public class SimpleParserTest {
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
 		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
-		assertEquals("123 - &#123;", handler.getParsedElements().poll().getChild("body").getCData());
+		assertEquals("123 - &#123;", handler.getParsedElements().poll().findChild("body").getCData());
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 
@@ -191,7 +191,7 @@ public class SimpleParserTest {
 		parser.parse(handler, data, 0, data.length);
 		assertFalse(error.get());
 		assertNotEquals(SimpleParser.State.ERROR, ((SimpleParser.ParserState) handler.restoreParserState()).state);
-		assertEquals("123 - &a123;", handler.getParsedElements().poll().getChild("body").getCData());
+		assertEquals("123 - &a123;", handler.getParsedElements().poll().findChild("body").getCData());
 		handler.saveParserState(null);
 		handler = new DomBuilderHandlerImpl(error);
 

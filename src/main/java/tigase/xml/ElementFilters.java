@@ -17,27 +17,48 @@
  */
 package tigase.xml;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Predicate;
 
+/**
+ * Class contains helper functions to easily create <code>Predicate&lt;Element&gt;</code>
+ */
 public class ElementFilters {
 
-	public static Predicate<Element> xmlns(String xmlns) {
+	/**
+	 * Method returns predicate testing <code>Element</code> XMLNS
+	 */
+	public static @NotNull Predicate<Element> xmlns(@NotNull String xmlns) {
 		return el -> xmlns.equals(el.getXMLNS());
 	}
 
-	public static Predicate<Element> name(String name) {
+	/**
+	 * Method returns predicate testing <code>Element</code> name
+	 */
+	public static @NotNull Predicate<Element> name(@NotNull String name) {
 		return el -> name.equals(el.getName());
 	}
 
-	public static Predicate<Element> attribute(String attrName, String attrValue) {
-		return el -> attrValue.equals(el.getAttribute(attrName));
+	/**
+	 * Method returns predicate testing <code>Element</code> attribute name and value
+	 */
+	public static @NotNull Predicate<Element> attribute(@NotNull String name, @NotNull String value) {
+		return el -> name.equals(el.getAttribute(value));
 	}
 
-	public static Predicate<Element> nameAndAttribute(String name, String attrName, String attrValue) {
-		return name(name).and(attribute(attrName, attrValue));
+	/**
+	 * Method returns predicate testing <code>Element</code> name, attribute name and value
+	 */
+	public static @NotNull Predicate<Element> nameAndAttribute(@NotNull String name, @NotNull String attributeName,
+															   @NotNull String attributeValue) {
+		return name(name).and(attribute(attributeName, attributeValue));
 	}
 
-	public static Predicate<Element> nameAndXMLNS(String name, String xmlns) {
+	/**
+	 * Method returns predicate testing <code>Element</code> name and xmlns
+	 */
+	public static @NotNull Predicate<Element> nameAndXMLNS(@NotNull String name, @NotNull String xmlns) {
 		return name(name).and(xmlns(xmlns));
 	}
 

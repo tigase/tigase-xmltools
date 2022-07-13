@@ -18,13 +18,23 @@
 package tigase.xml;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * Class implements <code>Predicate</code> for filtering <code>Element</code>s.
+ */
 public class ElementMatcher implements Predicate<Element> {
 
-	protected static ElementMatcher parse(Path.State state) throws Path.PathFormatException {
+	/**
+	 * Method parses <code>String</code> into matcher
+	 * @param state
+	 * @return
+	 * @throws Path.PathFormatException
+	 */
+	protected static @NotNull ElementMatcher parse(@NotNull Path.State state) throws Path.PathFormatException {
 		int slashIdx = state.text.indexOf('/');
 		int squareIdx = state.text.indexOf('[');
 		if (slashIdx == -1) {
@@ -59,14 +69,20 @@ public class ElementMatcher implements Predicate<Element> {
 
 	private final Attribute[] attributes;
 
-	public ElementMatcher(String name, String xmlns, List<Attribute> attributes) {
+	/**
+	 * Constructor to create instance
+	 * @param name - to match or null
+	 * @param xmlns - to match or null
+	 * @param attributes - to match or empty list
+	 */
+	public ElementMatcher(@Nullable String name, @Nullable String xmlns, @NotNull List<Attribute> attributes) {
 		this.name = name;
 		this.xmlns = xmlns;
 		this.attributes = attributes.toArray(Attribute[]::new);
 	}
 
 	@Override
-	public boolean test(Element element) {
+	public boolean test(@NotNull Element element) {
 		if (name != null && !name.equals(element.getName())) {
 			return false;
 		}
@@ -141,9 +157,14 @@ public class ElementMatcher implements Predicate<Element> {
 		}
 	}
 
-	public record Attribute(@NotNull String name, String value) {
+	/**
+	 * Class holds attribute name and value to match against <code>Element</code> using <code>ElementMatcher</code>
+	 * @param name
+	 * @param value
+	 */
+	public record Attribute(@NotNull String name, @Nullable String value) {
 
-		protected static Attribute parse(Path.State state) throws Path.PathFormatException {
+		protected static @NotNull Attribute parse(@NotNull Path.State state) throws Path.PathFormatException {
 			if (!state.text.startsWith("[@") || state.text.length() < 2) {
 				throw new Path.PathFormatException();
 			}

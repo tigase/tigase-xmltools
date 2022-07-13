@@ -17,6 +17,7 @@
  */
 package tigase.xml;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -24,13 +25,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * <code>Path</code> holds predicates that need to be matched to find child (element within a tree of elements).
+ */
 public class Path {
-	
+
+	/**
+	 * Exception thrown if it is not possible to parse String into path
+	 */
 	public static class PathFormatException extends Throwable {
 
 	}
 
-	public static Path parse(String text) throws PathFormatException {
+	/**
+	 * Method parses <code>String</code> into path
+	 * @param text
+	 * @return
+	 * @throws PathFormatException
+	 */
+	public static @NotNull Path parse(@NotNull String text) throws PathFormatException {
 		if (!text.startsWith("/")) {
 			throw new PathFormatException();
 		}
@@ -56,7 +69,7 @@ public class Path {
 	 * @return
 	 * @throws PathFormatException
 	 */
-	public static Path of(String... matcherStrings) throws PathFormatException {
+	public static @NotNull Path of(@NotNull String... matcherStrings) throws PathFormatException {
 		ArrayList<ElementMatcher> matchers = new ArrayList<>();
 		for (String str : matcherStrings) {
 			State state = new State();
@@ -66,7 +79,13 @@ public class Path {
 		return new Path(matchers.toArray(ElementMatcher[]::new));
 	}
 
-	public static Path of(ElementMatcher... matchers) {
+	/**
+	 * Method for creating <code>Path</code> from <code>ElementMatcher</code>s.
+	 * Each matcher is responsible for filtering nodes at one level of the elements tree.
+	 * @param matchers
+	 * @return
+	 */
+	public static @NotNull Path of(@NotNull ElementMatcher... matchers) {
 		return new Path(matchers);
 	}
 
@@ -80,8 +99,12 @@ public class Path {
 		this.matchers = matchers;
 	}
 
-	@Nullable
-	public Element evaluate(Element element) {
+	/**
+	 * Method filters passed element children (and subchildren) and returns first child matching this path
+	 * @param element
+	 * @return
+	 */
+	public @Nullable Element evaluate(@NotNull Element element) {
 		Element el = element;
 		for (ElementMatcher predicate : matchers) {
 			if (el == null) {
@@ -92,7 +115,12 @@ public class Path {
 		return el;
 	}
 
-	public List<Element> evaluateAll(Element element) {
+	/**
+	 * Method filters passed element children (and subchildren) and returns children matching this path
+	 * @param element
+	 * @return
+	 */
+	public @NotNull List<Element> evaluateAll(@NotNull Element element) {
 		if (element == null) {
 			// FIXME: I'm not sure about this.. maybe assert would be a better option..
 			return Collections.emptyList();
@@ -109,6 +137,9 @@ public class Path {
 		return result;
 	}
 
+	/**
+	 * Method for building a new path by adding additional element matcher to the end of the path
+	 */
 	public Path then(ElementMatcher matcher) {
 		ElementMatcher[] newMatchers =  Arrays.copyOf(matchers, matchers.length + 1);
 		newMatchers[matchers.length] = matcher;
