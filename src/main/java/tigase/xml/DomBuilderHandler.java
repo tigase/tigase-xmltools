@@ -39,10 +39,10 @@ public class DomBuilderHandler
 
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
 	private static Logger log = Logger.getLogger("tigase.xml.DomBuilderHandler");
-	private LinkedList<Element> all_roots = new LinkedList<Element>();
+	private LinkedList<Element> all_roots = new LinkedList<>();
 	private ElementFactory customFactory = null;
 	private Stack<Element> el_stack = new Stack<Element>();
-	private Map<String, String> namespaces = new TreeMap<String, String>();
+	private Map<String, String> namespaces = new TreeMap<>();
 	private Object parserState = null;
 	private String top_xmlns = null;
 
@@ -64,15 +64,8 @@ public class DomBuilderHandler
 
 	public void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Start element name: " + name);
-			log.finest("Element attributes names: " + Arrays.toString(attr_names));
-			log.finest("Element attributes values: " + Arrays.toString(attr_values));
+			log.log(Level.FINEST, "Start element name: " + name + ", Element attributes names: " + Arrays.toString(attr_names) + ", Element attributes values: " + Arrays.toString(attr_values));
 		}
-		//System.out.println("Start element name: "+name);
-		//System.out.println("Element attributes names: "+Arrays.toString(attr_names));
-		//System.out.println("Element attributes values: "+Arrays.toString(attr_values));
-
-		// Look for 'xmlns:' declarations:
 		if (attr_names != null) {
 			for (int i = 0; i < attr_names.length; ++i) {
 				// Exit the loop as soon as we reach end of attributes set
@@ -82,9 +75,9 @@ public class DomBuilderHandler
 				if (attr_names[i].toString().startsWith("xmlns:")) {
 					namespaces.put(attr_names[i].substring("xmlns:".length(), attr_names[i].length()),
 								   attr_values[i].toString());
-				} // end of if (att_name.startsWith("xmlns:"))
-			} // end of for (String att_name : attnames)
-		} // end of if (attr_names != null)
+				}
+			}
+		}
 
 		String tmp_name = name.toString();
 		String new_xmlns = null;
@@ -100,8 +93,8 @@ public class DomBuilderHandler
 					new_xmlns = namespaces.get(pref);
 					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
 					prefix = pref;
-				} // end of if (tmp_name.startsWith(xmlns))
-			} // end of for (String xmlns: namespaces.keys())
+				}
+			}
 		}
 		Element elem = newElement(tmp_name, null, attr_names, attr_values);
 		String ns = elem.getXMLNS();
@@ -116,7 +109,6 @@ public class DomBuilderHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Element CDATA: " + cdata);
 		}
-		//System.out.println("Element CDATA: "+cdata);
 		try {
 			el_stack.peek().addCData(cdata.toString());
 		} catch (EmptyStackException e) {
@@ -129,8 +121,6 @@ public class DomBuilderHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("End element name: " + name);
 		}
-		//System.out.println("End element name: "+name);
-
 		String tmp_name = name.toString();
 		String tmp_name_prefix = null;
 		int idx = tmp_name.indexOf(':');
@@ -141,13 +131,13 @@ public class DomBuilderHandler
 			for (String pref : namespaces.keySet()) {
 				if (tmp_name_prefix.equals(pref)) {
 					tmp_name = tmp_name.substring(pref.length() + 1, tmp_name.length());
-				} // end of if (tmp_name.startsWith(xmlns))
-			} // end of for (String xmlns: namespaces.keys())
+				}
+			}
 		}
 
 		if (el_stack.isEmpty()) {
 			el_stack.push(newElement(tmp_name, null, null, null));
-		} // end of if (tmp_name.equals())
+		}
 
 		Element elem = el_stack.pop();
 		if (!elem.matches(ElementFilters.name(tmp_name))) {
@@ -158,10 +148,10 @@ public class DomBuilderHandler
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("Adding new request: " + elem.toString());
 			}
-		} // end of if (el_stack.isEmpty())
+		}
 		else {
 			el_stack.peek().addChild(elem);
-		} // end of if (el_stack.isEmpty()) else
+		}
 		return true;
 	}
 
@@ -169,7 +159,6 @@ public class DomBuilderHandler
 		if (log.isLoggable(Level.FINEST)) {
 			log.finest("Other XML content: " + other);
 		}
-		// Just ignore
 	}
 
 	public void saveParserState(Object state) {
@@ -183,5 +172,4 @@ public class DomBuilderHandler
 	private Element newElement(String name, String cdata, StringBuilder[] attnames, StringBuilder[] attvals) {
 		return customFactory.elementInstance(name, cdata, attnames, attvals);
 	}
-
-}// DomBuilderHandler
+}

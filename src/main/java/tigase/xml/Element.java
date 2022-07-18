@@ -35,16 +35,11 @@ import static tigase.xml.ElementFilters.xmlns;
 /**
  * <code>Element</code> - basic document tree node implementation. Supports Java 5.0 generic feature to make it easier
  * to extend this class and still preserve some useful functionality. Sufficient for simple cases but probably in the
- * most more advanced cases should be extended with additional features. Look in API documentation for more details and
- * information about existing extensions. The most important features apart from abvious tree implementation are: <ul>
- * <li><code>toString()</code> implementation so it can generate valid <em>XML</em> content from this element and all
- * children.</li> <li><code>addChild(...)</code>, <code>getChild(childName)</code> supporting generic types.</li>
- * <li><code>findChild(childPath)</code> finding child in subtree by given path to element.</li>
- * <li><code>getChildCData(childPath)</code>, <code>getAttribute(childPath, attName)</code> returning element CData from
- * child in subtree by given path to element.</li> </ul> <p> Created: Mon Oct 4 17:55:16 2004 </p>
+ * more advanced cases should be extended with additional features. Look in API documentation for more details and
+ * information about existing extensions.
+ * <p> Created: Mon Oct 4 17:55:16 2004 </p>
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
- * @version $Rev$
  */
 @TODO(note = "Make it a bit lighter.")
 public class Element
@@ -77,7 +72,7 @@ public class Element
 	// static reference to make things faster
 	private static final String ATTR_XMLNS_KEY = "xmlns";
 
-	// Function used for deduplication of element names to reduce memory usage when a lot of elements may contains
+	// Function used for deduplication of element names to reduce memory usage when a lot of elements may contain
 	// the same name
 	protected static BiFunction<String, String, String> elementNameDeduplicationFn = List.of("message", "iq",
 																							 "presence", "query",
@@ -94,7 +89,7 @@ public class Element
 			.stream()
 			.collect(Collectors.toMap(Function.identity(), Function.identity()))::getOrDefault;
 	// Map of attributes
-	private Map<String,String> attributes = null;
+	private Map<String, String> attributes = null;
 
 	// List of nodes (Element or CData)
 	private List<XMLNodeIfc> children = null;
@@ -124,7 +119,6 @@ public class Element
 
 	/**
 	 * Constructor creating element with a name
-	 * @param name
 	 */
 	public Element(@NotNull String name) {
 		this.name = elementNameDeduplicationFn.apply(name, name);
@@ -132,8 +126,10 @@ public class Element
 
 	/**
 	 * Add attribute
+	 *
 	 * @param name - name of the attribute
 	 * @param value - value of the attribute
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element addAttribute(@NotNull String name, @NotNull String value) {
@@ -142,7 +138,7 @@ public class Element
 
 	/**
 	 * Add attributes
-	 * @param attributes
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element addAttributes(@NotNull Map<String, String> attributes) {
@@ -157,7 +153,7 @@ public class Element
 
 	/**
 	 * Add CData node with passed value
-	 * @param cdata
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element addCData(@NotNull String cdata) {
@@ -166,47 +162,37 @@ public class Element
 
 	/**
 	 * Add node as a child.
-	 * @param child
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element addChild(@NotNull XMLNodeIfc child) {
-		if (child == null) {
-			throw new NullPointerException("Element child can not be null.");
-		}
+		Objects.requireNonNull(child, "Element child can not be null.");
 		if (children == null) {
 			this.children = new ArrayList<>();
-		}    // end of if (children == null)
+		}
 		children.add(child);
 		return this;
 	}
 
 	/**
 	 * Add children
-	 * @param children
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element addChildren(@NotNull List<Element> children) {
-		if (children == null) {
-			throw new NullPointerException("List of children cannot be null.");
-		}    // end of if (children == null)
+		Objects.requireNonNull(children, "List of children cannot be null.");
 		if (this.children == null) {
 			this.children = new ArrayList<>(children.size());
-		}    // end of if (children == null)
+		}
 		for (XMLNodeIfc child : children) {
-			if (child == null) {
-				throw new NullPointerException("Child can not be null.");
-			}
+			Objects.requireNonNull(child, "Child can not be null.");
 			this.children.add(child);
-		}    // end of for (Element child: children)
-
-		// this.children.addAll(children);
-		// Collections.sort(children);
+		}
 		return this;
 	}
 
 	/**
 	 * Serialize subnodes
-	 * @return
 	 */
 	public String childrenToString() {
 		StringBuilder result = new StringBuilder();
@@ -217,7 +203,6 @@ public class Element
 
 	/**
 	 * Serialize subnodes to passed builder
-	 * @param result
 	 */
 	public void childrenToString(@NotNull StringBuilder result) {
 		if (children != null) {
@@ -227,19 +212,18 @@ public class Element
 				// it may add null children to the element, let's be save here.
 				// FIXME: there are protections against adding null as a child
 				//if (child != null) {
-					if (child instanceof Element) {
-						((Element) child).toString(result);
-					} else {
-						result.append(child.toString());
-					}
+				if (child instanceof Element) {
+					((Element) child).toString(result);
+				} else {
+					result.append(child.toString());
+				}
 				//}
-			}    // end of for ()
-		}        // end of if (child != null)
+			}
+		}
 	}
 
 	/**
 	 * Serialize subnodes as a formatted string
-	 * @return
 	 */
 	public String childrenToStringPretty() {
 		StringBuilder result = new StringBuilder();
@@ -251,17 +235,16 @@ public class Element
 				// it may add null children to the element, let's be save here.
 				// FIXME: there are protections against adding null as a child
 				// if (child != null) {
-					result.append(child.toStringPretty());
+				result.append(child.toStringPretty());
 				//}
-			}    // end of for ()
-		}        // end of if (child != null)
+			}
+		}
 
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
 	/**
 	 * Serialize subnodes as a secure string
-	 * @return
 	 */
 	public String childrenToStringSecure() {
 		StringBuilder result = new StringBuilder();
@@ -272,7 +255,6 @@ public class Element
 
 	/**
 	 * Serialize subnodes to passed builder as a secure string
-	 * @return
 	 */
 	public void childrenToStringSecure(@NotNull StringBuilder result) {
 		if (children != null) {
@@ -282,14 +264,14 @@ public class Element
 				// it may add null children to the element, let's be save here.
 				// FIXME: there are protections against adding null as a child
 				// if (child != null) {
-					if (child instanceof Element) {
-						((Element) child).toStringSecure(result);
-					} else {
-						result.append(child.toStringSecure());
-					}
+				if (child instanceof Element) {
+					((Element) child).toStringSecure(result);
+				} else {
+					result.append(child.toStringSecure());
+				}
 				// }
-			}    // end of for ()
-		}        // end of if (child != null)
+			}
+		}
 	}
 
 	@Override
@@ -299,8 +281,6 @@ public class Element
 
 	/**
 	 * Methods checks equality of instances of `Element` excluding list of children
-	 * @param obj
-	 * @return
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -329,8 +309,6 @@ public class Element
 
 	/**
 	 * Method returns first child which matches predicate
-	 * @param predicate
-	 * @return
 	 */
 	public @Nullable Element findChild(@NotNull Predicate<Element> predicate) {
 		if (children != null) {
@@ -351,8 +329,6 @@ public class Element
 
 	/**
 	 * Method returns first child which name matches
-	 * @param name
-	 * @return
 	 */
 	public @Nullable Element findChild(@NotNull String name) {
 		return findChild(name(name));
@@ -360,9 +336,6 @@ public class Element
 
 	/**
 	 * Method returns first child which matches name and xmlns
-	 * @param name
-	 * @param xmlns
-	 * @return
 	 */
 	public @Nullable Element findChild(@NotNull String name, @NotNull String xmlns) {
 		return findChild(name(name).and(xmlns(xmlns)));
@@ -370,8 +343,6 @@ public class Element
 
 	/**
 	 * Method returns first element which matches path
-	 * @param path
-	 * @return
 	 */
 	public @Nullable Element findChildAt(@NotNull Path path) {
 		return path.evaluate(this);
@@ -379,8 +350,6 @@ public class Element
 
 	/**
 	 * Method returns list of children matching predicate
-	 * @param predicate
-	 * @return
 	 */
 	public @NotNull List<Element> findChildren(@NotNull Predicate<Element> predicate) {
 		if (children != null) {
@@ -405,8 +374,6 @@ public class Element
 
 	/**
 	 * Method returns list of children matching path
-	 * @param path
-	 * @return
 	 */
 	public @NotNull List<Element> findChildrenAt(@NotNull Path path) {
 		return path.evaluateAll(this);
@@ -414,34 +381,28 @@ public class Element
 
 	/**
 	 * Method returns value of the attribute
-	 * @param name
-	 * @return
 	 */
 	public @Nullable String getAttribute(String name) {
 		if (attributes != null) {
 			return attributes.get(name);
-		}    // end of if (attributes != null)
+		}
 
 		return null;
 	}
 
 	/**
 	 * Method returns value of the attribute of the first element matching path
-	 * @param path
-	 * @param name
-	 * @return
 	 */
 	public @Nullable String getAttributeAt(Path path, String name) {
-		Element subchild = findChildAt(path);
-		if (subchild == null) {
+		Element subChild = findChildAt(path);
+		if (subChild == null) {
 			return null;
 		}
-		return subchild.getAttribute(name);
+		return subChild.getAttribute(name);
 	}
 
 	/**
 	 * Method returns copy of all attributes
-	 * @return
 	 */
 	public @NotNull Map<String, String> getAttributes() {
 		return ((attributes != null) ? Collections.unmodifiableMap(attributes) : Collections.emptyMap());
@@ -449,7 +410,7 @@ public class Element
 
 	/**
 	 * Method replaces all attributes with name-value pairs provided in the map
-	 * @param attributes
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element setAttributes(@NotNull Map<String, String> attributes) {
@@ -463,14 +424,11 @@ public class Element
 	/**
 	 * Method replaces all attributes with provided name-value pair.
 	 * Length of both arrays must be equal!
-	 * @param names
-	 * @param values
-	 * @return
 	 */
 	// FIXME: Should we remove this method as well? or it is better to keep if for easy way to set attributes in bulk?
 	public @NotNull Element setAttributes(@NotNull String[] names, @NotNull String[] values) {
 		attributes = new HashMap<>(names.length);
-		for (int i=0; i<names.length; i++) {
+		for (int i = 0; i < names.length; i++) {
 			setAttribute(names[i], values[i]);
 		}
 		return this;
@@ -478,7 +436,6 @@ public class Element
 
 	/**
 	 * Method returns CData value of the element
-	 * @return
 	 */
 	public @Nullable String getCData() {
 		return cdataToString();
@@ -486,22 +443,18 @@ public class Element
 
 	/**
 	 * Method returns CData value of the first element matching path
-	 * @param path
-	 * @return
 	 */
 	public @Nullable String getCDataAt(@NotNull Path path) {
-		Element subchild = findChildAt(path);
-		if (subchild == null) {
+		Element subChild = findChildAt(path);
+		if (subChild == null) {
 			return null;
 		}
-		return subchild.getCData();
+		return subChild.getCData();
 	}
 
 	/**
 	 * Method sets CData of the element.
 	 * <strong>WARNING: This method replaces existing CData and removes children of the element!</strong>
-	 * @param cdata
-	 * @return
 	 */
 	public @NotNull Element setCData(@NotNull String cdata) {
 		children = new ArrayList<>();
@@ -510,7 +463,6 @@ public class Element
 
 	/**
 	 * Method returns list of all children
-	 * @return
 	 */
 	public List<Element> getChildren() {
 		if (children != null) {
@@ -530,20 +482,19 @@ public class Element
 
 	/**
 	 * Method replaces all nodes (children and cdata) with passed list of children
-	 * @param children
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element setChildren(@NotNull List<XMLNodeIfc> children) {
 		this.children = new ArrayList<>(children.size());
 		for (XMLNodeIfc child : children) {
 			this.children.add(child.clone());
-		}    // end of for (Element child: children)
+		}
 		return this;
 	}
 
 	/**
 	 * Method returns name of the element
-	 * @return
 	 */
 	public @NotNull String getName() {
 		return this.name;
@@ -551,7 +502,6 @@ public class Element
 
 	/**
 	 * Method returns XMLNS of the element
-	 * @return
 	 */
 	public @Nullable String getXMLNS() {
 		if (xmlns == null) {
@@ -563,7 +513,7 @@ public class Element
 
 	/**
 	 * Method sets XMLNS of the element
-	 * @param ns
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element setXMLNS(@Nullable String ns) {
@@ -586,9 +536,6 @@ public class Element
 
 	/**
 	 * Method executes function passing self as a parameter and returns its result
-	 * @param mapper
-	 * @return
-	 * @param <R>
 	 */
 	public @Nullable <R> R map(@NotNull Function<Element, ? extends R> mapper) {
 		return mapper.apply(this);
@@ -597,7 +544,7 @@ public class Element
 	/**
 	 * Method executes consumer passing self as a parameter
 	 * Useful for conditional building of element in the single line
-	 * @param modifier
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element modify(@NotNull Consumer<Element> modifier) {
@@ -607,9 +554,6 @@ public class Element
 
 	/**
 	 * Method applies function against each child of the element and returns list of non-null return values
-	 * @param mapper
-	 * @return
-	 * @param <R>
 	 */
 	public <R> @NotNull List<R> compactMapChildren(@NotNull Function<Element, ? extends R> mapper) {
 		if (children != null) {
@@ -635,9 +579,6 @@ public class Element
 
 	/**
 	 * Method executes function passing each child and then combining returned lists of results in a single list
-	 * @param mapper
-	 * @return
-	 * @param <R>
 	 */
 	// FIXME: I'm not sure if this should still be here
 	public <R> @NotNull List<R> flatMapChildren(@NotNull Function<Element, Collection<? extends R>> mapper) {
@@ -661,9 +602,6 @@ public class Element
 
 	/**
 	 * Method applies function against each child of the element and returns list results
-	 * @param mapper
-	 * @return
-	 * @param <R>
 	 */
 	public <R> @NotNull List<R> mapChildren(@NotNull Function<Element, ? extends R> mapper) {
 		if (children != null) {
@@ -686,8 +624,6 @@ public class Element
 
 	/**
 	 * Method test if this element matches predicate
-	 * @param predicate
-	 * @return
 	 */
 	public boolean matches(@NotNull Predicate<Element> predicate) {
 		return predicate.test(this);
@@ -695,7 +631,6 @@ public class Element
 
 	/**
 	 * Method removes attribute
-	 * @param name
 	 */
 	public void removeAttribute(@NotNull String name) {
 		if (attributes != null) {
@@ -703,12 +638,12 @@ public class Element
 				xmlns = null;
 			}
 			attributes.remove(name);
-		}    // end of if (attributes == null)
+		}
 	}
 
 	/**
 	 * Method removes child instance
-	 * @param child
+	 *
 	 * @return true - if child was removed
 	 */
 	public boolean removeChild(@NotNull Element child) {
@@ -716,15 +651,14 @@ public class Element
 
 		if (children != null) {
 			res = children.remove(child);
-		}    // end of if (children == null)
+		}
 
 		return res;
 	}
 
 	/**
 	 * Method removes first child with matching name and xmlns
-	 * @param name
-	 * @param xmlns
+	 *
 	 * @return true - if child was removed
 	 */
 	public boolean removeChild(@NotNull String name, @NotNull String xmlns) {
@@ -738,7 +672,7 @@ public class Element
 
 	/**
 	 * Method removes first child matching predicate
-	 * @param predicate
+	 *
 	 * @return true - if child was removed
 	 */
 	public boolean removeChild(@NotNull Predicate<Element> predicate) {
@@ -751,8 +685,6 @@ public class Element
 
 	/**
 	 * Method check if attribute is set
-	 * @param name
-	 * @return
 	 */
 	public boolean hasAttribute(@NotNull String name) {
 		return getAttribute(name) != null;
@@ -760,8 +692,6 @@ public class Element
 
 	/**
 	 * Method check if attribute is set to the value
-	 * @param name
-	 * @return
 	 */
 	public boolean hasAttribute(@NotNull String name, @NotNull String value) {
 		return Objects.equals(value, getAttribute(name));
@@ -769,20 +699,15 @@ public class Element
 
 	/**
 	 * Method sets attribute value
-	 * @param name
-	 * @param value
+	 *
 	 * @return this element
 	 */
 	public @NotNull Element setAttribute(@NotNull String name, @NotNull String value) {
-		if (name == null) {
-			throw new NullPointerException("Attribute name cannot be null.");
-		}
-		if (value == null) {
-			throw new NullPointerException("Attribute value cannot be null.");
-		}
+		Objects.requireNonNull(name, "Attribute name cannot be null.");
+		Objects.requireNonNull(value, "Attribute value cannot be null.");
 		if (attributes == null) {
 			attributes = new HashMap<>(5);
-		}    // end of if (attributes == null)
+		}
 		String n = attributesDeduplicationFn.apply(name, name);
 		String v = value;
 
@@ -803,15 +728,14 @@ public class Element
 
 	/**
 	 * Method serializes element to passed build
-	 * @param result
 	 */
 	public void toString(StringBuilder result) {
 		result.append("<").append(name);
 		if (attributes != null) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
-			}    // end of for ()
-		}      // end of if (attributes != null)
+			}
+		}
 
 		if (children != null && !children.isEmpty()) {
 			result.append(">");
@@ -824,7 +748,6 @@ public class Element
 
 	/**
 	 * Method serializes element to formatted string
-	 * @return
 	 */
 	@Override
 	public String toStringPretty() {
@@ -834,8 +757,8 @@ public class Element
 		if (attributes != null) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
-			}    // end of for ()
-		}      // end of if (attributes != null)
+			}
+		}
 
 		String childrenStr = childrenToStringPretty();
 
@@ -855,7 +778,6 @@ public class Element
 
 	/**
 	 * Method serializes element without children
-	 * @return
 	 */
 	public String toStringNoChildren() {
 		StringBuilder result = new StringBuilder();
@@ -864,8 +786,8 @@ public class Element
 		if (attributes != null) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
-			}    // end of for ()
-		}      // end of if (attributes != null)
+			}
+		}
 
 		String cdata = cdataToString();
 
@@ -873,7 +795,7 @@ public class Element
 			result.append(">");
 			if (cdata != null) {
 				result.append(cdata);
-			}    // end of if (cdata != null)
+			}
 			result.append("</").append(name).append(">");
 		} else {
 			result.append("/>");
@@ -884,7 +806,6 @@ public class Element
 
 	/**
 	 * Method serializes element to a secure string
-	 * @return
 	 */
 	@Override
 	public String toStringSecure() {
@@ -896,15 +817,14 @@ public class Element
 
 	/**
 	 * Method serializes element as a secure string to passed builder
-	 * @param result
 	 */
 	public void toStringSecure(StringBuilder result) {
 		result.append("<").append(name);
 		if (attributes != null) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
-			}    // end of for ()
-		}      // end of if (attributes != null)
+			}
+		}
 
 		if (children != null && !children.isEmpty()) {
 			result.append(">");
@@ -917,7 +837,6 @@ public class Element
 
 	/**
 	 * Method returns joined CData values
-	 * @return
 	 */
 	public String cdataToString() {
 		StringBuilder result = new StringBuilder();
@@ -930,11 +849,11 @@ public class Element
 				if ((child != null) && (child instanceof CData)) {
 					result.append(child.toString());
 				}
-			}    // end of for ()
-		}        // end of if (child != null)
+			}
+		}
 
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
-}    // Element
+}
 

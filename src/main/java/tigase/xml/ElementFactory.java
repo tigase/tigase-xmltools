@@ -28,4 +28,4 @@ public interface ElementFactory {
 
 	Element elementInstance(String name, String cdata, StringBuilder[] attNames, StringBuilder[] attValues);
 
-} // ElementFactory
+}

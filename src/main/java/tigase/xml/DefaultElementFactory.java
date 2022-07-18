@@ -35,29 +35,26 @@ public class DefaultElementFactory
 	public DefaultElementFactory() {
 	}
 
-	// Implementation of tigase.xml.ElementFactory
-
-	public final Element elementInstance(final String name, final String cdata, final StringBuilder[] attnames,
-										 final StringBuilder[] attvals) {
+	public final Element elementInstance(final String name, final String cdata, final StringBuilder[] attributesNames,
+										 final StringBuilder[] attributesValues) {
 		Element result = new Element(name);
 		if (cdata != null) {
 			result.addCData(cdata);
 		}
-		if (attnames != null && attvals != null) {
-			for (int i=0; i<attnames.length; i++) {
-				StringBuilder attnameBuilder = attnames[i];
-				StringBuilder attvalueBuilder = attvals[i];
-				if (attnameBuilder == null || attvalueBuilder == null) {
+		if (attributesNames != null && attributesValues != null) {
+			for (int i = 0; i < attributesNames.length; i++) {
+				StringBuilder attributeNameBuilder = attributesNames[i];
+				StringBuilder attributeValueBuilder = attributesValues[i];
+				if (attributeNameBuilder == null || attributeValueBuilder == null) {
 					continue;
 				}
-				String attname = attnameBuilder.toString();
-				if (attname.isEmpty()) {
+				String attributeName = attributeNameBuilder.toString();
+				if (attributeName.isEmpty()) {
 					continue;
 				}
-				result.addAttribute(attname, attvalueBuilder.toString());
+				result.addAttribute(attributeName, attributeValueBuilder.toString());
 			}
 		}
 		return result;
 	}
-
-} // DefaultElementFactory
+}

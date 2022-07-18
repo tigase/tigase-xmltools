@@ -126,9 +126,7 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @return
 	 */
 	public @NotNull ElementMatcher addAttribute(@NotNull String name, @Nullable String value) {
-		if (name == null) {
-			throw new NullPointerException("Attribute name cannot be null!");
-		}
+		Objects.requireNonNull(name, "Attribute name cannot be null!");
 		attributes = Arrays.copyOf(attributes, attributes.length + 1);
 		attributes[attributes.length - 1] = new Attribute(name, value);
 		return this;

@@ -20,10 +20,7 @@ package tigase.xml;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * <code>Path</code> holds predicates that need to be matched to find child (element within a tree of elements).
@@ -134,6 +131,7 @@ public class Path {
 	 * @return
 	 */
 	public @NotNull List<Element> evaluateAll(@NotNull Element element) {
+		Objects.requireNonNull(element);
 		if (element == null) {
 			// FIXME: I'm not sure about this.. maybe assert would be a better option..
 			return Collections.emptyList();
