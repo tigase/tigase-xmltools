@@ -42,7 +42,7 @@ public class DomBuilderHandler
 	private LinkedList<Element> all_roots = new LinkedList<Element>();
 	private ElementFactory customFactory = null;
 	private Stack<Element> el_stack = new Stack<Element>();
-	private Map<String, String> namespaces = new TreeMap<String, String>();
+	private Map<String, String> namespaces = new TreeMap<>();
 	private Object parserState = null;
 	private String top_xmlns = null;
 
@@ -64,8 +64,6 @@ public class DomBuilderHandler
 
 	public void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values) {
 		log.log(Level.TRACE, () -> "Start element name: " + name + "; Element attributes names: " + Arrays.toString(attr_names) + "; Element attributes values: " + Arrays.toString(attr_values));
-
-		// Look for 'xmlns:' declarations:
 		if (attr_names != null) {
 			for (int i = 0; i < attr_names.length; ++i) {
 				// Exit the loop as soon as we reach end of attributes set
@@ -107,7 +105,6 @@ public class DomBuilderHandler
 
 	public void elementCData(StringBuilder cdata) {
 		log.log(Level.TRACE, () -> "Element cdata: " + cdata );
-		//System.out.println("Element CDATA: "+cdata);
 		try {
 			el_stack.peek().addCData(cdata.toString());
 		} catch (EmptyStackException e) {
@@ -118,8 +115,6 @@ public class DomBuilderHandler
 
 	public boolean endElement(StringBuilder name) {
 		log.log(Level.TRACE, () -> "End element name: " + name);
-		//System.out.println("End element name: "+name);
-
 		String tmp_name = name.toString();
 		String tmp_name_prefix = null;
 		int idx = tmp_name.indexOf(':');
@@ -168,5 +163,4 @@ public class DomBuilderHandler
 	private Element newElement(String name, String cdata, StringBuilder[] attnames, StringBuilder[] attvals) {
 		return customFactory.elementInstance(name, cdata, attnames, attvals);
 	}
-
 }
