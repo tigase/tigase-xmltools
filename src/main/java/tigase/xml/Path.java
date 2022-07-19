@@ -45,6 +45,7 @@ public class Path {
 	 * @throws PathFormatException
 	 */
 	public static @NotNull Path parse(@NotNull String text) throws PathFormatException {
+		Objects.requireNonNull(text, "String to parse as Path cannot be null!");
 		if (!text.startsWith("/")) {
 			throw new PathFormatException("Path cannot start without '/'");
 		}
@@ -112,6 +113,7 @@ public class Path {
 	 * @return
 	 */
 	public @Nullable Element evaluate(@NotNull Element element) {
+		Objects.requireNonNull(element, "Element cannot be null!");
 		Element el = element;
 		if (!matchers[0].test(el)) {
 			return null;
@@ -131,11 +133,7 @@ public class Path {
 	 * @return
 	 */
 	public @NotNull List<Element> evaluateAll(@NotNull Element element) {
-		Objects.requireNonNull(element);
-		if (element == null) {
-			// FIXME: I'm not sure about this.. maybe assert would be a better option..
-			return Collections.emptyList();
-		}
+		Objects.requireNonNull(element, "Element cannot be null!");
 		if (!matchers[0].test(element)) {
 			return Collections.emptyList();
 		}
@@ -155,6 +153,7 @@ public class Path {
 	 * Method for building a new path by adding additional element matcher to the end of the path
 	 */
 	public Path then(ElementMatcher matcher) {
+		Objects.requireNonNull(matcher, "ElementMatcher cannot be null!");
 		ElementMatcher[] newMatchers =  Arrays.copyOf(matchers, matchers.length + 1);
 		newMatchers[matchers.length] = matcher;
 		return new Path(newMatchers);

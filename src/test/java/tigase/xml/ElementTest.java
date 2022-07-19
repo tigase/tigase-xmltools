@@ -87,7 +87,7 @@ public class ElementTest {
 		String attName = "key";
 		String attValue = "value";
 
-		parent.addAttribute(attName, attValue);
+		parent.setAttribute(attName, attValue);
 		assertEquals(attValue, parent.getAttribute(attName));
 	}
 
@@ -101,7 +101,7 @@ public class ElementTest {
 		parent.removeAttribute(p_att_name);
 		attrs.put("key1", "val1");
 		attrs.put("key2", "val2");
-		parent.addAttributes(attrs);
+		parent.setAttributes(attrs);
 		assertEquals(attrs.size(), parent.getAttributes().size());
 		assertEquals(attrs, parent.getAttributes());
 	}

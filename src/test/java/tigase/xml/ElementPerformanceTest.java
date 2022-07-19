@@ -105,7 +105,7 @@ public class ElementPerformanceTest {
 		Element test = new Element("test");
 		for (String name : ATTRIBUTE_NAMES) {
 			{
-				test.addAttribute(name, name);
+				test.setAttribute(name, name);
 			}
 		}
 		blackhole.consume(test);

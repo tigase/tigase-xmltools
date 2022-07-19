@@ -65,7 +65,7 @@ public class DBElement
 	public DBElement(String argName, String attname, String attvalue) {
 		super(argName);
 		if (attname != null && !attname.isEmpty()) {
-			addAttribute(attname, attvalue);
+			setAttribute(attname, attvalue);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class DBElement
 				if (attname.isEmpty()) {
 					continue;
 				}
-				addAttribute(attname, attvalueBuilder.toString());
+				setAttribute(attname, attvalueBuilder.toString());
 			}
 		}
 	}
