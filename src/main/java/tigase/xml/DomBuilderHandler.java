@@ -39,10 +39,10 @@ public class DomBuilderHandler
 
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
 	private static Logger log = Logger.getLogger("tigase.xml.DomBuilderHandler");
-	private LinkedList<Element> all_roots = new LinkedList<>();
+	private Deque<Element> all_roots = new ArrayDeque<>();
 	private ElementFactory customFactory = null;
-	private Stack<Element> el_stack = new Stack<Element>();
-	private Map<String, String> namespaces = new TreeMap<>();
+	private Deque<Element> el_stack = new ArrayDeque<>();
+	private Map<String, String> namespaces = new TreeMap<String, String>();
 	private Object parserState = null;
 	private String top_xmlns = null;
 

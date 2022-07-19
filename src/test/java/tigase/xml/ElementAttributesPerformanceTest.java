@@ -76,7 +76,7 @@ public class ElementAttributesPerformanceTest {
 				case "Static" -> attributeName = "id";
 			};
 
-			element = new Element("root").addAttribute(new String(attributeName), "true");
+			element = new Element("root").setAttribute(new String(attributeName), "true");
 		}
 
 	}

@@ -92,7 +92,7 @@ public class Element
 	private Map<String, String> attributes = null;
 
 	// List of nodes (Element or CData)
-	private List<XMLNodeIfc> children = null;
+	private List<XMLNodeIfc> nodes = null;
 
 	// Element name
 	private final String name;
@@ -112,8 +112,8 @@ public class Element
 		this.name = src.name;
 
 		this.xmlns = src.xmlns;
-		if (src.children != null) {
-			this.children = new ArrayList<>(src.children);
+		if (src.nodes != null) {
+			this.nodes = new ArrayList<>(src.nodes);
 		}
 	}
 
@@ -125,52 +125,23 @@ public class Element
 	}
 
 	/**
-	 * Add attribute
-	 *
-	 * @param name - name of the attribute
-	 * @param value - value of the attribute
-	 *
-	 * @return this element
-	 */
-	public @NotNull Element addAttribute(@NotNull String name, @NotNull String value) {
-		return setAttribute(name, value);
-	}
-
-	/**
-	 * Add attributes
-	 *
-	 * @return this element
-	 */
-	public @NotNull Element addAttributes(@NotNull Map<String, String> attributes) {
-		if (this.attributes == null) {
-			this.attributes = new HashMap<>(attributes.size());
-		}
-		for (Map.Entry<String, String> entry : attributes.entrySet()) {
-			setAttribute(entry.getKey(), entry.getValue());
-		}
-		return this;
-	}
-
-	/**
 	 * Add CData node with passed value
 	 *
 	 * @return this element
 	 */
 	public @NotNull Element addCData(@NotNull String cdata) {
-		return addChild(new CData(cdata));
+		addNode(new CData(cdata));
+		return this;
 	}
 
 	/**
-	 * Add node as a child.
+	 * Add element as a child.
 	 *
 	 * @return this element
 	 */
-	public @NotNull Element addChild(@NotNull XMLNodeIfc child) {
+	public @NotNull Element addChild(@NotNull Element child) {
 		Objects.requireNonNull(child, "Element child can not be null.");
-		if (children == null) {
-			this.children = new ArrayList<>();
-		}
-		children.add(child);
+		addNode(child);
 		return this;
 	}
 
@@ -181,22 +152,29 @@ public class Element
 	 */
 	public @NotNull Element addChildren(@NotNull List<Element> children) {
 		Objects.requireNonNull(children, "List of children cannot be null.");
-		if (this.children == null) {
-			this.children = new ArrayList<>(children.size());
+		if (this.nodes == null) {
+			this.nodes = new ArrayList<>(children.size());
 		}
 		for (XMLNodeIfc child : children) {
-			Objects.requireNonNull(child, "Child can not be null.");
-			this.children.add(child);
+			Objects.requireNonNull(child, "Element child can not be null.");
+			this.nodes.add(child);
 		}
 		return this;
+	}
+
+	private void addNode(@NotNull XMLNodeIfc node) {
+		if (nodes == null) {
+			this.nodes = new ArrayList<>();
+		}    // end of if (children == null)
+		nodes.add(node);
 	}
 
 	/**
 	 * Serialize subnodes
 	 */
-	public String childrenToString() {
+	public String nodesToString() {
 		StringBuilder result = new StringBuilder();
-		childrenToString(result);
+		nodesToString(result);
 
 		return (result.length() > 0) ? result.toString() : null;
 	}
@@ -204,20 +182,14 @@ public class Element
 	/**
 	 * Serialize subnodes to passed builder
 	 */
-	public void childrenToString(@NotNull StringBuilder result) {
-		if (children != null) {
-			for (XMLNodeIfc child : children) {
-
-				// This is weird but if there is a bug in some other component
-				// it may add null children to the element, let's be save here.
-				// FIXME: there are protections against adding null as a child
-				//if (child != null) {
-				if (child instanceof Element) {
-					((Element) child).toString(result);
+	public void nodesToString(@NotNull StringBuilder result) {
+		if (nodes != null) {
+			for (XMLNodeIfc node : nodes) {
+				if (node instanceof Element) {
+					((Element) node).toString(result);
 				} else {
-					result.append(child.toString());
+					result.append(node.toString());
 				}
-				//}
 			}
 		}
 	}
@@ -225,18 +197,12 @@ public class Element
 	/**
 	 * Serialize subnodes as a formatted string
 	 */
-	public String childrenToStringPretty() {
+	public String nodesToStringPretty() {
 		StringBuilder result = new StringBuilder();
 
-		if (children != null) {
-			for (XMLNodeIfc child : children) {
-
-				// This is weird but if there is a bug in some other component
-				// it may add null children to the element, let's be save here.
-				// FIXME: there are protections against adding null as a child
-				// if (child != null) {
-				result.append(child.toStringPretty());
-				//}
+		if (nodes != null) {
+			for (XMLNodeIfc node : nodes) {
+				result.append(node.toStringPretty());
 			}
 		}
 
@@ -246,9 +212,9 @@ public class Element
 	/**
 	 * Serialize subnodes as a secure string
 	 */
-	public String childrenToStringSecure() {
+	public String nodesToStringSecure() {
 		StringBuilder result = new StringBuilder();
-		childrenToStringSecure(result);
+		nodesToStringSecure(result);
 
 		return (result.length() > 0) ? result.toString() : null;
 	}
@@ -256,20 +222,14 @@ public class Element
 	/**
 	 * Serialize subnodes to passed builder as a secure string
 	 */
-	public void childrenToStringSecure(@NotNull StringBuilder result) {
-		if (children != null) {
-			for (XMLNodeIfc child : children) {
-
-				// This is weird but if there is a bug in some other component
-				// it may add null children to the element, let's be save here.
-				// FIXME: there are protections against adding null as a child
-				// if (child != null) {
-				if (child instanceof Element) {
-					((Element) child).toStringSecure(result);
+	public void nodesToStringSecure(@NotNull StringBuilder result) {
+		if (nodes != null) {
+			for (XMLNodeIfc node : nodes) {
+				if (node instanceof Element) {
+					((Element) node).toStringSecure(result);
 				} else {
-					result.append(child.toStringSecure());
+					result.append(node.toStringSecure());
 				}
-				// }
 			}
 		}
 	}
@@ -311,8 +271,8 @@ public class Element
 	 * Method returns first child which matches predicate
 	 */
 	public @Nullable Element findChild(@NotNull Predicate<Element> predicate) {
-		if (children != null) {
-			for (XMLNodeIfc node : children) {
+		if (nodes != null) {
+			for (XMLNodeIfc node : nodes) {
 				if (!(node instanceof Element)) {
 					continue;
 				}
@@ -352,20 +312,13 @@ public class Element
 	 * Method returns list of children matching predicate
 	 */
 	public @NotNull List<Element> findChildren(@NotNull Predicate<Element> predicate) {
-		if (children != null) {
+		if (nodes != null) {
 			LinkedList<Element> result = new LinkedList<Element>();
-
-			for (XMLNodeIfc node : children) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
-
-				Element el = (Element) node;
+			forEachChild(el -> {
 				if (predicate.test(el)) {
 					result.add(el);
 				}
-			}
-
+			});
 			return result;
 		}
 
@@ -425,7 +378,6 @@ public class Element
 	 * Method replaces all attributes with provided name-value pair.
 	 * Length of both arrays must be equal!
 	 */
-	// FIXME: Should we remove this method as well? or it is better to keep if for easy way to set attributes in bulk?
 	public @NotNull Element setAttributes(@NotNull String[] names, @NotNull String[] values) {
 		attributes = new HashMap<>(names.length);
 		for (int i = 0; i < names.length; i++) {
@@ -457,23 +409,18 @@ public class Element
 	 * <strong>WARNING: This method replaces existing CData and removes children of the element!</strong>
 	 */
 	public @NotNull Element setCData(@NotNull String cdata) {
-		children = new ArrayList<>();
-		return addChild(new CData(cdata));
+		nodes = new ArrayList<>();
+		addNode(new CData(cdata));
+		return this;
 	}
 
 	/**
 	 * Method returns list of all children
 	 */
 	public List<Element> getChildren() {
-		if (children != null) {
-			LinkedList<Element> result = new LinkedList<Element>();
-
-			for (XMLNodeIfc node : children) {
-				if (node instanceof Element) {
-					result.add((Element) node);
-				}
-			}
-
+		if (nodes != null) {
+			ArrayList<Element> result = new ArrayList<>();
+			forEachChild(result::add);
 			return result;
 		}
 
@@ -485,11 +432,12 @@ public class Element
 	 *
 	 * @return this element
 	 */
-	public @NotNull Element setChildren(@NotNull List<XMLNodeIfc> children) {
-		this.children = new ArrayList<>(children.size());
-		for (XMLNodeIfc child : children) {
-			this.children.add(child.clone());
-		}
+	public @NotNull Element setChildren(@NotNull List<XMLNodeIfc> nodes) {
+		this.nodes = new ArrayList<>(nodes.size());
+		for (XMLNodeIfc node : nodes) {
+			Objects.requireNonNull(node, "Child cannot be null!");
+			this.nodes.add(node.clone());
+		}    // end of for (Element child: children)
 		return this;
 	}
 
@@ -518,12 +466,8 @@ public class Element
 	 */
 	public @NotNull Element setXMLNS(@Nullable String ns) {
 		if (ns == null) {
-			// FIXME: leaving setting `xmlns` to removeAttribute()/setAttribute() methods
-			//xmlns = null;
 			removeAttribute(ATTR_XMLNS_KEY);
 		} else {
-			// FIXME: leaving setting `xmlns` to removeAttribute()/setAttribute() methods
-			//xmlns = ns;
 			setAttribute(ATTR_XMLNS_KEY, ns);
 		}
 		return this;
@@ -556,21 +500,14 @@ public class Element
 	 * Method applies function against each child of the element and returns list of non-null return values
 	 */
 	public <R> @NotNull List<R> compactMapChildren(@NotNull Function<Element, ? extends R> mapper) {
-		if (children != null) {
+		if (nodes != null) {
 			LinkedList<R> result = new LinkedList<R>();
-
-			for (XMLNodeIfc node : children) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
-
-				Element el = (Element) node;
+			forEachChild(el -> {
 				R val = mapper.apply(el);
 				if (val != null) {
 					result.add(val);
 				}
-			}
-
+			});
 			return result;
 		}
 
@@ -580,20 +517,10 @@ public class Element
 	/**
 	 * Method executes function passing each child and then combining returned lists of results in a single list
 	 */
-	// FIXME: I'm not sure if this should still be here
 	public <R> @NotNull List<R> flatMapChildren(@NotNull Function<Element, Collection<? extends R>> mapper) {
-		if (children != null) {
+		if (nodes != null) {
 			LinkedList<R> result = new LinkedList<R>();
-
-			for (XMLNodeIfc node : children) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
-
-				Element el = (Element) node;
-				result.addAll(mapper.apply(el));
-			}
-
+			forEachChild(el -> result.addAll(mapper.apply(el)));
 			return result;
 		}
 
@@ -604,22 +531,21 @@ public class Element
 	 * Method applies function against each child of the element and returns list results
 	 */
 	public <R> @NotNull List<R> mapChildren(@NotNull Function<Element, ? extends R> mapper) {
-		if (children != null) {
+		if (nodes != null) {
 			LinkedList<R> result = new LinkedList<R>();
-
-			for (XMLNodeIfc node : children) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
-
-				Element el = (Element) node;
-				result.add(mapper.apply(el));
-			}
-
+			forEachChild(el -> result.add(mapper.apply(el)));
 			return result;
 		}
 
 		return Collections.emptyList();
+	}
+
+	private void forEachChild(Consumer<Element> consumer) {
+		for (XMLNodeIfc node : nodes) {
+			if (node instanceof Element) {
+				consumer.accept((Element) node);
+			}
+		}
 	}
 
 	/**
@@ -649,9 +575,9 @@ public class Element
 	public boolean removeChild(@NotNull Element child) {
 		boolean res = false;
 
-		if (children != null) {
-			res = children.remove(child);
-		}
+		if (nodes != null) {
+			res = nodes.remove(child);
+		}    // end of if (children == null)
 
 		return res;
 	}
@@ -678,7 +604,7 @@ public class Element
 	public boolean removeChild(@NotNull Predicate<Element> predicate) {
 		Element child = findChild(predicate);
 		if (child != null) {
-			children.remove(child);
+			nodes.remove(child);
 		}
 		return child != null;
 	}
@@ -737,9 +663,9 @@ public class Element
 			}
 		}
 
-		if (children != null && !children.isEmpty()) {
+		if (nodes != null && !nodes.isEmpty()) {
 			result.append(">");
-			childrenToString(result);
+			nodesToString(result);
 			result.append("</").append(name).append(">");
 		} else {
 			result.append("/>");
@@ -760,12 +686,12 @@ public class Element
 			}
 		}
 
-		String childrenStr = childrenToStringPretty();
+		String nodesStr = nodesToStringPretty();
 
-		if ((childrenStr != null) && (childrenStr.length() > 0)) {
+		if ((nodesStr != null) && (nodesStr.length() > 0)) {
 			result.append(">");
 			result.append("\n");
-			result.append(childrenStr);
+			result.append(nodesStr);
 			result.append("</").append(name).append(">");
 			result.append("\n");
 		} else {
@@ -826,9 +752,9 @@ public class Element
 			}
 		}
 
-		if (children != null && !children.isEmpty()) {
+		if (nodes != null && !nodes.isEmpty()) {
 			result.append(">");
-			childrenToStringSecure(result);
+			nodesToStringSecure(result);
 			result.append("</").append(name).append(">");
 		} else {
 			result.append("/>");
@@ -841,13 +767,10 @@ public class Element
 	public String cdataToString() {
 		StringBuilder result = new StringBuilder();
 
-		if (children != null) {
-			for (XMLNodeIfc child : children) {
-
-				// This is weird but if there is a bug in some other component
-				// it may add null children to the element, let's be save here.
-				if ((child != null) && (child instanceof CData)) {
-					result.append(child.toString());
+		if (nodes != null) {
+			for (XMLNodeIfc node : nodes) {
+				if (node instanceof CData) {
+					result.append(node.toString());
 				}
 			}
 		}

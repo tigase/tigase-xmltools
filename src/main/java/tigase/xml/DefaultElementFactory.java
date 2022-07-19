@@ -52,7 +52,7 @@ public class DefaultElementFactory
 				if (attributeName.isEmpty()) {
 					continue;
 				}
-				result.addAttribute(attributeName, attributeValueBuilder.toString());
+				result.setAttribute(attributeName, attributeValueBuilder.toString());
 			}
 		}
 		return result;
