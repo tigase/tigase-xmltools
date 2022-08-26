@@ -3,39 +3,42 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-26 03:50-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-08-26 22:53+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmltools-documentation/tigase-xmltools-documentation/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Overview.rst:2
 msgid "Overview"
-msgstr ""
+msgstr "概述"
 
 #: ../../Overview.rst:4
 msgid ""
 "Tigase XML Tools is a library providing support for fast and efficient "
 "parsing and working with XML documents."
-msgstr ""
+msgstr "Tigase XML Tools 是一个支持快速高效的解析和处理 XML 文档的库。"
 
 #: ../../Overview.rst:6
 msgid ""
 "It contains of many classes however three of them, described below, are "
 "the most important."
-msgstr ""
+msgstr "它包含许多类，但其中三个（如下所述）是最重要的。"
 
 #: ../../Overview.rst:9
 msgid "Element"
-msgstr ""
+msgstr "元素"
 
 #: ../../Overview.rst:11
 msgid ""
@@ -45,6 +48,9 @@ msgid ""
 "only single thread will work on particular instance of the ``Element`` "
 "class."
 msgstr ""
+"此类表示单个 XML 元素。包含元素名称、命名空间、属性和内部元素（如果有）。此类"
+"的实例是可变的且不同步的，因此需要确保只有单个线程才能处理 ``Element`` "
+"类的特定实例。"
 
 #: ../../Overview.rst:15
 msgid ""
@@ -54,84 +60,90 @@ msgid ""
 " instead of ``.eqauls()`` for comparison inside this methods which make "
 "this comparison faster."
 msgstr ""
+"名称包含 ``StaticStr`` 的方法要求传递的参数是静态字符串，"
+"这意味着字符串需要是静态的或 ``String::intern()`` 方法的结果。此要求是使用 "
+"``==`` 而不是 ``.eqauls()`` 在此方法中进行比较的结果，这使比较更快。"
 
 #: ../../Overview.rst:18
 msgid "Creating new instance"
-msgstr ""
+msgstr "创建新实例"
 
 #: ../../Overview.rst:20
 msgid ""
 "To create new element instance one of a few constructors may be used. "
 "Each of them require as a first argument the name of element."
-msgstr ""
+msgstr "要创建新的元素实例，可以使用几个构造函数之一。它们中的每一个都需要元素的名称"
+"作为第一个参数。"
 
 #: ../../Overview.rst:23
 msgid "Attributes"
-msgstr ""
+msgstr "属性"
 
 #: ../../Overview.rst:25
 msgid "Element attributes are easily accessing using one of following methods:"
-msgstr ""
+msgstr "使用以下方法之一可以轻松访问元素属性："
 
 #: ../../Overview.rst:28
 msgid "``String getAttributeStaticStr(String attName)``"
-msgstr ""
+msgstr "``String getAttributeStaticStr(String attName)``"
 
 #: ../../Overview.rst:28
 msgid ""
 "Method returns attribute value for passed attribute name. It will return "
 "``null`` if attribute is not set."
-msgstr ""
+msgstr "方法返回传递的属性名称的属性值。如果未设置属性，它将返回 ``null``。"
 
 #: ../../Overview.rst:31
 msgid "``Map<String, String> getAttributes()``"
-msgstr ""
+msgstr "``Map<String, String> getAttributes()``"
 
 #: ../../Overview.rst:31
 msgid "Method returns a map of attributes which are set for this XML element."
-msgstr ""
+msgstr "方法返回为此 XML 元素设置的属性映射。"
 
 #: ../../Overview.rst:33
 msgid "You may easily modify attribute values by using one of following methods:"
-msgstr ""
+msgstr "您可以使用以下方法之一轻松修改属性值："
 
 #: ../../Overview.rst:36
 msgid "``void setAttribute(String key, String value)``"
-msgstr ""
+msgstr "``void setAttribute(String key, String value)``"
 
 #: ../../Overview.rst:36
 msgid ""
 "Set value for the attribute. Does not support ``null`` value. To remove a"
 " value for attribute, you need to use ``removeAttribute()`` method."
-msgstr ""
+msgstr "设置属性的值。不支持 ``null`` 值。要删除属性的值，您需要使用 "
+"``removeAttribute()`` 方法。"
 
 #: ../../Overview.rst:39
 msgid "``void setAttributes(Map<String, String> newAttributes)``"
-msgstr ""
+msgstr "``void setAttributes(Map<String, String> newAttributes)``"
 
 #: ../../Overview.rst:39
 msgid ""
 "Sets attributes for element to attribute and values passed in provided "
 "map."
-msgstr ""
+msgstr "将元素的属性设置为在提供的映射中传递的属性和值。"
 
 #: ../../Overview.rst:42
 msgid "``void removeAttribute(String key)``"
-msgstr ""
+msgstr "``void removeAttribute(String key)``"
 
 #: ../../Overview.rst:42
 msgid "Removes attribute and its value from element attributes."
-msgstr ""
+msgstr "从元素属性中删除属性及其值。"
 
 #: ../../Overview.rst:45
 msgid "Children"
-msgstr ""
+msgstr "Children"
 
 #: ../../Overview.rst:47
 msgid ""
 "Each instance of the ``Element`` class may contain elements inside it "
 "(inner elements) named here children. To access them you may call:"
-msgstr ""
+msgstr "``Element`` 类的每个实例都可能包含其中的元素（内部元素），这里命名为 "
+"children。要访问它们，您可以调用："
 
 #: ../../Overview.rst:50
 msgid ""
@@ -139,24 +151,27 @@ msgid ""
 "String child_xmlns)``; \\ ``Element getChildStaticStr(String name)``; \\ "
 "``Element getChildStaticStr(String name, String child_xmlns)``"
 msgstr ""
+"``Element getChild(String name)``; \\ ``Element getChild(String name, String "
+"child_xmlns)``; \\ ``Element getChildStaticStr(String name)``; \\ ``Element "
+"getChildStaticStr(String name, String child_xmlns)``"
 
 #: ../../Overview.rst:50
 msgid "Returns a child element or ``null``"
-msgstr ""
+msgstr "返回一个子元素或 ``null``"
 
 #: ../../Overview.rst:53
 msgid "``List<Element> getChildren()``"
-msgstr ""
+msgstr "``List<Element> getChildren()``"
 
 #: ../../Overview.rst:53
 msgid "Returns a list of children elements or ``null``"
-msgstr ""
+msgstr "返回子元素列表或 ``null``"
 
 #: ../../Overview.rst:57
 msgid ""
 "Each of this methods may return a null if there is no child matching "
 "requirements."
-msgstr ""
+msgstr "如果没有 child匹配要求，则这些方法中的每一个都可能返回 null。"
 
 #: ../../Overview.rst:59
 msgid ""
@@ -166,10 +181,13 @@ msgid ""
 "``Element`` which you want to removed and call ``boolean "
 "removeChild(Element child)``."
 msgstr ""
+"要将元素添加为元素的子元素，请调用 ``void addChild(XMLNodeIfc child)`` 或 ``"
+"void addChildren(List<Element> children)``。要删除元素，您需要检索想要删除的 "
+"``Element`` 实例并调用 ``boolean removeChild(Element child)``。"
 
 #: ../../Overview.rst:62
 msgid "Value"
-msgstr ""
+msgstr "值"
 
 #: ../../Overview.rst:64
 msgid ""
@@ -177,10 +195,12 @@ msgid ""
 "you need to call ``String getCData()`` and to set elements value ``void "
 "setCData(String argCData)``."
 msgstr ""
+"在 XML 中，每个元素都可能有赋值。要检索元素值，您需要调用 ``String "
+"getCData()`` 并设置元素值 ``void setCData(String argCData)``。"
 
 #: ../../Overview.rst:68
 msgid "DomBuilderHandler"
-msgstr ""
+msgstr "DomBuilderHandler"
 
 #: ../../Overview.rst:70
 msgid ""
@@ -188,47 +208,50 @@ msgid ""
 "responsible for creation of elements and building XML trees in response "
 "to its method calls made by ``SimpleParser`` (XML parser)."
 msgstr ""
+"这个类是 ``SimpleHandler`` 接口的一个实现，它负责创建元素和构建XML树以响应由 "
+"``SimpleParser`` （XML解析器）进行的方法调用。"
 
 #: ../../Overview.rst:73
 msgid "SimpleParser"
-msgstr ""
+msgstr "SimpleParser"
 
 #: ../../Overview.rst:75
 msgid ""
 "It is an implementation of a XML parser which is responsible for parsing "
 "provided array of chars and calling instance of ``SimpleHandler`` to "
 "react on element being read, etc."
-msgstr ""
+msgstr "它是一个 XML 解析器的实现，它负责解析提供的字符数组并调用 ``SimpleHandler`` "
+"的实例以对正在读取的元素做出反应等。"
 
 #: ../../Usage.rst:2
 msgid "Usage"
-msgstr ""
+msgstr "用法"
 
 #: ../../Usage.rst:5
 msgid "Parsing XML"
-msgstr ""
+msgstr "解析 XML"
 
 #: ../../Usage.rst:35
 msgid "Creating elements tree"
-msgstr ""
+msgstr "创建元素树"
 
 #: ../../Usage.rst:37
 msgid ""
 "Creating ``message`` element with ``body`` inner element. Body element "
 "will contain a value ``Test``."
-msgstr ""
+msgstr "使用 ``body`` 内部元素创建 ``message`` 元素。正文元素将包含一个值 ``Test``。"
 
 #: ../../Usage.rst:39 ../../Usage.rst:63
 msgid "**Example.**"
-msgstr ""
+msgstr "**例子。**"
 
 #: ../../Usage.rst:52 ../../Usage.rst:81
 msgid "**Result.**"
-msgstr ""
+msgstr "**结果。**"
 
 #: ../../Usage.rst:59
 msgid "Modifying elements"
-msgstr ""
+msgstr "修改元素"
 
 #: ../../Usage.rst:61
 msgid ""
@@ -236,18 +259,21 @@ msgid ""
 "previous example. Now we will set ``message`` attribute ``id`` to ``1``, "
 "remove ``body`` inner element and add new element ``test``."
 msgstr ""
+"在 ``messageElem`` 变量中，我们在前面的示例中创建了一个消息元素。现在我们将 "
+"``message`` 属性 ``id`` 设置为 ``1``，删除 ``body`` 内部元素并添加新元素 "
+"``test``。"
 
 #: ../../Usage.rst:88
 msgid "Serializing to XML"
-msgstr ""
+msgstr "序列化为 XML"
 
 #: ../../Usage.rst:90
 msgid ""
 "To serialize an element and its subelements to ``String`` you need to "
 "call its ``toString()`` method which will return serialized element."
-msgstr ""
+msgstr "要将元素及其子元素序列化为 ``String``，您需要调用其 ``toString()`` "
+"方法，该方法将返回序列化的元素。"
 
 #: ../../index.rst:4
 msgid "Tigase XML Tools - Version 4.2.0"
-msgstr ""
-
+msgstr "Tigase XML 工具 - 版本 4.2.0"
