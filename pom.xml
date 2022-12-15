@@ -5,7 +5,7 @@
     <parent>
         <groupId>tigase</groupId>
         <artifactId>tigase-projects-parent</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.5</version>
         <relativePath />
     </parent>
 
@@ -18,7 +18,7 @@
     </properties>
 
     <artifactId>tigase-xmltools</artifactId>
-    <version>4.2.0-SNAPSHOT</version>
+    <version>4.2.0</version>
     <packaging>bundle</packaging>
 
     <name>Tigase XML Tools</name>
@@ -49,7 +49,7 @@
         <connection>scm:git:${scm_repo_base}/${project.artifactId}.git</connection>
         <developerConnection>scm:git:${scm_repo_base}/${project.artifactId}.git</developerConnection>
         <url>${scm_repo_base}/${project.artifactId}</url>
-        <tag>HEAD</tag>
+        <tag>tigase-xmltools-4.2.0</tag>
     </scm>
 
     <build>
@@ -68,7 +68,7 @@
         </plugins>
     </build>
 
-    <dependencies></dependencies>
+    <dependencies />
 
     <repositories>
         <repository>
