@@ -1,4 +1,7 @@
-version: 16
+version: 25
+imports:
+- projectPath: Templates
+  revision: 0.0.1
 jobs:
 - name: maven ci
   steps:
@@ -14,10 +17,8 @@ jobs:
     image: maven:3-eclipse-temurin-17
     interpreter: !DefaultInterpreter
       commands:
-      - echo "Detecting project version (may require some time while downloading maven
-        dependencies)..."
-      - echo $(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version
-        -q -DforceStdout) > buildVersion
+      - echo "Detecting project version (may require some time while downloading maven dependencies)..."
+      - echo $(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout) > buildVersion
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !SetBuildVersionStep
@@ -31,8 +32,7 @@ jobs:
     interpreter: !DefaultInterpreter
       commands:
       - mvn -version
-      - mvn -Dmaven.deploy.username=jenkins -Dmaven.deploy.password=@secrets:maven-deploy-password@
-        clean test deploy
+      - mvn -Dmaven.deploy.username=jenkins -Dmaven.deploy.password=@secrets:maven-deploy-password@ clean test deploy
     useTTY: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   triggers:
@@ -40,8 +40,6 @@ jobs:
   retryCondition: never
   maxRetries: 3
   retryDelay: 30
-  cpuRequirement: 250
-  memoryRequirement: 256
   caches:
   - key: maven-cache
     path: /root/.m2/repository
@@ -52,12 +50,24 @@ jobs:
     name: Push to GitHub
     remoteUrl: https://github.com/tigase/tigase-xmltools.git
     passwordSecret: access-token
-    withLfs: false
     force: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   retryCondition: never
   maxRetries: 3
   retryDelay: 30
-  cpuRequirement: 250
-  memoryRequirement: 256
+  timeout: 3600
+- name: Maven CI
+  steps:
+  - !UseTemplateStep
+    name: maven build & deploy
+    templateName: Tigase Server - Maven build & deploy
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger {}
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  caches:
+  - key: maven-cache
+    path: /root/.m2/repository
   timeout: 3600
