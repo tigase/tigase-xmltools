@@ -19,9 +19,6 @@ package tigase.xml;
 
 import tigase.xml.annotations.TODO;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.Reader;
 import java.util.Arrays;
 
 /**
@@ -69,22 +66,25 @@ public class SimpleParser {
 	private static final char[] QUOTES = {SINGLE_QUOTE, DOUBLE_QUOTE};
 	private static final char[] WHITE_CHARS = {SPACE, LF, CR, TAB};
 	private static final char[] END_NAME_CHARS = {CLOSE_BRACKET, SLASH, SPACE, TAB, LF, CR};
-	private static final char[] ERR_NAME_CHARS = {OPEN_BRACKET, QUESTION_MARK, AMP};
 	private static final char[] IGNORE_CHARS = {'\0'};
 	private static final boolean[] ALLOWED_CHARS_LOW = new boolean[0x20];
-
+	private static final boolean[] NAME_ALLOWED_CHARS;
+	private static final boolean[] NAME_ALLOWED_FIRST_CHAR;
 	static {
+		NAME_ALLOWED_CHARS = new boolean[0xC0];
+		NAME_ALLOWED_FIRST_CHAR = new boolean[0xC0];
+		for (char c = 0; c<0xC0; c++) {
+			NAME_ALLOWED_FIRST_CHAR[c] = isAlpha(c) || c == ':' || c == '_';
+			NAME_ALLOWED_CHARS[c] = NAME_ALLOWED_FIRST_CHAR[c] || isNumeric(c) || c == '-' || c == '.' || c == 0xB7;
+		}
 
-		// Arrays.sort(WHITE_CHARS);
-		Arrays.sort(IGNORE_CHARS);
-	}
-
-	static {
 		ALLOWED_CHARS_LOW[0x09] = true;
 		ALLOWED_CHARS_LOW[0x0A] = true;
 		ALLOWED_CHARS_LOW[0x0D] = true;
-	}
 
+		Arrays.sort(IGNORE_CHARS);
+	}
+	
 	public int ATTRIBUTES_NUMBER_LIMIT = 50;
 	/**
 	 * Variable constant <code>MAX_ATTRIBS_NUMBER</code> keeps value of maximum possible attributes number. Real XML
@@ -168,8 +168,7 @@ public class SimpleParser {
 
 						default:
 							if (Arrays.binarySearch(WHITE_CHARS, chr) < 0) {
-								if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) ||
-										(chr == ERR_NAME_CHARS[2])) {
+								if (!checkIsCharValidNameChar(chr, true)) {
 									parser_state.state = State.ERROR;
 									parser_state.errorMessage = "Not allowed character in start element name: " + chr;
 
@@ -214,7 +213,7 @@ public class SimpleParser {
 						break;
 					}    // end of if ()
 
-					if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
+					if (!checkIsCharValidNameChar(chr, false)) {
 						parser_state.state = State.ERROR;
 						parser_state.errorMessage = "Not allowed character in start element name: " + chr +
 								"\nExisting characters in start element name: " + parser_state.element_name.toString();
@@ -262,7 +261,7 @@ public class SimpleParser {
 						break;
 					}    // end of if ()
 
-					if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
+					if (!checkIsCharValidNameChar(chr, parser_state.element_name.isEmpty())) {
 						parser_state.state = State.ERROR;
 						parser_state.errorMessage = "Not allowed character in close element name: " + chr +
 								"\nExisting characters in close element name: " + parser_state.element_name.toString();
@@ -310,6 +309,16 @@ public class SimpleParser {
 					if (!isWhite(chr)) {
 						parser_state.state = State.ATTRIB_NAME;
 
+						if (!checkIsCharValidNameChar(chr, true)) {
+							parser_state.state = State.ERROR;
+							parser_state.errorMessage = "Not allowed character in element attribute name: " + chr +
+									"\nExisting characters in element attribute name: " +
+									(parser_state.attrib_names != null && parser_state.current_attr > -1
+									 ? parser_state.attrib_names[parser_state.current_attr].toString()
+									 : "");
+							break;
+						}
+
 						if (parser_state.attrib_names == null) {
 							parser_state.attrib_names = initArray(MAX_ATTRIBS_NUMBER);
 							parser_state.attrib_values = initArray(MAX_ATTRIBS_NUMBER);
@@ -318,7 +327,7 @@ public class SimpleParser {
 								if (parser_state.attrib_names.length >= ATTRIBUTES_NUMBER_LIMIT) {
 									parser_state.state = State.ERROR;
 									parser_state.errorMessage =
-											"Attributes nuber limit exceeded: " + ATTRIBUTES_NUMBER_LIMIT +
+											"Attributes number limit exceeded: " + ATTRIBUTES_NUMBER_LIMIT +
 													"\nreceived: " + parser_state.element_name.toString();
 									break;
 								} else {
@@ -346,7 +355,7 @@ public class SimpleParser {
 						break;
 					}    // end of if ()
 
-					if ((chr == ERR_NAME_CHARS[0]) || (chr == ERR_NAME_CHARS[1]) || (chr == ERR_NAME_CHARS[2])) {
+					if (!checkIsCharValidNameChar(chr, false)) {
 						parser_state.state = State.ERROR;
 						parser_state.errorMessage = "Not allowed character in element attribute name: " + chr +
 								"\nExisting characters in element attribute name: " +
@@ -604,7 +613,54 @@ public class SimpleParser {
 
 		handler.saveParserState(parser_state);
 	}
+	
+	protected boolean checkIsCharValidNameChar(char chr, boolean firstChar) {
+		if (chr < 0xC0) {
+			return firstChar ? NAME_ALLOWED_FIRST_CHAR[chr] : NAME_ALLOWED_CHARS[chr];
+		}
+		if (chr <= '\u1FFF') {
+			if (chr <= 0x2FF) {
+				return chr != 0xD7 && chr != 0xF7;
+			}
+			if (chr >= 0x370) {
+				return chr != 0x37E;
+			}
+			// it is the same as ((!firstChar) && chr >= 0x300 && chr <= 0x36F)
+			return !firstChar;
+		} else {
+			if (chr >= '\u200C' && chr <= '\u200D') {
+				return true;
+			} else if (chr >= 0x203F && chr <= 0x2040) {
+				return !firstChar;
+			} else if (chr >= '\u2070' && chr <= '\u218F') {
+				return true;
+			} else if (chr >= '\u2C00' && chr <= '\u2FEF') {
+				return true;
+			} else if (chr >= '\u3001' && chr <= '\uD7FF') {
+				return true;
+			} else if (chr >= '\uF900' && chr <= '\uFDCF') {
+				return true;
+			} else if (chr >= '\uFDF0' && chr <= '\uFFFD') {
+				return true;
+			} else if (Character.isHighSurrogate(chr)) {
+				// 0xEFFFF == 0xDB7F 0xDFFF
+				// 0xDB7F == MIN_HIGH_SURROGATE + 0x37F
+				int high = chr - Character.MIN_HIGH_SURROGATE;
+				return high <= 0x37F;
+			} else {
+				return Character.isLowSurrogate(chr);
+			}
+		}
+	}
 
+	protected static boolean isAlpha(char chr) {
+		return	(chr >= 'a' && chr <= 'z') || (chr >= 'A' && chr <= 'Z');
+	}
+
+	protected static boolean isNumeric(char chr) {
+		return chr >= '0' && chr <= '9';
+	}
+	
 	protected boolean checkIsCharValidInXML(ParserState parserState, char chr) {
 		boolean highSurrogate = parserState.highSurrogate;
 		parserState.highSurrogate = false;
