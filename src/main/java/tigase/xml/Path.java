@@ -17,8 +17,8 @@
  */
 package tigase.xml;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -44,7 +44,7 @@ public class Path {
 	 * @return
 	 * @throws PathFormatException
 	 */
-	public static @NotNull Path parse(@NotNull String text) throws PathFormatException {
+	public static @NonNull Path parse(@NonNull String text) throws PathFormatException {
 		Objects.requireNonNull(text, "String to parse as Path cannot be null!");
 		if (!text.startsWith("/")) {
 			throw new PathFormatException("Path cannot start without '/'");
@@ -73,7 +73,7 @@ public class Path {
 	 * @return
 	 * @throws PathFormatException
 	 */
-	public static @NotNull Path of(@NotNull String... matcherStrings) throws PathFormatException {
+	public static @NonNull Path of(@NonNull String... matcherStrings) throws PathFormatException {
 		ArrayList<ElementMatcher> matchers = new ArrayList<>();
 		for (String str : matcherStrings) {
 			matchers.add(ElementMatcher.parse(str));
@@ -87,11 +87,17 @@ public class Path {
 	 * @param matchers
 	 * @return
 	 */
-	public static @NotNull Path of(@NotNull ElementMatcher... matchers) {
+	public static @NonNull Path of(@NonNull ElementMatcher... matchers) {
 		if (matchers.length == 0) {
 			throw new IllegalArgumentException("At least 1 matcher is required!");
 		}
 		return new Path(matchers);
+	}
+
+	public static @NonNull Path nameAndXmlns(@NonNull String name, @NonNull String xmlns) {
+		return new Path(new ElementMatcher[]{
+				new ElementMatcher(name, xmlns, Collections.emptyList())
+		});
 	}
 
 	protected static class State {
@@ -112,7 +118,7 @@ public class Path {
 	 * @param element
 	 * @return
 	 */
-	public @Nullable Element evaluate(@NotNull Element element) {
+	public @Nullable Element evaluate(@NonNull Element element) {
 		Objects.requireNonNull(element, "Element cannot be null!");
 		Element el = element;
 		if (!matchers[0].test(el)) {
@@ -132,7 +138,7 @@ public class Path {
 	 * @param element
 	 * @return
 	 */
-	public @NotNull List<Element> evaluateAll(@NotNull Element element) {
+	public @NonNull List<Element> evaluateAll(@NonNull Element element) {
 		Objects.requireNonNull(element, "Element cannot be null!");
 		if (!matchers[0].test(element)) {
 			return Collections.emptyList();

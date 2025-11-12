@@ -17,8 +17,8 @@
  */
 package tigase.xml;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -34,7 +34,7 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @return
 	 * @throws Path.PathFormatException
 	 */
-	protected static @NotNull ElementMatcher parse(@NotNull Path.State state) throws Path.PathFormatException {
+	protected static @NonNull ElementMatcher parse(Path.@NonNull State state) throws Path.PathFormatException {
 		int slashIdx = state.text.indexOf('/');
 		int squareIdx = state.text.indexOf('[');
 		if (slashIdx == -1) {
@@ -73,7 +73,7 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @return
 	 * @throws Path.PathFormatException
 	 */
-	public static @NotNull ElementMatcher parse(@NotNull String text) throws Path.PathFormatException {
+	public static @NonNull ElementMatcher parse(@NonNull String text) throws Path.PathFormatException {
 		Path.State state = new Path.State(text);
 		return parse(state);
 	}
@@ -95,8 +95,8 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @param xmlns - to match or null
 	 * @param attributes - to match or empty list
 	 */
-	public ElementMatcher(@Nullable String name, @Nullable String xmlns, @NotNull List<Attribute> attributes) {
-		this(name, xmlns, attributes.toArray(Attribute[]::new));
+	public ElementMatcher(@Nullable String name, @Nullable String xmlns, @Nullable List<Attribute> attributes) {
+		this(name, xmlns, attributes != null ? attributes.toArray(Attribute[]::new) : new  Attribute[0]);
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @param name
 	 * @return
 	 */
-	public @NotNull ElementMatcher setName(@Nullable String name) {
+	public @NonNull ElementMatcher setName(@Nullable String name) {
 		this.name = name;
 		return this;
 	}
@@ -114,7 +114,7 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @param xmlns
 	 * @return
 	 */
-	public @NotNull ElementMatcher setXMLNS(@Nullable String xmlns) {
+	public @NonNull ElementMatcher setXMLNS(@Nullable String xmlns) {
 		this.xmlns = xmlns;
 		return this;
 	}
@@ -125,21 +125,21 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @param value - attribute value or null to accept any value
 	 * @return
 	 */
-	public @NotNull ElementMatcher addAttribute(@NotNull String name, @Nullable String value) {
+	public @NonNull ElementMatcher addAttribute(@NonNull String name, @Nullable String value) {
 		Objects.requireNonNull(name, "Attribute name cannot be null!");
 		attributes = Arrays.copyOf(attributes, attributes.length + 1);
 		attributes[attributes.length - 1] = new Attribute(name, value);
 		return this;
 	}
 
-	private ElementMatcher(@Nullable String name, @Nullable String xmlns, @NotNull Attribute[] attributes) {
+	private ElementMatcher(@Nullable String name, @Nullable String xmlns, @NonNull Attribute[] attributes) {
 		this.name = name;
 		this.xmlns = xmlns;
 		this.attributes = attributes;
 	}
 
 	@Override
-	public boolean test(@NotNull Element element) {
+	public boolean test(@NonNull Element element) {
 		if (name != null && !name.equals(element.getName())) {
 			return false;
 		}
@@ -226,9 +226,9 @@ public class ElementMatcher implements Predicate<Element> {
 	 * @param name
 	 * @param value
 	 */
-	public record Attribute(@NotNull String name, @Nullable String value) {
+	public record Attribute(@NonNull String name, @Nullable String value) {
 
-		protected static @NotNull Attribute parse(@NotNull Path.State state) throws Path.PathFormatException {
+		protected static @NonNull Attribute parse(Path.@NonNull State state) throws Path.PathFormatException {
 			if (!state.text.startsWith("[@") || state.text.length() < 2) {
 				throw new Path.PathFormatException("Invalid attribute format");
 			}

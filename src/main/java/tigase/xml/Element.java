@@ -17,8 +17,9 @@
  */
 package tigase.xml;
 
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import tigase.xml.annotations.TODO;
 
 import java.io.FileReader;
@@ -77,7 +78,7 @@ public class Element
 	protected static BiFunction<String, String, String> elementNameDeduplicationFn = List.of("message", "iq",
 																							 "presence", "query",
 																							 "pubsub", "body",
-																							 "stanza-id")
+																							 "stanza-id", "event")
 			.stream()
 			.collect(Collectors.toMap(Function.identity(), Function.identity()))::getOrDefault;
 
@@ -85,7 +86,7 @@ public class Element
 	// may be the same
 	protected static BiFunction<String, String, String> attributesDeduplicationFn = List.of("id", "name",
 																							ATTR_XMLNS_KEY, "from",
-																							"to")
+																							"to", "hash")
 			.stream()
 			.collect(Collectors.toMap(Function.identity(), Function.identity()))::getOrDefault;
 	// Map of attributes
@@ -170,16 +171,6 @@ public class Element
 	}
 
 	/**
-	 * Serialize subnodes
-	 */
-	public String nodesToString() {
-		StringBuilder result = new StringBuilder();
-		nodesToString(result);
-
-		return (result.length() > 0) ? result.toString() : null;
-	}
-
-	/**
 	 * Serialize subnodes to passed builder
 	 */
 	public void nodesToString(@NonNull StringBuilder result) {
@@ -197,28 +188,14 @@ public class Element
 	/**
 	 * Serialize subnodes as a formatted string
 	 */
-	public String nodesToStringPretty() {
-		StringBuilder result = new StringBuilder();
-
+	public void nodesToStringPretty(@NonNull StringBuilder result) {
 		if (nodes != null) {
 			for (XMLNodeIfc node : nodes) {
 				result.append(node.toStringPretty());
 			}
 		}
-
-		return (result.length() > 0) ? result.toString() : null;
 	}
-
-	/**
-	 * Serialize subnodes as a secure string
-	 */
-	public String nodesToStringSecure() {
-		StringBuilder result = new StringBuilder();
-		nodesToStringSecure(result);
-
-		return (result.length() > 0) ? result.toString() : null;
-	}
-
+	
 	/**
 	 * Serialize subnodes to passed builder as a secure string
 	 */
@@ -306,6 +283,23 @@ public class Element
 	 */
 	public @Nullable Element findChildAt(@NonNull Path path) {
 		return path.evaluate(this);
+	}
+
+	/**
+	 * Method returns first element which matches path
+	 */
+	public @Nullable Element findChildAt(@NonNull Predicate<Element> predicate, @NonNull Predicate<Element>... path) {
+		Element child = findChild(predicate);
+		if (child == null) {
+			return null;
+		}
+		for (Predicate<Element> pathPredicate : path) {
+			child = child.findChild(pathPredicate);
+			if (child == null) {
+				return null;
+			}
+		}
+		return child;
 	}
 
 	/**
@@ -496,58 +490,93 @@ public class Element
 		modifier.accept(this);
 		return this;
 	}
+	
 
-	/**
-	 * Method applies function against each child of the element and returns list of non-null return values
-	 */
-	public <R> @NonNull List<R> compactMapChildren(@NonNull Function<Element, ? extends R> mapper) {
-		if (nodes != null) {
-			LinkedList<R> result = new LinkedList<R>();
-			forEachChild(el -> {
-				R val = mapper.apply(el);
-				if (val != null) {
-					result.add(val);
-				}
-			});
+	private static class ElementMapperHelper {
+		
+		protected static <X> List<X> toList(Consumer<Consumer<X>> consumer) {
+			ArrayList<X> result = new ArrayList<X>();
+			consumer.accept(result::add);
 			return result;
 		}
 
-		return Collections.emptyList();
+		protected static <X,Y> Consumer<Y> map(@NonNull Function<Y, ? extends X> mapper, @NonNull Consumer<X> consumer) {
+			return el -> consumer.accept(mapper.apply(el));
+		}
+
+		protected static <X> Consumer<X> filter(@NonNull Predicate<X> predicate, @NonNull Consumer<X> consumer) {
+			return it -> {
+				if (predicate.test(it)) {
+					consumer.accept(it);
+				}
+			};
+		}
+		
 	}
 
 	/**
-	 * Method executes function passing each child and then combining returned lists of results in a single list
+	 * Method transforms first child element matching predicate
 	 */
-	// FIXME: I'm not sure if this should still be here
-	public <R> @NonNull List<R> flatMapChildren(@NonNull Function<Element, Collection<? extends R>> mapper) {
-		if (nodes != null) {
-			LinkedList<R> result = new LinkedList<R>();
-			forEachChild(el -> result.addAll(mapper.apply(el)));
-			return result;
+	public <R> R mapChild(@NonNull Predicate<Element> predicate, @NonNull Function<Element, R> mapper) {
+		Element child = findChild(predicate);
+		if (child == null) {
+			return null;
 		}
-
-		return Collections.emptyList();
+		return mapper.apply(child);
 	}
 
 	/**
 	 * Method applies function against each child of the element and returns list results
 	 */
 	public <R> @NonNull List<R> mapChildren(@NonNull Function<Element, ? extends R> mapper) {
-		if (nodes != null) {
-			LinkedList<R> result = new LinkedList<R>();
-			forEachChild(el -> result.add(mapper.apply(el)));
-			return result;
-		}
-
-		return Collections.emptyList();
+		return mapChildren(null, mapper, null);
 	}
 
-	private void forEachChild(Consumer<Element> consumer) {
+	/**
+	 * Method applies function against each child of the element and returns list results
+	 */
+	public <R> @NonNull List<R> mapChildren(@NonNull Predicate<Element> predicate, @NonNull Function<Element, ? extends R> mapper) {
+		return mapChildren(predicate, mapper, null);
+	}
+	
+	/**
+	 * Method applies function against each child of the element and returns list of non-null return values
+	 */
+	public <R> @NotNull List<R> compactMapChildren(@NonNull Function<Element, ? extends R> mapper) {
+		return mapChildren(null, mapper, Objects::nonNull);
+	}
+
+	/**
+	 * Method applies function against each child of the element and returns list of non-null return values
+	 */
+	public <R> @NotNull List<R> compactMapChildren(@Nullable Predicate<Element> predicate, @NonNull Function<Element, ? extends R> mapper) {
+		return mapChildren(predicate, mapper, Objects::nonNull);
+	}
+
+	/**
+	 * Method applied filtering and transformation for child elements (used internally)
+	 */
+	private <R> @NotNull List<R> mapChildren(@Nullable Predicate<Element> predicate, @NonNull Function<Element, ? extends R> mapper, @Nullable Predicate<R> elementPredicate) {
+		return ElementMapperHelper.toList(consumer -> {
+			var mappingConsumer = ElementMapperHelper.map(mapper, elementPredicate == null ? consumer : ElementMapperHelper.filter(elementPredicate, consumer));
+			forEachChild(predicate == null ? mappingConsumer : ElementMapperHelper.filter(predicate, mappingConsumer));
+		});
+	}
+
+	public void forEachChild(Consumer<Element> consumer) {
 		for (XMLNodeIfc node : nodes) {
 			if (node instanceof Element) {
 				consumer.accept((Element) node);
 			}
 		}
+	}
+
+	public void forEachChild(@NonNull Predicate<Element> predicate, Consumer<Element> consumer) {
+		forEachChild(child -> {
+			if (predicate.test(child)) {
+				consumer.accept(child);
+			}
+		});
 	}
 
 	/**
@@ -688,12 +717,10 @@ public class Element
 			}
 		}
 
-		String nodesStr = nodesToStringPretty();
-
-		if ((nodesStr != null) && (nodesStr.length() > 0)) {
+		if (nodes != null && !nodes.isEmpty()) {
 			result.append(">");
 			result.append("\n");
-			result.append(nodesStr);
+			nodesToString(result);
 			result.append("</").append(name).append(">");
 			result.append("\n");
 		} else {
