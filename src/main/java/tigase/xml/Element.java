@@ -44,16 +44,24 @@ import java.util.function.Function;
 public class Element
 		implements XMLNodeIfc<Element> {
 
+	@Deprecated
 	protected XMLIdentityHashMap<String, String> attributes = null;
 
+	@Deprecated
 	protected LinkedList<XMLNodeIfc> children = null;
 
 	// protected String cdata = null;
 
+	// Deprecated due to change of access to private
+	@Deprecated
 	protected String defxmlns = null;
 
+	// Deprecated due to change of access to private
+	@Deprecated
 	protected String name = null;
 
+	// Deprecated due to change of access to private
+	@Deprecated
 	protected String xmlns = null;
 
 	public static void main(String[] args) throws Exception {
@@ -93,10 +101,15 @@ public class Element
 		this.children = src.children;
 	}
 
+	@Deprecated
 	public Element(String argName) {
 		setName(argName);
 	}
 
+	/**
+	 * @deprecated use {@link #Element(java.lang.String) } instead.
+	 */
+	@Deprecated
 	public Element(String argName, String argCData) {
 		setName(argName);
 		if (argCData != null) {
@@ -104,6 +117,10 @@ public class Element
 		}
 	}
 
+	/**
+	 * @deprecated use {@link #Element(java.lang.String) } instead.
+	 */
+	@Deprecated
 	public Element(String argName, String[] att_names, String[] att_values) {
 		setName(argName);
 		if (att_names != null) {
@@ -111,6 +128,10 @@ public class Element
 		}
 	}
 
+	/**
+	 * @deprecated use {@link #Element(java.lang.String) } instead.
+	 */
+	@Deprecated
 	public Element(String argName, Element[] children, String[] att_names, String[] att_values) {
 		setName(argName);
 		if (att_names != null) {
@@ -119,6 +140,10 @@ public class Element
 		addChildren(Arrays.asList(children));
 	}
 
+	/**
+	 * @deprecated use {@link #Element(java.lang.String) } instead.
+	 */
+	@Deprecated
 	public Element(String argName, String argCData, String[] att_names, String[] att_values) {
 		setName(argName);
 		if (argCData != null) {
@@ -129,6 +154,10 @@ public class Element
 		}
 	}
 
+	/**
+	 * @deprecated use {@link #Element(java.lang.String) } instead.
+	 */
+	@Deprecated
 	public Element(String argName, String argCData, StringBuilder[] att_names, StringBuilder[] att_values) {
 		setName(argName);
 		if (argCData != null) {
@@ -139,10 +168,15 @@ public class Element
 		}
 	}
 
+	/**
+	 * @deprecated use {@link #setAttribute(String, String)} } instead.
+	 */
+	@Deprecated
 	public void addAttribute(String attName, String attValue) {
 		setAttribute(attName, attValue);
 	}
 
+	@Deprecated
 	public void addAttributes(Map<String, String> attrs) {
 		if (attributes == null) {
 			attributes = new XMLIdentityHashMap<String, String>(attrs.size());
@@ -156,6 +190,8 @@ public class Element
 		addChild(new CData(argCData));
 	}
 
+	// Deprecated due to change of parameter type from XMLNodeIfc to Element
+	@Deprecated
 	public void addChild(XMLNodeIfc child) {
 		if (child == null) {
 			throw new NullPointerException("Element child can not be null.");
@@ -183,6 +219,7 @@ public class Element
 		// Collections.sort(children);
 	}
 
+	@Deprecated
 	public String childrenToString() {
 		StringBuilder result = new StringBuilder();
 		childrenToString(result);
@@ -190,6 +227,7 @@ public class Element
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
+	@Deprecated
 	public void childrenToString(StringBuilder result) {
 		if (children != null) {
 			for (XMLNodeIfc child : children) {
@@ -207,6 +245,7 @@ public class Element
 		}
 	}
 
+	@Deprecated
 	public String childrenToStringPretty() {
 		StringBuilder result = new StringBuilder();
 
@@ -224,6 +263,7 @@ public class Element
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
+	@Deprecated
 	public String childrenToStringSecure() {
 		StringBuilder result = new StringBuilder();
 		childrenToStringSecure(result);
@@ -231,6 +271,7 @@ public class Element
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
+	@Deprecated
 	public void childrenToStringSecure(StringBuilder result) {
 		if (children != null) {
 			for (XMLNodeIfc child : children) {
@@ -272,6 +313,7 @@ public class Element
 		return result;
 	}
 
+	@Deprecated
 	@Override
 	public int compareTo(Element elem) {
 		return toStringNoChildren().compareTo(elem.toStringNoChildren());
@@ -288,6 +330,7 @@ public class Element
 		return false;
 	}
 
+	@Deprecated
 	public Element findChildStaticStr(String[] elementPath) {
 		if (elementPath[0] != getName()) {
 			return null;
@@ -305,6 +348,7 @@ public class Element
 		return child;
 	}
 
+	@Deprecated
 	public Element findChild(String[] elemPath) {
 		if (elemPath[0].isEmpty()) {
 			elemPath = Arrays.copyOfRange(elemPath, 1, elemPath.length);
@@ -335,6 +379,7 @@ public class Element
 		return findChild(elementPath.split("/"));
 	}
 
+	@Deprecated
 	public Element findChild(Matcher<Element> matcher) {
 		if (children != null) {
 			for (XMLNodeIfc node : children) {
@@ -352,6 +397,7 @@ public class Element
 		return null;
 	}
 
+	@Deprecated
 	public List<Element> findChildren(Matcher<Element> matcher) {
 		if (children != null) {
 			LinkedList<Element> result = new LinkedList<Element>();
@@ -373,6 +419,7 @@ public class Element
 		return null;
 	}
 
+	@Deprecated
 	public <R> List<R> flatMapChildren(Function<Element, Collection<? extends R>> mapper) {
 		if (children != null) {
 			LinkedList<R> result = new LinkedList<R>();
@@ -392,6 +439,7 @@ public class Element
 		return null;
 	}
 
+	
 	public void forEachChild(Consumer<Element> consumer) {
 		if (children != null) {
 			for (XMLNodeIfc node : children) {
@@ -405,10 +453,6 @@ public class Element
 		}
 	}
 
-	/**
-	 * @deprecated use {@link #getAttributeStaticStr(java.lang.String) } instead.
-	 */
-	@Deprecated
 	public String getAttribute(String attName) {
 		if (attributes != null) {
 			return attributes.get(attName.intern());
@@ -432,6 +476,7 @@ public class Element
 		return result;
 	}
 
+	@Deprecated
 	public String getChildAttributeStaticStr(String childName, String attName) {
 		String result = null;
 		Element child = getChild(childName);
@@ -443,6 +488,7 @@ public class Element
 		return result;
 	}
 
+	@Deprecated
 	public String getAttributeStaticStr(String attName) {
 		if (attributes != null) {
 			return attributes.get(attName);
@@ -451,9 +497,6 @@ public class Element
 		return null;
 	}
 
-	/**
-	 * @deprecated use  {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) } instead.
-	 */
 	@Deprecated
 	public String getAttribute(String elementPath, String att_name) {
 		Element child = findChild(elementPath);
@@ -461,9 +504,6 @@ public class Element
 		return (child != null) ? child.getAttribute(att_name) : null;
 	}
 
-	/**
-	 * @deprecated {@link #getAttributeStaticStr(java.lang.String[], java.lang.String) } instead.
-	 */
 	@Deprecated
 	public String getAttribute(String[] elementPath, String att_name) {
 		Element child = findChild(elementPath);
@@ -471,6 +511,7 @@ public class Element
 		return (child != null) ? child.getAttribute(att_name) : null;
 	}
 
+	@Deprecated
 	public String getAttributeStaticStr(String[] elementPath, String att_name) {
 		Element child = findChildStaticStr(elementPath);
 
@@ -498,10 +539,12 @@ public class Element
 		return getChildCData(elementPath);
 	}
 
+	@Deprecated
 	public String getCData(String[] elementPath) {
 		return getChildCData(elementPath);
 	}
 
+	@Deprecated
 	public String getCDataStaticStr(String[] elementPath) {
 		return getChildCDataStaticStr(elementPath);
 	}
@@ -527,6 +570,7 @@ public class Element
 		addChild(new CData(argCData));
 	}
 
+	@Deprecated
 	public Element getChild(String name) {
 		if (children != null) {
 			for (XMLNodeIfc el : children) {
@@ -543,6 +587,7 @@ public class Element
 		return null;
 	}
 
+	@Deprecated
 	public Element getChildStaticStr(String name) {
 		if (children != null) {
 			for (XMLNodeIfc el : children) {
@@ -559,6 +604,7 @@ public class Element
 		return null;
 	}
 
+	@Deprecated
 	public Element getChild(String name, String child_xmlns) {
 		if (child_xmlns == null) {
 			return getChild(name);
@@ -579,6 +625,7 @@ public class Element
 		return null;
 	}
 
+	@Deprecated
 	public Element getChildStaticStr(String name, String child_xmlns) {
 		if (child_xmlns == null) {
 			return getChildStaticStr(name);
@@ -608,18 +655,21 @@ public class Element
 		return (child != null) ? child.getCData() : null;
 	}
 
+	@Deprecated
 	public String getChildCData(String[] elementPath) {
 		Element child = findChild(elementPath);
 
 		return (child != null) ? child.getCData() : null;
 	}
 
+	@Deprecated
 	public String getChildCDataStaticStr(String[] elementPath) {
 		Element child = findChildStaticStr(elementPath);
 
 		return (child != null) ? child.getCData() : null;
 	}
 
+	@Deprecated
 	public String getChildCData(Matcher<Element> matcher) {
 		Element child = findChild(matcher);
 
@@ -661,18 +711,21 @@ public class Element
 		return (child != null) ? child.getChildren() : null;
 	}
 
+	@Deprecated
 	public List<Element> getChildren(String[] elementPath) {
 		Element child = findChild(elementPath);
 
 		return (child != null) ? child.getChildren() : null;
 	}
 
+	@Deprecated
 	public List<Element> getChildrenStaticStr(String[] elementPath) {
 		Element child = findChildStaticStr(elementPath);
 
 		return (child != null) ? child.getChildren() : null;
 	}
 
+	@Deprecated
 	public List<Element> getChildren(Matcher<Element> matcher) {
 		Element child = findChild(matcher);
 
@@ -716,12 +769,14 @@ public class Element
 		return (child != null) ? child.getXMLNS() : null;
 	}
 
+	@Deprecated
 	public String getXMLNS(String[] elementPath) {
 		Element child = findChild(elementPath);
 
 		return (child != null) ? child.getXMLNS() : null;
 	}
 
+	@Deprecated
 	public String getXMLNSStaticStr(String[] elementPath) {
 		Element child = findChildStaticStr(elementPath);
 
@@ -741,6 +796,7 @@ public class Element
 		return mapChildren(null, mapper);
 	}
 
+	@Deprecated
 	public <R> List<R> mapChildren(Matcher<Element> matcher, Function<Element, ? extends R> mapper) {
 		if (children != null) {
 			LinkedList<R> result = new LinkedList<R>();
@@ -762,6 +818,7 @@ public class Element
 		return null;
 	}
 
+	@Deprecated
 	public boolean matches(Matcher<Element> matcher) {
 		return matcher.match(this);
 	}
@@ -804,6 +861,7 @@ public class Element
 		attributes.put(k, v);
 	}
 
+	@Deprecated
 	public void setAttributes(StringBuilder[] names, StringBuilder[] values) {
 		attributes = new XMLIdentityHashMap<String, String>(names.length);
 		for (int i = 0; i < names.length; i++) {
@@ -815,6 +873,7 @@ public class Element
 		}
 	}
 
+	@Deprecated
 	public void setAttributes(String[] names, String[] values) {
 		attributes = new XMLIdentityHashMap<String, String>(names.length);
 		for (int i = 0; i < names.length; i++) {
@@ -826,6 +885,7 @@ public class Element
 		}
 	}
 
+	@Deprecated
 	public void setDefXMLNS(String ns) {
 		defxmlns = ns.intern();
 	}
@@ -932,15 +992,18 @@ public class Element
 		}
 	}
 
+	@Deprecated
 	public Element withAttribute(String attName, String attValue) {
 		setAttribute(attName, attValue);
 		return this;
 	}
 
+	@Deprecated
 	public Element withElement(String name, Consumer<Element> consumer) {
 		return withElement(name, null, consumer);
 	}
 
+	@Deprecated
 	public Element withElement(String name, String xmlns, String cdata) {
 		Element el = new Element(name);
 		if (xmlns != null) {
@@ -953,6 +1016,7 @@ public class Element
 		return this;
 	}
 
+	@Deprecated
 	public Element withElement(String name, String xmlns, Consumer<Element> consumer) {
 		Element el = new Element(name);
 		if (xmlns != null) {
@@ -980,12 +1044,17 @@ public class Element
 		return (result.length() > 0) ? result.toString() : null;
 	}
 
+	/**
+	 * @deprecated replaced with usage of Predicate
+	 */
+	@Deprecated
 	public static interface Matcher<T> {
 
 		boolean match(T item);
 
 	}
 
+	@Deprecated
 	protected class XMLIdentityHashMap<K, V>
 			extends IdentityHashMap<K, V> {
 
