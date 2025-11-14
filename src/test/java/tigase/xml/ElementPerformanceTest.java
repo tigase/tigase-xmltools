@@ -111,13 +111,6 @@ public class ElementPerformanceTest {
 		blackhole.consume(test);
 	}
 
-	@Benchmark
-	@Measurement(iterations = 1000)
-	@BenchmarkMode(Mode.Throughput)
-	public void benchmarkElementWithAttributesCreationMixedStatic(Blackhole blackhole) {
-		blackhole.consume(new Element("test").setAttributes(ATTRIBUTE_NAMES,ATTRIBUTE_NAMES));
-	}
-
 	private static final Map<String,String> ATTRIBUTES_MAP = Map.of("id", "id", "name", "name", "from", "from", "to", "to", "xmlns", "xmlns");
 	@Benchmark
 	@Measurement(iterations = 1000)

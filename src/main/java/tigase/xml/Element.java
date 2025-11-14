@@ -73,6 +73,8 @@ public class Element
 	// static reference to make things faster
 	private static final String ATTR_XMLNS_KEY = "xmlns";
 
+	private static final Map<String,String> ATTRIBUTES_EMPTY = Collections.emptyMap();
+
 	// Function used for deduplication of element names to reduce memory usage when a lot of elements may contain
 	// the same name
 	protected static BiFunction<String, String, String> elementNameDeduplicationFn = List.of("message", "iq",
@@ -90,7 +92,7 @@ public class Element
 			.stream()
 			.collect(Collectors.toMap(Function.identity(), Function.identity()))::getOrDefault;
 	// Map of attributes
-	private Map<String, String> attributes = null;
+	private @NonNull Map<String, String> attributes = Collections.emptyMap();
 
 	// List of nodes (Element or CData)
 	private List<XMLNodeIfc> nodes = null;
@@ -107,7 +109,7 @@ public class Element
 	 * - the same instances will be added to the new copy).
 	 */
 	public Element(@NonNull Element src) {
-		if (src.attributes != null) {
+		if (!src.attributes.isEmpty()) {
 			this.attributes = new HashMap<>(src.attributes);
 		}
 		this.name = src.name;
@@ -221,25 +223,12 @@ public class Element
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Element)) {
+		if (!(obj instanceof Element elem)) {
 			return false;
 		}
-		Element elem = (Element) obj;
+
 		if (Objects.equals(getName(), elem.getName()) && Objects.equals(getXMLNS(), elem.getXMLNS())) {
-			if ((attributes == null || attributes.isEmpty()) == (elem.attributes == null || attributes.isEmpty())) {
-				if (attributes != null && !attributes.isEmpty()) {
-					for (Map.Entry<String, String> entry : attributes.entrySet()) {
-						if (!Objects.equals(entry.getValue(), elem.getAttribute(entry.getKey()))) {
-							return false;
-						}
-					}
-					return true;
-				} else {
-					return true;
-				}
-			} else {
-				return false;
-			}
+			return Objects.equals(attributes, elem.attributes);
 		}
 		return false;
 	}
@@ -330,11 +319,7 @@ public class Element
 	 * Method returns value of the attribute
 	 */
 	public @Nullable String getAttribute(String name) {
-		if (attributes != null) {
-			return attributes.get(name);
-		}
-
-		return null;
+		return attributes.get(name);
 	}
 
 	/**
@@ -352,7 +337,7 @@ public class Element
 	 * Method returns copy of all attributes
 	 */
 	public @NonNull Map<String, String> getAttributes() {
-		return ((attributes != null) ? Collections.unmodifiableMap(attributes) : Collections.emptyMap());
+		return (attributes != ATTRIBUTES_EMPTY) ? Collections.unmodifiableMap(attributes) : ATTRIBUTES_EMPTY;
 	}
 
 	/**
@@ -364,19 +349,6 @@ public class Element
 		this.attributes = new HashMap<>(attributes.size());
 		for (Map.Entry<String, String> entry : attributes.entrySet()) {
 			setAttribute(entry.getKey(), entry.getValue());
-		}
-		return this;
-	}
-
-	/**
-	 * Method replaces all attributes with provided name-value pair.
-	 * Length of both arrays must be equal!
-	 */
-	// FIXME: Should we remove this method as well? or it is better to keep if for easy way to set attributes in bulk?
-	public @NonNull Element setAttributes(@NonNull String[] names, @NonNull String[] values) {
-		attributes = new HashMap<>(names.length);
-		for (int i = 0; i < names.length; i++) {
-			setAttribute(names[i], values[i]);
 		}
 		return this;
 	}
@@ -590,7 +562,7 @@ public class Element
 	 * Method removes attribute
 	 */
 	public void removeAttribute(@NonNull String name) {
-		if (attributes != null) {
+		if (attributes != ATTRIBUTES_EMPTY) {
 			if (ATTR_XMLNS_KEY.equals(name)) {
 				xmlns = null;
 			}
@@ -662,7 +634,7 @@ public class Element
 	public @NonNull Element setAttribute(@NonNull String name, @NonNull String value) {
 		Objects.requireNonNull(name, "Attribute name cannot be null.");
 		Objects.requireNonNull(value, "Attribute value cannot be null.");
-		if (attributes == null) {
+		if (attributes == ATTRIBUTES_EMPTY) {
 			attributes = new HashMap<>(5);
 		}
 		String n = attributesDeduplicationFn.apply(name, name);
@@ -688,7 +660,7 @@ public class Element
 	 */
 	public void toString(StringBuilder result) {
 		result.append("<").append(name);
-		if (attributes != null) {
+		if (!attributes.isEmpty()) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
 			}
@@ -711,7 +683,7 @@ public class Element
 		StringBuilder result = new StringBuilder();
 
 		result.append("<").append(name);
-		if (attributes != null) {
+		if (!attributes.isEmpty()) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
 			}
@@ -738,7 +710,7 @@ public class Element
 		StringBuilder result = new StringBuilder();
 
 		result.append("<").append(name);
-		if (attributes != null) {
+		if (!attributes.isEmpty()) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
 			}
@@ -775,7 +747,7 @@ public class Element
 	 */
 	public void toStringSecure(StringBuilder result) {
 		result.append("<").append(name);
-		if (attributes != null) {
+		if (!attributes.isEmpty()) {
 			for (String key : attributes.keySet()) {
 				result.append(" ").append(key).append("=\"").append(attributes.get(key)).append("\"");
 			}
