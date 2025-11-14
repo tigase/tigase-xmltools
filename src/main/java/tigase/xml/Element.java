@@ -74,6 +74,7 @@ public class Element
 	private static final String ATTR_XMLNS_KEY = "xmlns";
 
 	private static final Map<String,String> ATTRIBUTES_EMPTY = Collections.emptyMap();
+	private static final List<XMLNodeIfc> NODES_EMPTY = Collections.emptyList();
 
 	// Function used for deduplication of element names to reduce memory usage when a lot of elements may contain
 	// the same name
@@ -95,7 +96,7 @@ public class Element
 	private @NonNull Map<String, String> attributes = Collections.emptyMap();
 
 	// List of nodes (Element or CData)
-	private List<XMLNodeIfc> nodes = null;
+	private @NonNull List<XMLNodeIfc> nodes = NODES_EMPTY;
 
 	// Element name
 	private final String name;
@@ -115,7 +116,7 @@ public class Element
 		this.name = src.name;
 
 		this.xmlns = src.xmlns;
-		if (src.nodes != null) {
+		if (!src.nodes.isEmpty()) {
 			this.nodes = new ArrayList<>(src.nodes);
 		}
 	}
@@ -155,7 +156,7 @@ public class Element
 	 */
 	public @NonNull Element addChildren(@NonNull List<Element> children) {
 		Objects.requireNonNull(children, "List of children cannot be null.");
-		if (this.nodes == null) {
+		if (this.nodes == NODES_EMPTY) {
 			this.nodes = new ArrayList<>(children.size());
 		}
 		for (XMLNodeIfc child : children) {
@@ -166,7 +167,7 @@ public class Element
 	}
 
 	private void addNode(@NonNull XMLNodeIfc node) {
-		if (nodes == null) {
+		if (nodes == NODES_EMPTY) {
 			this.nodes = new ArrayList<>();
 		}
 		nodes.add(node);
@@ -176,13 +177,11 @@ public class Element
 	 * Serialize subnodes to passed builder
 	 */
 	public void nodesToString(@NonNull StringBuilder result) {
-		if (nodes != null) {
-			for (XMLNodeIfc node : nodes) {
-				if (node instanceof Element) {
-					((Element) node).toString(result);
-				} else {
-					result.append(node.toString());
-				}
+		for (XMLNodeIfc node : nodes) {
+			if (node instanceof Element) {
+				((Element) node).toString(result);
+			} else {
+				result.append(node.toString());
 			}
 		}
 	}
@@ -191,10 +190,8 @@ public class Element
 	 * Serialize subnodes as a formatted string
 	 */
 	public void nodesToStringPretty(@NonNull StringBuilder result) {
-		if (nodes != null) {
-			for (XMLNodeIfc node : nodes) {
-				result.append(node.toStringPretty());
-			}
+		for (XMLNodeIfc node : nodes) {
+			result.append(node.toStringPretty());
 		}
 	}
 	
@@ -202,13 +199,11 @@ public class Element
 	 * Serialize subnodes to passed builder as a secure string
 	 */
 	public void nodesToStringSecure(@NonNull StringBuilder result) {
-		if (nodes != null) {
-			for (XMLNodeIfc node : nodes) {
-				if (node instanceof Element) {
-					((Element) node).toStringSecure(result);
-				} else {
-					result.append(node.toStringSecure());
-				}
+		for (XMLNodeIfc node : nodes) {
+			if (node instanceof Element) {
+				((Element) node).toStringSecure(result);
+			} else {
+				result.append(node.toStringSecure());
 			}
 		}
 	}
@@ -237,16 +232,13 @@ public class Element
 	 * Method returns first child which matches predicate
 	 */
 	public @Nullable Element findChild(@NonNull Predicate<Element> predicate) {
-		if (nodes != null) {
-			for (XMLNodeIfc node : nodes) {
-				if (!(node instanceof Element)) {
-					continue;
-				}
+		for (XMLNodeIfc node : nodes) {
+			if (!(node instanceof Element el)) {
+				continue;
+			}
 
-				Element el = (Element) node;
-				if (predicate.test(el)) {
-					return el;
-				}
+			if (predicate.test(el)) {
+				return el;
 			}
 		}
 
@@ -295,7 +287,7 @@ public class Element
 	 * Method returns list of children matching predicate
 	 */
 	public @NonNull List<Element> findChildren(@NonNull Predicate<Element> predicate) {
-		if (nodes != null) {
+		if (!nodes.isEmpty()) {
 			LinkedList<Element> result = new LinkedList<Element>();
 			forEachChild(el -> {
 				if (predicate.test(el)) {
@@ -385,7 +377,7 @@ public class Element
 	 * Method returns list of all children
 	 */
 	public @NonNull List<Element> getChildren() {
-		if (nodes != null) {
+		if (nodes != NODES_EMPTY) {
 			ArrayList<Element> result = new ArrayList<>();
 			forEachChild(result::add);
 			return result;
@@ -578,9 +570,9 @@ public class Element
 	public boolean removeChild(@NonNull Element child) {
 		boolean res = false;
 
-		if (nodes != null) {
+		if (nodes != NODES_EMPTY) {
 			res = nodes.remove(child);
-		}    // end of if (children == null)
+		}
 
 		return res;
 	}
@@ -666,7 +658,7 @@ public class Element
 			}
 		}
 
-		if (nodes != null && !nodes.isEmpty()) {
+		if (!nodes.isEmpty()) {
 			result.append(">");
 			nodesToString(result);
 			result.append("</").append(name).append(">");
@@ -689,7 +681,7 @@ public class Element
 			}
 		}
 
-		if (nodes != null && !nodes.isEmpty()) {
+		if (!nodes.isEmpty()) {
 			result.append(">");
 			result.append("\n");
 			nodesToString(result);
@@ -720,9 +712,7 @@ public class Element
 
 		if (cdata != null) {
 			result.append(">");
-			if (cdata != null) {
-				result.append(cdata);
-			}
+			result.append(cdata);
 			result.append("</").append(name).append(">");
 		} else {
 			result.append("/>");
@@ -753,7 +743,7 @@ public class Element
 			}
 		}
 
-		if (nodes != null && !nodes.isEmpty()) {
+		if (!nodes.isEmpty()) {
 			result.append(">");
 			nodesToStringSecure(result);
 			result.append("</").append(name).append(">");
@@ -768,15 +758,13 @@ public class Element
 	public String cdataToString() {
 		StringBuilder result = new StringBuilder();
 
-		if (nodes != null) {
-			for (XMLNodeIfc node : nodes) {
-				if (node instanceof CData) {
-					result.append(node.toString());
-				}
+		for (XMLNodeIfc node : nodes) {
+			if (node instanceof CData) {
+				result.append(node.toString());
 			}
 		}
 
-		return (result.length() > 0) ? result.toString() : null;
+		return (!result.isEmpty()) ? result.toString() : null;
 	}
 
 }
