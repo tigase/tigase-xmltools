@@ -839,6 +839,7 @@ public class Element
 		return res;
 	}
 
+	@Deprecated
 	public void setAttributeStaticStr(String elementPath[], String att_name, String att_value) {
 		Element child = findChildStaticStr(elementPath);
 
