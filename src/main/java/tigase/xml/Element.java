@@ -93,7 +93,7 @@ public class Element
 			.stream()
 			.collect(Collectors.toMap(Function.identity(), Function.identity()))::getOrDefault;
 	// Map of attributes
-	private @NonNull Map<String, String> attributes = Collections.emptyMap();
+	private @NonNull Map<String, String> attributes = ATTRIBUTES_EMPTY;
 
 	// List of nodes (Element or CData)
 	private @NonNull List<XMLNodeIfc> nodes = NODES_EMPTY;
