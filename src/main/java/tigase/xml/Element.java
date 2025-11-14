@@ -434,7 +434,7 @@ public class Element
 
 	@Override
 	public int hashCode() {
-		return toStringNoChildren().hashCode();
+		return Objects.hashCode(name) + Objects.hashCode(xmlns) + Objects.hashCode(attributes);
 	}
 
 	/**
