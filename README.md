@@ -2,7 +2,6 @@
     <img src="https://github.com/tigaseinc/website-assets/blob/master/tigase/images/xml-96.png?raw=true"/>
     <br/>
     <img src="https://github.com/tigaseinc/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true" width="25px"/>
-    <img src="https://tc.tigase.net/app/rest/builds/buildType:(id:TigaseUtils_Build)/statusIcon" width="100"/>
 </p>
 
 (project currently available under our own, self-hosted 1dev: https://forge.tigase.net/projects/25/)
@@ -21,11 +20,10 @@ Tigase XML Tools are used for fast and low resource XML parsing in [Tigase XMPP 
 
 When looking for support, please first search for answers to your question in the available online channels:
 
-* Our online documentation: [Tigase Docs](https://docs.tigase.net/tigase-xmltools/4.0.0/Tigase_XML_Tools_Guide/html/)
-* Our online forums: [Tigase Forums](https://help.tigase.net/portal/community)
-* Our online Knowledge Base [Tigase KB](https://help.tigase.net/portal/kb)
+* Our online documentation: [Tigase Docs](https://docs.tigase.net)
+* Existing issues in relevant project, for Tigase Server it's: [Tigase XMPP Server GitHub issues](https://github.com/tigase/tigase-server/issues)
 
-If you didn't find an answer in the resources above, feel free to open a [support ticket](https://help.tigase.net/portal/newticket).
+If you didn't find an answer in the resources above, feel free to submit your question as [new issue on GitHub](https://github.com/tigase/tigase-server/issues) or, if you have valid support subscription, open [new support ticket](https://tigase.net/technical-support).
 
 # Downloads
 
